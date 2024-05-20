@@ -6,6 +6,18 @@ namespace MapGeneratorTool
 	{
 		ReadTextureFromFile(filename);
 	}
+
+	//Texture& Texture::operator =(const Texture& other)
+	//{
+	//	if (this == &other) {
+	//		return *this; // Handle self-assignment
+	//	}
+
+	//	m_width = other.m_width;
+	//	m_height = other.m_height;
+	//	m_name = other.m_name;
+	//	m_buffer = other.m_buffer;
+	//}
 	void Texture::ReadTextureFromFile(const char* filename)
 	{
 		//m_buffer = textureHandler::decodeOneStep(filename, m_width, m_height);

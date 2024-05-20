@@ -1,12 +1,18 @@
 #include "HeightMap.h"
 namespace MapGeneratorTool
 {
-	HeightMap::HeightMap(unsigned width, unsigned height, const char* name, double noiseScale, const siv::PerlinNoise& noise) 
-		: m_texture(width, height, name), m_noiseScale(noiseScale), m_noise(noise)
+	HeightMap::HeightMap(unsigned width, unsigned height, const char* name, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
+		: m_texture(width, height, name), m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)
 	{
-		CreateHeightMap(width, height, noiseScale, noise);
+		m_noiseValues = CreateHeightMap(width, height, noiseScale, noise, specs);
 	}
 		
+	HeightMap::HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
+		: m_texture(texture), m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)
+	{
+
+	}
+
 	HeightMap::~HeightMap()
 	{
 
@@ -33,23 +39,59 @@ namespace MapGeneratorTool
 		m_texture.WriteTextureToFile();
 	}
 
-	void HeightMap::CreateHeightMap(unsigned width, unsigned height, double noiseScale, const siv::PerlinNoise& noise)
+	void HeightMap::RegenerateHeightMap(double noiseScale, const NoiseSpecs& specs)
+	{
+		m_noiseSpecs = specs;
+		m_noiseScale = noiseScale;
+		m_noiseValues = CreateHeightMap(m_texture.width(), m_texture.height(), noiseScale, m_noise, m_noiseSpecs);
+	}
+
+	std::vector<double> HeightMap::CreateHeightMap(unsigned width, unsigned height, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
     {
+		std::vector<double> heightMap(width * height);
 		if (noiseScale <= 0)
 		{
 			noiseScale = 0.0001f;
 		}
+
+		float minNoise = 40000.f;
+		float maxNoise = -40000.f;
+
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				double xSample = (double)x / noiseScale;
-				double ySample = (float)y / noiseScale;
+				float amplitude = 1;
+				float frequency = 1;
+				float noiseHeight = 0;
+				for (int i = 0; i < specs.m_octaves; i++)
+				{
+					double xSample = (double)x / noiseScale * frequency;
+					double ySample = (float)y / noiseScale * frequency;
 
-				m_noiseValues[y * width + x] = noise.noise2D_01(xSample, ySample);
+					noiseHeight += noise.noise2D(xSample, ySample);
+					amplitude *= specs.m_persistance;
+					frequency *= specs.m_lacunarity;
+				}
+
+				if (noiseHeight > maxNoise)
+					maxNoise = noiseHeight;
+				else if (noiseHeight < minNoise)
+					minNoise = noiseHeight;
+
+				heightMap[y * width + x] = noiseHeight;
 			}
 		}
-		
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				heightMap[y * width + x] = inverseLerp(minNoise, maxNoise, heightMap[y * width + x]);
+			}
+		}
+
+		return heightMap;
     }
 
 

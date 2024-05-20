@@ -55,13 +55,19 @@ namespace MapGeneratorTool
 		//MapGeneratorTool::textureHandler::encodeOneStep("lookup.png", image, width, height);
 		//MapGeneratorTool::textureHandler::encodeOneStep("terrain.png", image, width, height);
 
-		const siv::PerlinNoise::seed_type seed = 127856u;
+		const siv::PerlinNoise::seed_type seed = 1256u;
 
 		const siv::PerlinNoise perlin{ seed };
 
-		HeightMap map = HeightMap(width, height, "TestHM.png", 24, perlin);
+		//HeightMap map = HeightMap(width, height, "TestHM- Lacunarity2.png", 302.46, perlin, NoiseSpecs(1, 1, 1));
+		HeightMap map1 = HeightMap(width, height, "TestHM2-Lacunarity4.png", 300.46, perlin, NoiseSpecs(2, 0.5, 3));
+		//HeightMap map2 = HeightMap(width, height, "TestHM3-Lacunarity16.png", 27.6, perlin, NoiseSpecs(16, 0.5, 8));
+		//HeightMap map3 = HeightMap(width, height, "TestHM4Lacunarity32.png", 27.6, perlin, NoiseSpecs(32, 0.5, 3));
 		//MapGeneratorTool::textureHandler::encodeOneStep("heightMap.png", image, width, height); 
-		map.SaveHeightMapToFile();
+		map1.SaveHeightMapToFile();
+		//map1.SaveHeightMapToFile();
+		//map2.SaveHeightMapToFile();
+		//map3.SaveHeightMapToFile();
 	}
 
 

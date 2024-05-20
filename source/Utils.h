@@ -86,6 +86,11 @@ namespace MapGeneratorTool
 		}
 
 
+		static float inverseLerp(float xx, float yy, float value)
+		{
+			return (value - xx) / (yy - xx);
+		}
+
 		static const Color operator *(const Color& color, float scale)
 		{
 			return Color(color.R * scale, color.G * scale, color.B * scale, color.A);
