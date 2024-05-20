@@ -1,4 +1,4 @@
-#include "../headers/SimpleVoronoiDiagram.h"
+#include "SimpleVoronoiDiagram.h"
 #include <unordered_set>
 #include <cassert>
 namespace MapGeneratorTool

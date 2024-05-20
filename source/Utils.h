@@ -41,7 +41,7 @@ namespace MapGeneratorTool
 			uint8_t A;
 
 			Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : R(r), G(g), B(b), A(a) {};
-			Color() : R(255), G(255), B(255), A(0) {};
+			Color() : R(255), G(255), B(255), A(255) {};
 			Color(const Color& color)
 			{
 				*this = color;
@@ -54,11 +54,21 @@ namespace MapGeneratorTool
 				this->G = other.G;
 				this->B = other.B;
 				this->A = other.A;
+				return *this;
 			}
 			bool operator==(const Color& other) const
 			{
 				return R == other.R && G == other.G && B == other.B && A == other.A;
 			}
+
+		/*	Color& operator*=(float scale)
+			{
+
+				this->R *= scale;
+				this->G *= scale;
+				this->B *= scale;
+				return *this;
+			}*/
 
 			void RandColor()
 			{
@@ -69,11 +79,20 @@ namespace MapGeneratorTool
 			}
 		};
 
+
 		static float distanceSquared(const Point& a, const Point& b)
 		{
 			return pow(a.X - b.X, 2) + pow(a.Y - b.Y, 2);
 		}
+
+
+		static const Color operator *(const Color& color, float scale)
+		{
+			return Color(color.R * scale, color.G * scale, color.B * scale, color.A);
+		}
 	}
+
+
 }
 
 

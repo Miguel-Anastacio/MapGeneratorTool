@@ -26,16 +26,13 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) #link time optimization
 
 project ("MapGeneratorTool")
-add_subdirectory(lodepng)
+add_subdirectory(thirdparty/lodepng)
 
 # Add source to this project's executable.
 
-file(GLOB SOURCES
-    headers/*.h
-    source/*.cpp
-)
+file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
-add_executable(MapGeneratorTool ${SOURCES}) 
+add_executable(MapGeneratorTool) 
 
 if(PRODUCTION_BUILD)
 	# setup the ASSETS_PATH macro to be in the root folder of your exe
@@ -51,6 +48,11 @@ else()
 
 endif()
 
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
+
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/map/")
 
 target_link_libraries(MapGeneratorTool PUBLIC lodepng) 
 
