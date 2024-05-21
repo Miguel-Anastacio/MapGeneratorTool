@@ -79,6 +79,30 @@ namespace MapGeneratorTool
 			}
 		};
 
+		class Dimensions
+		{
+		public:
+			Dimensions(unsigned width, unsigned height) : m_width(width), m_height(height) {};
+			Dimensions() : m_width(1), m_height(1) {};
+
+			inline unsigned width()  const {
+				return m_width;
+			}
+			inline unsigned height()  const {
+				return m_height;
+			}
+
+		protected:
+			inline void setDimensions(unsigned width, unsigned height) {
+				m_width = width;
+				m_height = height;
+			}
+
+		private:
+			unsigned m_width;
+			unsigned m_height;
+
+		};
 
 		static float distanceSquared(const Point& a, const Point& b)
 		{
@@ -104,7 +128,7 @@ namespace MapGeneratorTool
 namespace std {
 	template <>
 	struct hash<MapGeneratorTool::Utils::Point> {
-		std::size_t operator()(const MapGeneratorTool::Utils::Point& point) const 
+		std::size_t operator()(const MapGeneratorTool::Utils::Point& point) const
 		{
 			return std::hash<int>()(point.X) ^ (std::hash<int>()(point.Y) << 1);
 		}

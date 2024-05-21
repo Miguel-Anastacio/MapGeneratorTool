@@ -1,14 +1,16 @@
 #pragma once
 #include <vector>
+#include "../Utils.h"
 namespace MapGeneratorTool
 {
-	class Texture
+	using namespace Utils;
+	class Texture : public Dimensions
 	{
 	public:
 		Texture(unsigned width, unsigned height, const char* name) :
-			m_width(width), m_height(height), m_name(name), m_buffer(width* height * 4) {};
+			Dimensions(width, height), m_name(name), m_buffer(width* height * 4) {};
 		Texture(const char* filename);
-		Texture(const Texture& other) : m_width(other.m_width), m_height(other.m_height), m_name(other.m_name), m_buffer(other.m_buffer) {};
+		Texture(const Texture& other) : Dimensions(other.width(), other.height()), m_name(other.m_name), m_buffer(other.m_buffer) {};
 		~Texture() {};
 
 		void ReadTextureFromFile(const char* filename);
@@ -18,18 +20,13 @@ namespace MapGeneratorTool
 		inline void SetBuffer(const std::vector<uint8_t>& buffer) {
 			m_buffer = buffer;
 		}
-
-		inline unsigned width()  const {
-			return m_width;
-		}
-		inline unsigned height()  const{
-			return m_height;
+		inline std::vector<uint8_t> GetBuffer() const{
+			return m_buffer;
 		}
 
 		//Texture& operator =(const Texture& other);
 	private:
-		unsigned m_width;
-		unsigned m_height;
+;
 		const char* m_name;
 		std::vector<uint8_t> m_buffer;
 	};

@@ -1,4 +1,33 @@
+#include <memory>
+#include "../Utils.h"
+#include <algorithm>
+#include <cmath>
+#include <unordered_map>
 namespace MapGeneratorTool
 {
+	class Texture;
+	using namespace Utils;
+	class Map : public Dimensions
+	{
+	public:
+		Map(const char* maskFileName, int seeds, const char* lookUpTextureName);
+		Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName);
+		~Map();
+
+	private:
+		inline int valSeeds(int seeds)
+		{
+			return std::clamp(seeds, 0, static_cast<int>(std::pow(256, 3)));
+		}
+		void CreateLookUpTexture();
+		void CreateLookUpTextureFromMask(const Texture& mask);
+
+		void PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const;
+		std::vector<uint8_t> GenerateMaskData(const Texture& mask) const;
+
+
+		int m_divisions;
+		std::unique_ptr<Texture> m_lookUpTexture;
+	};
 
 }

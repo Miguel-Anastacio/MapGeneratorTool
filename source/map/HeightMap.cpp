@@ -1,17 +1,20 @@
 #include "HeightMap.h"
+#include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
 namespace MapGeneratorTool
 {
-	HeightMap::HeightMap(unsigned width, unsigned height, const char* name, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
-		: m_texture(width, height, name), m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)
+	HeightMap::HeightMap(unsigned width, unsigned height, const char* name, double noiseScale, const FastNoiseLite& noise, const NoiseSpecs& specs)
+		: m_texture(std::make_unique<Texture>(width, height, name))/*, 
+		m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)*/
 	{
 		m_noiseValues = CreateHeightMap(width, height, noiseScale, noise, specs);
+		SaveHeightMapToFile();
 	}
 		
-	HeightMap::HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
-		: m_texture(texture), m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)
-	{
+	//HeightMap::HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
+	//	: m_texture(texture), m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)
+	//{
 
-	}
+	//}
 
 	HeightMap::~HeightMap()
 	{
@@ -20,8 +23,8 @@ namespace MapGeneratorTool
 
 	void HeightMap::SaveHeightMapToFile()
 	{
-		unsigned width = m_texture.width();
-		unsigned height = m_texture.height();
+		unsigned width = m_texture->width();
+		unsigned height = m_texture->height();
 		std::vector<uint8_t> image(width * height * 4);
 		for (int y = 0; y < height; y++)
 		{
@@ -35,18 +38,19 @@ namespace MapGeneratorTool
 			}
 		}
 
-		m_texture.SetBuffer(image);
-		m_texture.WriteTextureToFile();
+		m_texture->SetBuffer(image);
+		m_texture->WriteTextureToFile();
 	}
 
-	void HeightMap::RegenerateHeightMap(double noiseScale, const NoiseSpecs& specs)
+	void HeightMap::RegenerateHeightMap(double noiseScale, const FastNoiseLite& noise, const NoiseSpecs& specs)
 	{
-		m_noiseSpecs = specs;
-		m_noiseScale = noiseScale;
-		m_noiseValues = CreateHeightMap(m_texture.width(), m_texture.height(), noiseScale, m_noise, m_noiseSpecs);
+		//m_noiseSpecs = specs;
+		//m_noiseScale = noiseScale;
+		m_noiseValues = CreateHeightMap(m_texture->width(), m_texture->height(), noiseScale, noise, specs);
+		SaveHeightMapToFile();
 	}
 
-	std::vector<double> HeightMap::CreateHeightMap(unsigned width, unsigned height, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
+	std::vector<double> HeightMap::CreateHeightMap(unsigned width, unsigned height, double noiseScale, const FastNoiseLite& noise, const NoiseSpecs& specs)
     {
 		std::vector<double> heightMap(width * height);
 		if (noiseScale <= 0)
@@ -64,14 +68,15 @@ namespace MapGeneratorTool
 				float amplitude = 1;
 				float frequency = 1;
 				float noiseHeight = 0;
-				for (int i = 0; i < specs.m_octaves; i++)
+
+				for (int i = 0; i < specs.octaves(); i++)
 				{
 					double xSample = (double)x / noiseScale * frequency;
 					double ySample = (float)y / noiseScale * frequency;
 
-					noiseHeight += noise.noise2D(xSample, ySample);
-					amplitude *= specs.m_persistance;
-					frequency *= specs.m_lacunarity;
+					noiseHeight += noise.GetNoise(xSample, ySample);
+					amplitude *= specs.persistance();
+					frequency *= specs.lacunarity();
 				}
 
 				if (noiseHeight > maxNoise)

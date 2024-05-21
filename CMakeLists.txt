@@ -23,10 +23,12 @@ option(PRODUCTION_BUILD "Make this a production build" OFF)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) #link time optimization
+#set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) #link time optimization
 
 project ("MapGeneratorTool")
 add_subdirectory(thirdparty/lodepng)
+add_subdirectory(thirdparty/fastNoiseLite)
+
 
 # Add source to this project's executable.
 
@@ -54,7 +56,9 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURC
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/map/")
 
-target_link_libraries(MapGeneratorTool PUBLIC lodepng) 
+target_link_libraries(MapGeneratorTool PUBLIC lodepng)
+target_link_libraries(MapGeneratorTool PUBLIC fastNoiseLite)
+
 
 
 

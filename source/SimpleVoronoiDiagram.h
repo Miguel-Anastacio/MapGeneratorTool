@@ -13,5 +13,6 @@ namespace MapGeneratorTool
 		std::unordered_map<Point, Color> GenerateColorMap(const std::vector<Point>& seeds);
 
 		std::vector<Point> GenerateDiagram(const std::vector<Point>& seeds, int width, int height);
+		std::vector<Point> GenerateDiagramFromMask(const std::vector<Point>& seeds, int width, int height, const std::vector<uint8_t> mask);
 	}
 }

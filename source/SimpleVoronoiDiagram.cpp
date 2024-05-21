@@ -66,6 +66,43 @@ namespace MapGeneratorTool
 			return diagram;
 		}
 
+		std::vector<Point> GenerateDiagramFromMask(const std::vector<Point>& seeds, int width, int height, const std::vector<uint8_t> mask)
+		{
+			std::vector<Point> diagram(width * height);
+			for (int y = 0; y < height; y++)
+			{
+				for (int x = 0; x < width; x++)
+				{
+					// point type
+					int type = mask[y * width + x];
+					float minDist = std::numeric_limits<float>::max();
+					Point closestSeed(-100, -100);
+					for (size_t i = 0; i < seeds.size(); ++i)
+					{
+						float dist = distanceSquared(Point(x, y), seeds[i]);
+
+						// seed point type
+						int seedType = mask[seeds[i].Y * width + seeds[i].X];
+
+						if (dist < minDist && type == seedType)
+						{
+							minDist = dist;
+							closestSeed = seeds[i];
+						}
+					}
+
+					diagram[width * y + x] = closestSeed;
+				}
+			}
+
+			for (const auto& test : diagram)
+			{
+				assert(test != Point(-100, -100));
+			}
+
+			return diagram;
+		}
+
 
 		//std::vector<
 	}

@@ -20,15 +20,17 @@ namespace MapGeneratorTool
 	//}
 	void Texture::ReadTextureFromFile(const char* filename)
 	{
-		//m_buffer = textureHandler::decodeOneStep(filename, m_width, m_height);
+		unsigned width = 0, height = 0;
+		m_buffer = textureHandler::decodeOneStep(filename, width, height);
+		setDimensions(width, height);
 	}
 	void Texture::WriteTextureToFile(const char* filename) const
 	{
-		textureHandler::encodeOneStep(filename, m_buffer, m_width, m_height);
+		textureHandler::encodeOneStep(filename, m_buffer, width(), height());
 	}
 	void Texture::WriteTextureToFile() const
 	{
-		textureHandler::encodeOneStep(m_name, m_buffer, m_width, m_height);
+		textureHandler::encodeOneStep(m_name, m_buffer, width(), height());
 	}
 	//Texture::Texture(int width, int height, const char* name);
 }
