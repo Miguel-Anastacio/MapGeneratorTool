@@ -1,5 +1,6 @@
 #include "HeightMap.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
+#include "../utils/Point.h"
 namespace MapGeneratorTool
 {
 	HeightMap::HeightMap(unsigned width, unsigned height, const char* name, double noiseScale, const FastNoiseLite& noise, const NoiseSpecs& specs)
@@ -26,9 +27,9 @@ namespace MapGeneratorTool
 		unsigned width = m_texture->width();
 		unsigned height = m_texture->height();
 		std::vector<uint8_t> image(width * height * 4);
-		for (int y = 0; y < height; y++)
+		for (unsigned y = 0; y < height; y++)
 		{
-			for (int x = 0; x < width; x++)
+			for (unsigned x = 0; x < width; x++)
 			{
 				double value = m_noiseValues[width * y + x];
 				image[4 * width * y + 4 * x + 0] = value * 255;

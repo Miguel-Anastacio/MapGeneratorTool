@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include "Utils.h"
+#include "utils/Point.h"
 namespace MapGeneratorTool
 {
 	namespace VoronoiDiagram

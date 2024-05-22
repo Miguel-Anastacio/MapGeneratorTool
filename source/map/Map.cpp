@@ -2,6 +2,7 @@
 #include "../texture/Texture.h"
 #include "../SimpleVoronoiDiagram.h"
 #include "../../thirdparty/lodepng/textureHandler.h"
+
 namespace MapGeneratorTool
 {
 	Map::Map(const char* maskFileName, int seeds, const char* lookUpTextureName)
@@ -65,9 +66,9 @@ namespace MapGeneratorTool
 	{
 		std::vector<uint8_t> maskData(width() * height());
 		const std::vector<uint8_t> bufferMask = mask.GetBuffer();
-		for (int y = 0; y < height(); y++)
+		for (unsigned y = 0; y < height(); y++)
 		{
-			for (int x = 0; x < width(); x++)
+			for (unsigned x = 0; x < width(); x++)
 			{
 				int index = 4 * width() * y + 4 * x;
 				Color maskPixelColor(bufferMask[index], bufferMask[index + 1], bufferMask[index + 2], 255);

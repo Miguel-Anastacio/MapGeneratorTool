@@ -1,5 +1,6 @@
 #include <memory>
 #include "../Utils.h"
+#include"../utils/Point.h"
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
