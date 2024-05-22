@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map>
+#include <vector>
 namespace MapGeneratorTool
 {
 	namespace Utils
@@ -103,6 +105,19 @@ namespace MapGeneratorTool
 			unsigned m_height;
 
 		};
+
+		template<typename K, typename T> 
+		std::vector<T> mapValuesToVector(std::unordered_map<K, T> map)
+		{
+			std::vector<T> values;
+			values.reserve(map.size());
+			for (const auto val : map)
+			{
+				values.push_back(val.second);
+			}
+
+			return values;
+		}
 
 		static float distanceSquared(const Point& a, const Point& b)
 		{

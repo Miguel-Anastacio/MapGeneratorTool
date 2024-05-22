@@ -103,7 +103,34 @@ namespace MapGeneratorTool
 			return diagram;
 		}
 
+		std::vector<Point> ComputeCentroids(const std::vector<Point>& diagram, int width, int height, const std::vector<Point>& seeds)
+		{
+			// map of seeds to centroids
+			std::unordered_map<Point, Point> centroids;
+			std::unordered_map<Point, int> counts;
 
-		//std::vector<
+			// add all positions of each cell
+			for (int y = 0; y < height; y++) 
+			{
+				for (int x = 0; x < width; x++) 
+				{
+					Point seed = diagram[y * width + x];
+					centroids[seed].X += x;
+					centroids[seed].Y += y;
+					counts[seed]++;
+				}
+			}
+
+			// figure out the center of each cell 
+			// by dividing the total addition of each cell by the total number of points
+			for (auto& centroid : centroids) 
+			{
+				centroid.second.X /= counts[centroid.first];
+				centroid.second.Y /= counts[centroid.first];
+			}
+
+			return mapValuesToVector(centroids);
+		}
+
 	}
 }

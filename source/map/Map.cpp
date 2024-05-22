@@ -1,6 +1,7 @@
 #include "Map.h"
 #include "../texture/Texture.h"
 #include "../SimpleVoronoiDiagram.h"
+#include "../../thirdparty/lodepng/textureHandler.h"
 namespace MapGeneratorTool
 {
 	Map::Map(const char* maskFileName, int seeds, const char* lookUpTextureName)
@@ -29,17 +30,27 @@ namespace MapGeneratorTool
 
 	void Map::CreateLookUpTexture()
 	{
-		const std::vector<Point> seeds = VoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
+		std::vector<Point> seeds = VoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
+		int iterations = 2;
+		for (int i = 0; i < iterations; i++)
+		{
+			const std::vector<Point> diagram = VoronoiDiagram::GenerateDiagram(seeds, width(), height());
+			seeds = VoronoiDiagram::ComputeCentroids(diagram, width(), height(), seeds);
+		}
+
+		const std::vector<Point> finalDiagram = VoronoiDiagram::GenerateDiagram(seeds, width(), height());
 		const std::unordered_map<Point, Color> colorMap = VoronoiDiagram::GenerateColorMap(seeds);
-		const std::vector<Point> diagram = VoronoiDiagram::GenerateDiagram(seeds, width(), height());
 		
-		PopulateTexture(colorMap, diagram, m_lookUpTexture.get());
+		PopulateTexture(colorMap, finalDiagram, m_lookUpTexture.get());
+		OutputSeedPoints(seeds);
+
+
+
 	}
 
 	void Map::CreateLookUpTextureFromMask(const Texture& mask)
 	{
-		//unsigned width = width();
-		std::vector<uint8_t> maskData = GenerateMaskData(mask);
+		const std::vector<uint8_t> maskData = GenerateMaskData(mask);
 		
 		const std::vector<Point> seeds = VoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
 		const std::vector<Point> diagram = VoronoiDiagram::GenerateDiagramFromMask(seeds, width(), height(), maskData);
@@ -47,6 +58,7 @@ namespace MapGeneratorTool
 		const std::unordered_map<Point, Color> colorMap = VoronoiDiagram::GenerateColorMap(seeds);
 
 		PopulateTexture(colorMap, diagram, m_lookUpTexture.get());
+		OutputSeedPoints(seeds);
 	}
 
 	std::vector<uint8_t> Map::GenerateMaskData(const Texture& mask) const
@@ -76,6 +88,33 @@ namespace MapGeneratorTool
 		return maskData;
 	}
 
+	void Map::OutputSeedPoints(const std::vector<Point>& seeds) const
+	{
+		std::vector<uint8_t> image(width() * height() * 4);
+		for (int y = 0; y < height(); y++)
+		{
+			for (int x = 0; x < width(); x++)
+			{
+				image[4 * width() * y + 4 * x + 0] = 0;
+				image[4 * width() * y + 4 * x + 1] = 0;
+				image[4 * width() * y + 4 * x + 2] = 0;
+				image[4 * width() * y + 4 * x + 3] = 255;
+			}
+		}
+
+		for (auto& pt : seeds)
+		{
+			int index = 4 * width() * pt.Y + 4 * pt.X;
+			image[index] = 255;
+			image[index+1] = 0;
+			image[index+2] = 0;
+			image[index+3] = 255;
+		}
+
+		textureHandler::encodeOneStep("seeds.png", image, width(), height());
+
+	}
+
 	void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const
 	{
 		std::vector<uint8_t> image(width() * height() * 4);
@@ -92,5 +131,6 @@ namespace MapGeneratorTool
 		}
 
 		texture->SetBuffer(image);
+
 	}
 }

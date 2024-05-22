@@ -14,5 +14,7 @@ namespace MapGeneratorTool
 
 		std::vector<Point> GenerateDiagram(const std::vector<Point>& seeds, int width, int height);
 		std::vector<Point> GenerateDiagramFromMask(const std::vector<Point>& seeds, int width, int height, const std::vector<uint8_t> mask);
+
+		std::vector<Point> ComputeCentroids(const std::vector<Point>& diagram, int width, int height, const std::vector<Point>& seeds);
 	}
 }

@@ -24,7 +24,7 @@ namespace MapGeneratorTool
 
 		void PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const;
 		std::vector<uint8_t> GenerateMaskData(const Texture& mask) const;
-
+		void OutputSeedPoints(const std::vector<Point>& seeds) const;
 
 		int m_divisions;
 		std::unique_ptr<Texture> m_lookUpTexture;
