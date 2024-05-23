@@ -66,6 +66,8 @@ public:
         return mNeighbors[i];
     }
 
+ 
+
 private:
     std::vector<std::vector<std::size_t>> mNeighbors;
 };

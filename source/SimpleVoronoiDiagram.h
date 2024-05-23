@@ -4,20 +4,35 @@
 #include "Utils.h"
 #include "utils/Point.h"
 #include "utils/Color.h"
+#include "texture/Texture.h"
+#include "MyGAL/Diagram.h"
 namespace MapGeneratorTool
 {
 	namespace SimpleVoronoiDiagram
 	{
-		using namespace Utils;
+	using namespace Utils;
+	using ::std::vector;
+	using ::std::unordered_map;
 
-		std::vector<Utils::Point> GenerateSeeds(int numberOfSeeds, int width, int height);
+	vector<Utils::Point> GenerateSeeds(int numberOfSeeds, int width, int height);
+	unordered_map<Utils::Point, Utils::Color> GenerateColorMap(const vector<Point>& seeds);
 
-		std::unordered_map<Point, Color> GenerateColorMap(const std::vector<Point>& seeds);
+	vector<Point> GenerateDiagram(const vector<Point>& seeds, int width, int height);
 
-		std::vector<Point> GenerateDiagram(const std::vector<Point>& seeds, int width, int height);
+	vector<Point> GenerateDiagramFromMask(const vector<Point>& seeds, int width, int height, const vector<uint8_t> mask);
 
-		std::vector<Point> GenerateDiagramFromMask(const std::vector<Point>& seeds, int width, int height, const std::vector<uint8_t> mask);
+	vector<Point> ComputeCentroids(const vector<Point>& diagram, int width, int height, const vector<Point>& seeds);
 
-		std::vector<Point> ComputeCentroids(const std::vector<Point>& diagram, int width, int height, const std::vector<Point>& seeds);
+	template <typename T>
+	void WriteDiagramToTexture(const Texture& texture, mygal::Diagram<T>& diagram);
+
+	template<typename T>
+	void WriteDiagramToTexture(const Texture& texture, mygal::Diagram<T>& diagram)
+	{
+
 	}
+
+	}
+
+	
 }

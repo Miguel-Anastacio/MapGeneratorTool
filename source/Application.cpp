@@ -6,11 +6,17 @@
 #include "HeightMap.h"
 #include "texture/Texture.h"
 #include "../map/Map.h"
-#include "MyGAL/FortuneAlgorithm.h"
-#include "MyGAL/Vector2.h"
+#include <SFML/Graphics.hpp>
 namespace MapGeneratorTool
 {
 	using namespace Utils;
+
+
+
+
+
+
+
 	void Run() 
 	{
 		std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -41,11 +47,14 @@ namespace MapGeneratorTool
 		//VoronoiDiagram diagram = FortuneAlgo::generateRandomDiagram(seedsNumber);
 		//FortuneAlgo::drawDiagram(diagram);
 		//Map mapWithMask = Map("mask.png", seedsNumber, "lookup3mask.png");
-		auto points = std::vector<mygal::Vector2<double>>
-		{
-			{0.354, 0.678}, {0.632, 0.189}, {0.842, 0.942}
-		};
-		mygal::FortuneAlgorithm<double> diagram(points);
+
+
+		auto points = generatePoints<double>(1000);
+		mygal::Diagram diagram = generateDiagram(points);
+		auto polygons = diagram.GetPolygons();
+		drawPolygons(polygons);
+
+
 
 	}
 

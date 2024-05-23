@@ -485,6 +485,43 @@ private:
     {
         mHalfEdges.erase(halfEdge->it);
     }
+
+public:
+    std::vector<std::vector<Vector2<T>>> GetPolygons()
+    {
+        std::vector<std::vector<Vector2<T>>> polygons;
+        constexpr double Offset = 1.0f;
+        for (const auto& site : getSites())
+        {
+            polygons.emplace_back(std::vector<Vector2<T>>());
+            Vector2 center = site.point;
+            auto face = site.face;
+            auto halfEdge = face->outerComponent;
+            if (halfEdge == nullptr)
+                continue;
+            while (halfEdge->prev != nullptr)
+            {
+                halfEdge = halfEdge->prev;
+                if (halfEdge == face->outerComponent)
+                    break;
+            }
+            auto start = halfEdge;
+            while (halfEdge != nullptr)
+            {
+                if (halfEdge->origin != nullptr && halfEdge->destination != nullptr)
+                {
+                    auto origin = (halfEdge->origin->point - center) * Offset + center;
+                    auto destination = (halfEdge->destination->point - center) * Offset + center;
+                    polygons.back().push_back(origin);
+                }
+                halfEdge = halfEdge->next;
+                if (halfEdge == start)
+                    break;
+            }
+        }
+
+        return polygons;
+    }
 };
 
 }

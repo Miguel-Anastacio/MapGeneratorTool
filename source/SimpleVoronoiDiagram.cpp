@@ -9,7 +9,7 @@
 #include <random>
 
 namespace MapGeneratorTool
-{
+{	
 	namespace SimpleVoronoiDiagram
 	{
 		using namespace Utils;
@@ -32,8 +32,7 @@ namespace MapGeneratorTool
 				Color color;
 				do {
 					color.RandColor();
-				} 
-				while (colorsInUse.contains(color));
+				} while (colorsInUse.contains(color));
 
 				colorMap.emplace(seeds[i], color);
 
@@ -51,10 +50,10 @@ namespace MapGeneratorTool
 				{
 					float minDist = std::numeric_limits<float>::max();
 					Point closestSeed(-100, -100);
-					for (size_t i = 0; i < seeds.size(); ++i) 
+					for (size_t i = 0; i < seeds.size(); ++i)
 					{
 						float dist = distanceSquared(Point(x, y), seeds[i]);
-						if (dist < minDist) 
+						if (dist < minDist)
 						{
 							minDist = dist;
 							closestSeed = seeds[i];
@@ -117,9 +116,9 @@ namespace MapGeneratorTool
 			std::unordered_map<Point, int> counts;
 
 			// add all positions of each cell
-			for (int y = 0; y < height; y++) 
+			for (int y = 0; y < height; y++)
 			{
-				for (int x = 0; x < width; x++) 
+				for (int x = 0; x < width; x++)
 				{
 					Point seed = diagram[y * width + x];
 					centroids[seed].X += x;
@@ -130,7 +129,7 @@ namespace MapGeneratorTool
 
 			// figure out the center of each cell 
 			// by dividing the total addition of each cell by the total number of points
-			for (auto& centroid : centroids) 
+			for (auto& centroid : centroids)
 			{
 				centroid.second.X /= counts[centroid.first];
 				centroid.second.Y /= counts[centroid.first];
