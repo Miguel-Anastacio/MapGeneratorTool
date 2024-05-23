@@ -2,37 +2,41 @@
 #include "../texture/Texture.h"
 #include "../SimpleVoronoiDiagram.h"
 #include "../../thirdparty/lodepng/textureHandler.h"
+#include "../utils/Renderer.h"
 
 namespace MapGeneratorTool
 {
 
 Map::Map(const char* maskFileName, int seeds, const char* lookUpTextureName)
 	:
-	m_divisions(valSeeds(seeds))
+	m_divisions(valSeeds(seeds)), 
+	m_lookupTextureName(lookUpTextureName),
+	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
 {
 	// read mask
 	const Texture mask = Texture(maskFileName);
-	m_lookUpTexture = std::make_unique<Texture>(mask.width(), mask.height(), lookUpTextureName);
+	//m_lookUpTexture = std::make_unique<Texture>(mask.width(), mask.height(), lookUpTextureName);
 
 	setDimensions(mask.width(), mask.height());
-
 	CreateLookUpTextureFromMask(mask);
 }
 Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName)
-	: Dimensions(width, height), m_lookUpTexture(std::make_unique<Texture>(width, height, lookUpTextureName)),
-	m_divisions(valSeeds(seeds))
+	: Dimensions(width, height), m_lookupTextureName(lookUpTextureName),
+	m_divisions(valSeeds(seeds)),
+	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
 {
-	CreateLookUpTexture();
+	//CreateLookUpTexture();
 }
 
 Map::~Map()
 {
-	m_lookUpTexture->WriteTextureToFile();
+	//m_lookUpTexture->WriteTextureToFile();
+	SaveDiagramToFile();
 }
 
 void Map::CreateLookUpTexture()
 {
-	std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
+	/*std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
 	int iterations = 2;
 	for (int i = 0; i < iterations; i++)
 	{
@@ -44,21 +48,24 @@ void Map::CreateLookUpTexture()
 	const std::unordered_map<Point, Color> colorMap = SimpleVoronoiDiagram::GenerateColorMap(seeds);
 		
 	PopulateTexture(colorMap, finalDiagram, m_lookUpTexture.get());
-	OutputSeedPoints(seeds);
+	OutputSeedPoints(seeds);*/
+
+
+
 
 }
 
 void Map::CreateLookUpTextureFromMask(const Texture& mask)
 {
-	const std::vector<uint8_t> maskData = GenerateMaskData(mask);
-		
-	const std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
-	const std::vector<Point> diagram = SimpleVoronoiDiagram::GenerateDiagramFromMask(seeds, width(), height(), maskData);
+	//const std::vector<uint8_t> maskData = GenerateMaskData(mask);
+	//	
+	//const std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
+	//const std::vector<Point> diagram = SimpleVoronoiDiagram::GenerateDiagramFromMask(seeds, width(), height(), maskData);
 
-	const std::unordered_map<Point, Color> colorMap = SimpleVoronoiDiagram::GenerateColorMap(seeds);
+	//const std::unordered_map<Point, Color> colorMap = SimpleVoronoiDiagram::GenerateColorMap(seeds);
 
-	PopulateTexture(colorMap, diagram, m_lookUpTexture.get());
-	OutputSeedPoints(seeds);
+	////PopulateTexture(colorMap, diagram, m_lookUpTexture.get());
+	//OutputSeedPoints(seeds);
 }
 
 std::vector<uint8_t> Map::GenerateMaskData(const Texture& mask) const
@@ -115,6 +122,13 @@ void Map::OutputSeedPoints(const std::vector<Point>& seeds) const
 
 }
 
+void Map::SaveDiagramToFile()
+{
+	sf::RenderTexture texture;
+	MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), texture, width(), height());
+	saveToFile(texture, m_lookupTextureName);
+}
+
 void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const
 {
 	std::vector<uint8_t> image(width() * height() * 4);
@@ -129,7 +143,6 @@ void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, cons
 			image[4 * width() * y + 4 * x + 3] = 255;
 		}
 	}
-
 	texture->SetBuffer(image);
 
 }

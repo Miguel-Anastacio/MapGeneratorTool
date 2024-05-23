@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
+#include <MyGAL/Diagram.h>
 namespace MapGeneratorTool
 {
 	class Texture;
@@ -28,8 +29,14 @@ namespace MapGeneratorTool
 		std::vector<uint8_t> GenerateMaskData(const Texture& mask) const;
 		void OutputSeedPoints(const std::vector<Point>& seeds) const;
 
+		void SaveDiagramToFile();
+		
+
 		int m_divisions;
-		std::unique_ptr<Texture> m_lookUpTexture;
+		const char* m_lookupTextureName;
+		mygal::Diagram<double> m_diagram;
+
+		//std::unique_ptr<Texture> m_lookUpTexture;
 	};
 
 }

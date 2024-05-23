@@ -2,20 +2,12 @@
 #include "Application.h"
 #include "../thirdparty/lodepng/textureHandler.h"
 #include "../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "SimpleVoronoiDiagram.h"
 #include "HeightMap.h"
 #include "texture/Texture.h"
 #include "../map/Map.h"
-#include <SFML/Graphics.hpp>
 namespace MapGeneratorTool
 {
 	using namespace Utils;
-
-
-
-
-
-
 
 	void Run() 
 	{
@@ -42,17 +34,19 @@ namespace MapGeneratorTool
 		//map2.SaveHeightMapToFile();
 		//map3.SaveHeightMapToFile();
 
-		//Map newMap = Map(width, height, seedsNumber, "lookup3lloyd.png");
+		Map newMap = Map(width, height, seedsNumber, "lookupmyGAl.png");
 		//std::vector<Vector2> points = FortuneAlgo::generatePoints(seedsNumber);
 		//VoronoiDiagram diagram = FortuneAlgo::generateRandomDiagram(seedsNumber);
 		//FortuneAlgo::drawDiagram(diagram);
 		//Map mapWithMask = Map("mask.png", seedsNumber, "lookup3mask.png");
 
 
-		auto points = generatePoints<double>(1000);
+		/*auto points = generatePoints<double>(1000);
 		mygal::Diagram diagram = generateDiagram(points);
 		auto polygons = diagram.GetPolygons();
-		drawPolygons(polygons);
+		drawPolygons(polygons);*/
+
+
 
 
 
