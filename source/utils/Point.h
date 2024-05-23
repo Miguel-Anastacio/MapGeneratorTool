@@ -19,6 +19,8 @@ namespace MapGeneratorTool
 
 				this->X = other.X;
 				this->Y = other.Y;
+
+				return *this;
 			}
 
 			bool operator ==(const Point& other) const

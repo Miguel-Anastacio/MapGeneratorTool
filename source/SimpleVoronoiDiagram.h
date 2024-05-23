@@ -3,9 +3,10 @@
 #include <unordered_map>
 #include "Utils.h"
 #include "utils/Point.h"
+#include "utils/Color.h"
 namespace MapGeneratorTool
 {
-	namespace VoronoiDiagram
+	namespace SimpleVoronoiDiagram
 	{
 		using namespace Utils;
 
@@ -14,6 +15,7 @@ namespace MapGeneratorTool
 		std::unordered_map<Point, Color> GenerateColorMap(const std::vector<Point>& seeds);
 
 		std::vector<Point> GenerateDiagram(const std::vector<Point>& seeds, int width, int height);
+
 		std::vector<Point> GenerateDiagramFromMask(const std::vector<Point>& seeds, int width, int height, const std::vector<uint8_t> mask);
 
 		std::vector<Point> ComputeCentroids(const std::vector<Point>& diagram, int width, int height, const std::vector<Point>& seeds);

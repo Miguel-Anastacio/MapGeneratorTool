@@ -12,6 +12,14 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
+include(FetchContent)
+FetchContent_Declare(SFML
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
 
 #set this to true to ship the game!
 #! ! ! ! ! ! !
@@ -28,6 +36,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 project ("MapGeneratorTool")
 add_subdirectory(thirdparty/lodepng)
 add_subdirectory(thirdparty/fastNoiseLite)
+#add_subdirectory(thirdparty/FortuneAlgorithm)
+add_subdirectory(thirdparty/MyGAL)
 
 
 # Add source to this project's executable.
@@ -52,12 +62,16 @@ endif()
 
 target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
 
-target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+#target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/map/")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/")
 
 target_link_libraries(MapGeneratorTool PUBLIC lodepng)
 target_link_libraries(MapGeneratorTool PUBLIC fastNoiseLite)
+target_link_libraries(MapGeneratorTool PRIVATE sfml-graphics)
+#target_link_libraries(MapGeneratorTool PUBLIC fortuneAlgo)
+#target_link_libraries(MapGeneratorTool PUBLIC MyGAL)
 
 
 

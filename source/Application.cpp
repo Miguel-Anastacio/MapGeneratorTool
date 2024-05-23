@@ -6,6 +6,8 @@
 #include "HeightMap.h"
 #include "texture/Texture.h"
 #include "../map/Map.h"
+#include "MyGAL/FortuneAlgorithm.h"
+#include "MyGAL/Vector2.h"
 namespace MapGeneratorTool
 {
 	using namespace Utils;
@@ -34,8 +36,17 @@ namespace MapGeneratorTool
 		//map2.SaveHeightMapToFile();
 		//map3.SaveHeightMapToFile();
 
-		Map newMap = Map(width, height, seedsNumber, "lookup3lloyd.png");
+		//Map newMap = Map(width, height, seedsNumber, "lookup3lloyd.png");
+		//std::vector<Vector2> points = FortuneAlgo::generatePoints(seedsNumber);
+		//VoronoiDiagram diagram = FortuneAlgo::generateRandomDiagram(seedsNumber);
+		//FortuneAlgo::drawDiagram(diagram);
 		//Map mapWithMask = Map("mask.png", seedsNumber, "lookup3mask.png");
+		auto points = std::vector<mygal::Vector2<double>>
+		{
+			{0.354, 0.678}, {0.632, 0.189}, {0.842, 0.942}
+		};
+		mygal::FortuneAlgorithm<double> diagram(points);
+
 	}
 
 

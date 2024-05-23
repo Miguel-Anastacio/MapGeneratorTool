@@ -1,9 +1,16 @@
 #include "SimpleVoronoiDiagram.h"
 #include <unordered_set>
 #include <cassert>
+//#include "../thirdparty/FortuneAlgorithm/src/FortuneAlgorithm.h"
+//#include "../thirdparty/FortuneAlgorithm/src/Vector2.h"
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <random>
+
 namespace MapGeneratorTool
 {
-	namespace VoronoiDiagram
+	namespace SimpleVoronoiDiagram
 	{
 		using namespace Utils;
 		std::vector<Point> GenerateSeeds(int numberOfSeeds, int width, int height)

@@ -31,16 +31,16 @@ namespace MapGeneratorTool
 
 	void Map::CreateLookUpTexture()
 	{
-		std::vector<Point> seeds = VoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
+		std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
 		int iterations = 2;
 		for (int i = 0; i < iterations; i++)
 		{
-			const std::vector<Point> diagram = VoronoiDiagram::GenerateDiagram(seeds, width(), height());
-			seeds = VoronoiDiagram::ComputeCentroids(diagram, width(), height(), seeds);
+			const std::vector<Point> diagram = SimpleVoronoiDiagram::GenerateDiagram(seeds, width(), height());
+			seeds = SimpleVoronoiDiagram::ComputeCentroids(diagram, width(), height(), seeds);
 		}
 
-		const std::vector<Point> finalDiagram = VoronoiDiagram::GenerateDiagram(seeds, width(), height());
-		const std::unordered_map<Point, Color> colorMap = VoronoiDiagram::GenerateColorMap(seeds);
+		const std::vector<Point> finalDiagram = SimpleVoronoiDiagram::GenerateDiagram(seeds, width(), height());
+		const std::unordered_map<Point, Color> colorMap = SimpleVoronoiDiagram::GenerateColorMap(seeds);
 		
 		PopulateTexture(colorMap, finalDiagram, m_lookUpTexture.get());
 		OutputSeedPoints(seeds);
@@ -53,10 +53,10 @@ namespace MapGeneratorTool
 	{
 		const std::vector<uint8_t> maskData = GenerateMaskData(mask);
 		
-		const std::vector<Point> seeds = VoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
-		const std::vector<Point> diagram = VoronoiDiagram::GenerateDiagramFromMask(seeds, width(), height(), maskData);
+		const std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
+		const std::vector<Point> diagram = SimpleVoronoiDiagram::GenerateDiagramFromMask(seeds, width(), height(), maskData);
 
-		const std::unordered_map<Point, Color> colorMap = VoronoiDiagram::GenerateColorMap(seeds);
+		const std::unordered_map<Point, Color> colorMap = SimpleVoronoiDiagram::GenerateColorMap(seeds);
 
 		PopulateTexture(colorMap, diagram, m_lookUpTexture.get());
 		OutputSeedPoints(seeds);
