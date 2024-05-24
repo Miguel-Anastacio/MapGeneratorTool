@@ -13,8 +13,8 @@ namespace MapGeneratorTool
 	class Map : public Dimensions
 	{
 	public:
-		Map(const char* maskFileName, int seeds, const char* lookUpTextureName);
-		Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName);
+		//Map(const char* maskFileName, int seeds, const char* lookUpTextureName,int iterLloyd);
+		Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName, int iterLloyd=0);
 		~Map();
 
 	private:

@@ -7,25 +7,31 @@
 namespace MapGeneratorTool
 {
 
-Map::Map(const char* maskFileName, int seeds, const char* lookUpTextureName)
-	:
-	m_divisions(valSeeds(seeds)), 
-	m_lookupTextureName(lookUpTextureName),
-	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
-{
-	// read mask
-	const Texture mask = Texture(maskFileName);
-	//m_lookUpTexture = std::make_unique<Texture>(mask.width(), mask.height(), lookUpTextureName);
+//Map::Map(const char* maskFileName, int seeds, const char* lookUpTextureName, int iterLloyd)
+//	:
+//	m_divisions(valSeeds(seeds)), 
+//	m_lookupTextureName(lookUpTextureName),
+//	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
+//{
+//	// read mask
+//	const Texture mask = Texture(maskFileName);
+//	//m_lookUpTexture = std::make_unique<Texture>(mask.width(), mask.height(), lookUpTextureName);
+//
+//	setDimensions(mask.width(), mask.height());
+//	CreateLookUpTextureFromMask(mask);
+//}
 
-	setDimensions(mask.width(), mask.height());
-	CreateLookUpTextureFromMask(mask);
-}
-Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName)
+Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName, int iterLloyd)
 	: Dimensions(width, height), m_lookupTextureName(lookUpTextureName),
 	m_divisions(valSeeds(seeds)),
 	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
 {
-	//CreateLookUpTexture();
+	for (int i = 0; i < iterLloyd; i++)
+	{
+		std::vector<mygal::Vector2<double>> centroids = m_diagram.computeLloydRelaxation();
+		m_diagram = std::move(geomt::generateDiagram(centroids));
+	}
+	
 }
 
 Map::~Map()

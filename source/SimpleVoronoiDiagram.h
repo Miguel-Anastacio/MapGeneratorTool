@@ -1,13 +1,9 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
 #include <random>
 #include <chrono>
 #include <iostream>
-#include "Utils.h"
-#include "utils/Point.h"
 #include "utils/Color.h"
-#include "texture/Texture.h"
 #include "MyGAL/Diagram.h"
 #include "MyGAL/FortuneAlgorithm.h"
 namespace MapGeneratorTool

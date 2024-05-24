@@ -34,7 +34,7 @@ namespace MapGeneratorTool
 		//map2.SaveHeightMapToFile();
 		//map3.SaveHeightMapToFile();
 
-		Map newMap = Map(width, height, seedsNumber, "lookupmyGAl.png");
+		Map newMap = Map(width, height, seedsNumber, "lookupmyGAL-lloyd100.png", 100);
 		//std::vector<Vector2> points = FortuneAlgo::generatePoints(seedsNumber);
 		//VoronoiDiagram diagram = FortuneAlgo::generateRandomDiagram(seedsNumber);
 		//FortuneAlgo::drawDiagram(diagram);
