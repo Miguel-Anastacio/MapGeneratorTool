@@ -77,6 +77,16 @@ namespace MapGeneratorTool
 
 			return diagram;
 		}
+
+		template<typename T>
+		void lloydRelaxation(mygal::Diagram<T>& diagram, int iterations)
+		{
+			for (int i = 0; i < iterations; i++)
+			{
+				std::vector<mygal::Vector2<double>> centroids = diagram.computeLloydRelaxation();
+				diagram = std::move(geomt::generateDiagram(centroids));
+			}
+		}
 	}
 
 	

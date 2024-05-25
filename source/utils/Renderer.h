@@ -22,11 +22,15 @@ namespace MapGeneratorTool
     template<typename T>
     void drawPolygons(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height)
     {
-        if (!texture.create(width, height))
+        if (texture.getSize() == sf::Vector2u(0, 0))
         {
-            // error...
+            if (!texture.create(width, height))
+            {
+                // error...
+                std::cout << "Error creating texture to draw polygons to map" << "\n";
+                return;
+            }
         }
-
 
         std::unordered_set<Utils::Color> colorsInUse;
         // drawing uses the same functions
@@ -54,7 +58,7 @@ namespace MapGeneratorTool
         texture.display();
     }
 
-    static void saveToFile(const sf::RenderTexture& texture, const char* filename)
+    void saveToFile(const sf::RenderTexture& texture, const char* filename)
     {
         texture.getTexture().copyToImage().saveToFile(filename);
     }

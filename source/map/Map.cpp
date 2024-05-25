@@ -1,6 +1,6 @@
 #include "Map.h"
 #include "../texture/Texture.h"
-#include "../SimpleVoronoiDiagram.h"
+#include "../ComputeGeometry.h"
 #include "../../thirdparty/lodepng/textureHandler.h"
 #include "../utils/Renderer.h"
 
@@ -26,12 +26,9 @@ Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureNa
 	m_divisions(valSeeds(seeds)),
 	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
 {
-	for (int i = 0; i < iterLloyd; i++)
-	{
-		std::vector<mygal::Vector2<double>> centroids = m_diagram.computeLloydRelaxation();
-		m_diagram = std::move(geomt::generateDiagram(centroids));
-	}
-	
+	geomt::lloydRelaxation(m_diagram, iterLloyd);
+	m_lookupTexture.create(width, height);
+	MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width, height);
 }
 
 Map::~Map()
@@ -130,9 +127,8 @@ void Map::OutputSeedPoints(const std::vector<Point>& seeds) const
 
 void Map::SaveDiagramToFile()
 {
-	sf::RenderTexture texture;
-	MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), texture, width(), height());
-	saveToFile(texture, m_lookupTextureName);
+	/*MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width(), height());*/
+	saveToFile(m_lookupTexture, m_lookupTextureName);
 }
 
 void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const

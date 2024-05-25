@@ -5,6 +5,8 @@ namespace MapGeneratorTool
 {
 	namespace Utils
 	{
+		
+
 		class Dimensions
 		{
 		public:

@@ -6,6 +6,7 @@
 #include <cmath>
 #include <unordered_map>
 #include <MyGAL/Diagram.h>
+#include <SFML/Graphics/RenderTexture.hpp>
 namespace MapGeneratorTool
 {
 	class Texture;
@@ -16,6 +17,11 @@ namespace MapGeneratorTool
 		//Map(const char* maskFileName, int seeds, const char* lookUpTextureName,int iterLloyd);
 		Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName, int iterLloyd=0);
 		~Map();
+
+		inline sf::RenderTexture& lookupTexture()
+		{
+			return m_lookupTexture;
+		}
 
 	private:
 		inline int valSeeds(int seeds)
@@ -35,6 +41,7 @@ namespace MapGeneratorTool
 		int m_divisions;
 		const char* m_lookupTextureName;
 		mygal::Diagram<double> m_diagram;
+		sf::RenderTexture m_lookupTexture;
 
 		//std::unique_ptr<Texture> m_lookUpTexture;
 	};

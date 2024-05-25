@@ -15,11 +15,11 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-include(FetchContent)
-FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.6.x)
-FetchContent_MakeAvailable(SFML)
+#include(FetchContent)
+#FetchContent_Declare(SFML
+#    GIT_REPOSITORY https://github.com/SFML/SFML.git
+#    GIT_TAG 2.6.x)
+#FetchContent_MakeAvailable(SFML)
 
 #set this to true to ship the game!
 #! ! ! ! ! ! !
@@ -36,9 +36,8 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 project ("MapGeneratorTool")
 add_subdirectory(thirdparty/lodepng)
 add_subdirectory(thirdparty/fastNoiseLite)
-#add_subdirectory(thirdparty/FortuneAlgorithm)
 add_subdirectory(thirdparty/MyGAL)
-
+add_subdirectory(thirdparty)
 
 # Add source to this project's executable.
 
@@ -69,10 +68,11 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURC
 
 target_link_libraries(MapGeneratorTool PUBLIC lodepng)
 target_link_libraries(MapGeneratorTool PUBLIC fastNoiseLite)
-target_link_libraries(MapGeneratorTool PRIVATE sfml-graphics)
-#target_link_libraries(MapGeneratorTool PUBLIC fortuneAlgo)
-#target_link_libraries(MapGeneratorTool PUBLIC MyGAL)
+#target_link_libraries(MapGeneratorTool PRIVATE sfml-graphics)
 
-
+target_link_libraries(MapGeneratorTool
+  PUBLIC
+    ImGui-SFML::ImGui-SFML
+)
 
 
