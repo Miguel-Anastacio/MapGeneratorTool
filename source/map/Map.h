@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 #include "../Utils.h"
 #include"../utils/Point.h"
@@ -7,6 +8,7 @@
 #include <unordered_map>
 #include <MyGAL/Diagram.h>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include "MapSpecs.h"
 namespace MapGeneratorTool
 {
 	class Texture;
@@ -23,6 +25,10 @@ namespace MapGeneratorTool
 			return m_lookupTexture;
 		}
 
+		void GenerateMap(const LookupMapData& data);
+		void SaveDiagramToFile() const; 
+		void SaveDiagramToFile(const char* filename) const; 
+
 	private:
 		inline int valSeeds(int seeds)
 		{
@@ -35,7 +41,6 @@ namespace MapGeneratorTool
 		std::vector<uint8_t> GenerateMaskData(const Texture& mask) const;
 		void OutputSeedPoints(const std::vector<Point>& seeds) const;
 
-		void SaveDiagramToFile();
 		
 
 		int m_divisions;

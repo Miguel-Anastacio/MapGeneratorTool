@@ -37,6 +37,15 @@ Map::~Map()
 	SaveDiagramToFile();
 }
 
+void Map::GenerateMap(const LookupMapData& data)
+{
+	m_diagram = std::move(geomt::generateDiagram(geomt::generatePoints<double>(data.numberOfSeeds, data.seed)));
+	geomt::lloydRelaxation(m_diagram, data.lloyd);
+	m_lookupTexture.clear();
+	m_lookupTexture.create(data.width, data.height);
+	drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, data.width, data.height);
+}
+
 void Map::CreateLookUpTexture()
 {
 	/*std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
@@ -125,10 +134,15 @@ void Map::OutputSeedPoints(const std::vector<Point>& seeds) const
 
 }
 
-void Map::SaveDiagramToFile()
+void Map::SaveDiagramToFile() const
 {
 	/*MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width(), height());*/
 	saveToFile(m_lookupTexture, m_lookupTextureName);
+}
+
+void Map::SaveDiagramToFile(const char* filename) const
+{
+	saveToFile(m_lookupTexture, filename);
 }
 
 void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const

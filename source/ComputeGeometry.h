@@ -51,6 +51,20 @@ namespace MapGeneratorTool
 
 			return points;
 		}
+		template<typename T>
+		std::vector<mygal::Vector2<T>> generatePoints(int nbPoints, int seedValue )
+		{
+			std::cout << "seed: " << seedValue << '\n';
+			auto generator = std::default_random_engine(seedValue);
+			auto distribution = std::uniform_real_distribution<T>(0.0, 1.0);
+
+			auto points = std::vector<mygal::Vector2<T>>(nbPoints);
+			for (auto i = 0; i < nbPoints; ++i)
+				points[i] = mygal::Vector2<T>(distribution(generator), distribution(generator));
+
+			return points;
+		}
+
 
 		template<typename T>
 		mygal::Diagram<T> generateDiagram(const std::vector<mygal::Vector2<T>>& points)
