@@ -1,9 +1,10 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "ui/basePanel.h"
+#include "utils/Event.h"
 namespace MapGeneratorTool
 {
-
 	enum class State
 	{
 		DiagramEditor,
@@ -21,6 +22,10 @@ namespace MapGeneratorTool
 
 		void SwitchState(State newState);
 
+		inline void SetLookupData(const LookupMapData& data) {
+			m_lookupData = data;
+		}
+
 		inline State CurrentState() const {
 			return m_currentState;
 		}
@@ -29,6 +34,8 @@ namespace MapGeneratorTool
 		{
 			return m_currentPanel.get();
 		}
+
+		std::vector<std::unique_ptr<Event>> EventQueue;
 
 	private:
 		StateManager();
@@ -39,7 +46,7 @@ namespace MapGeneratorTool
 
 		State m_currentState;
 		std::unique_ptr<ui::BasePanel> m_currentPanel;
+		LookupMapData m_lookupData;
 	};
 
-	
 }

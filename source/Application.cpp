@@ -10,12 +10,13 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <memory>
 #include "ui/navBar.h"
 #include "ui/basePanel.h"
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
+
 #include "StateManager.h"
-#include <memory>
 namespace MapGeneratorTool
 {
 	using namespace Utils;
@@ -75,9 +76,59 @@ namespace MapGeneratorTool
 		colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 	}
 
+	void ProccessWindowEvents(sf::RenderWindow& window, sf::Clock& deltaClock)
+	{
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			ImGui::SFML::ProcessEvent(window, event);
+
+			if (event.type == sf::Event::Closed) {
+				window.close();
+			}
+		}
+
+		ImGui::SFML::Update(window, deltaClock.restart());
+	}
+
+	void ProcessEvents(Map& map)
+	{
+		auto& test = StateManager::Get().EventQueue;
+		for (auto& event : StateManager::Get().EventQueue)
+		{
+			event->Execute(map);
+		}
+
+		StateManager::Get().EventQueue.clear();
+	}
+
+	void RenderState(const sf::RenderTexture& texture, const ui::BasePanel& panel)
+	{
+		panel.RenderPanel();
+
+		static ImVec2 viewportSize{ 500, 500 };
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.f, 10.f));
+		if (ImGui::Begin("Viewport")) {
+			viewportSize = ImGui::GetWindowSize();
+			/*sf::Vector2u size = texture.getSize();
+			if (size.x > 1024)
+			{
+				size.x = 1024;
+			}
+			if (size.y > 1024)
+			{
+				size.y = 1024;
+			}*/
+
+			ImGui::Image(texture);
+		}
+		ImGui::End();
+		ImGui::PopStyleVar();
+	}
+
 
 	void Run()
 	{
+		// INIT
 		sf::RenderWindow window(sf::VideoMode(1280, 720), "MapGeneratorTool");
 		window.setFramerateLimit(60);
 		ImGui::SFML::Init(window);
@@ -86,40 +137,24 @@ namespace MapGeneratorTool
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		setFancyImguiStyle();
 
-
 		ui::NavBar nav;
+
 		// generate Map
 		const unsigned width = 1024, height = 1024;
 		const int seedsNumber = 400;
 		Map newMap = Map(width, height, seedsNumber, "lookupmyGALnew.png");
+		StateManager::Get().SetLookupData(LookupMapData(width, height, 0, seedsNumber));
+		StateManager::Get().SwitchState(State::DiagramEditor);
 
 		sf::Clock deltaClock;
-		while (window.isOpen()) {
-			sf::Event event;
-			while (window.pollEvent(event)) {
-				ImGui::SFML::ProcessEvent(window, event);
-
-				if (event.type == sf::Event::Closed) {
-					window.close();
-				}
-			}
-
-			ImGui::SFML::Update(window, deltaClock.restart());
-
-			static ImVec2 viewportSize{ 500, 500 };
-
+		while (window.isOpen()) 
+		{
+			ProccessWindowEvents(window, deltaClock);
+			ProcessEvents(newMap);
 			ImGui::DockSpaceOverViewport();
-			nav.RenderNavBar();
-			
-			StateManager::Get().CurrentPanel()->RenderPanel();
 
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.f, 0.f));
-			if (ImGui::Begin("Viewport")) {
-				viewportSize = ImGui::GetWindowSize();
-				ImGui::Image(newMap.lookupTexture());
-			}
-			ImGui::End();
-			ImGui::PopStyleVar();
+			nav.RenderNavBar();
+			RenderState(newMap.lookupTexture(), *StateManager::Get().CurrentPanel());
 
 			window.clear();
 			ImGui::SFML::Render(window);
@@ -127,21 +162,6 @@ namespace MapGeneratorTool
 		}
 
 		ImGui::SFML::Shutdown();
-	}
-	
-	void UpdateUI(ui::BasePanel& currentPanel)
-	{
-		switch (StateManager::Get().CurrentState())
-		{
-		case State::DiagramEditor:
-			currentPanel = ui::LookupEditor("LookupEditor");
-			break;
-		case State::TerrainEditor:
-			currentPanel = ui::TerrainEditor("TerrainEditor");
-			break;
-		default:
-			break;
-		}
 	}
 
 

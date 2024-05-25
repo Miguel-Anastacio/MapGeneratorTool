@@ -2,8 +2,10 @@
 #include "StateManager.h"
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
+#include "map/Map.h"
 namespace MapGeneratorTool
 {
+	
 	StateManager::StateManager()
 	{
 		m_currentPanel = std::make_unique<ui::LookupEditor>("lookup");
@@ -13,7 +15,7 @@ namespace MapGeneratorTool
 		switch (newState)
 		{
 		case State::DiagramEditor:
-			m_currentPanel = std::make_unique<ui::LookupEditor>("lookup");
+			m_currentPanel = std::make_unique<ui::LookupEditor>("lookup", m_lookupData);
 			break;
 		case State::TerrainEditor:
 			m_currentPanel = std::make_unique<ui::TerrainEditor>("terrain");

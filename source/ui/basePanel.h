@@ -13,7 +13,6 @@ namespace ui
 
 		virtual void RenderPanel() const = 0;
 
-
 	protected:
 		const char* m_name;
 
@@ -26,9 +25,6 @@ namespace ui
 
 			return window_flags;
 		}
-		
-
-
 	};
 
 }
