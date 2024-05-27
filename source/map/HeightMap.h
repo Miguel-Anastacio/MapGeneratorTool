@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../Utils.h"
+#include "MapComponent.h"
 #include "../texture/Texture.h"
 #include <cassert>
 #include <algorithm>
@@ -12,27 +12,25 @@ namespace MapGeneratorTool
 {
 	using namespace Utils;
 	//class Texture;
-	class HeightMap : public Dimensions
+	class HeightMap : public MapComponent
 	{
 	public:
 		HeightMap(const char* name, const NoiseMapData& data);
 		//HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs);
 		~HeightMap();
 
-		void SaveHeightMapToFile();
-		void SaveHeightMapToFile(const char* filename);
 		void RegenerateHeightMap(const NoiseMapData& data);
-
-		inline const sf::RenderTexture& Texture() const
+		inline std::vector<double> NoiseMap() const 
 		{
-			return m_texture;
+			return m_noiseValues;
 		}
 
 	private:
 		std::vector<double> CreateHeightMap(const NoiseMapData& data) const;
+		std::vector<sf::Uint8> CreateBuffer();
 
-		sf::RenderTexture m_texture;
 		std::vector<double> m_noiseValues;
+
 		//double m_noiseScale;
 		//FastNoiseLite m_noise;
 		//NoiseSpecs m_noiseSpecs;

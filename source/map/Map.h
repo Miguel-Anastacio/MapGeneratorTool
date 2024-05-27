@@ -10,6 +10,7 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include "MapSpecs.h"
 #include "HeightMap.h"
+#include "TerrainMap.h"
 namespace MapGeneratorTool
 {
 	class Texture;
@@ -29,12 +30,17 @@ namespace MapGeneratorTool
 		{
 			return m_heightmap->Texture();
 		}
+		inline const sf::RenderTexture& TerrainMapTexture() const
+		{
+			return m_terrainmap->Texture();
+		}
 
 		void GenerateMap(const LookupMapData& data);
 		void GenerateHeightMap(const NoiseMapData& data);
 
 		void SaveLookupMapToFile() const;
 		void SaveLookupMapToFile(const char* filename) const;
+
 		void SaveHeightMapToFile(const char* filename) const;
 
 	private:
@@ -58,6 +64,7 @@ namespace MapGeneratorTool
 		
 
 		std::unique_ptr<HeightMap> m_heightmap;
+		std::unique_ptr<TerrainMap> m_terrainmap;
 
 		//std::unique_ptr<Texture> m_lookUpTexture;
 	};

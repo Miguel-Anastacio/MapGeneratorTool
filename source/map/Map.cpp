@@ -51,8 +51,8 @@ void Map::GenerateMap(const LookupMapData& data)
 
 void Map::GenerateHeightMap(const NoiseMapData& data)
 {
-
 	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", data);
+	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), data.width, data.height);
 
 }
 
@@ -136,7 +136,7 @@ void Map::SaveLookupMapToFile(const char* filename) const
 
 void Map::SaveHeightMapToFile(const char* filename) const
 {
-	m_heightmap->SaveHeightMapToFile(filename);
+	m_heightmap->SaveToFile(filename);
 }
 
 void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const

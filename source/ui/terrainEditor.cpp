@@ -13,7 +13,6 @@ void TerrainEditor::RenderPanel() const
 
     ImGui::Begin(m_name, nullptr, window_flags);
     // height map editing
-
     bool generate = false;
     static int width = m_data.width;
     generate = generate || ImGui::SliderInt("Width", &width, 10, 2048, "%d");

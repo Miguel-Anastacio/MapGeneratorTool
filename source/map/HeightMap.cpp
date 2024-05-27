@@ -11,7 +11,7 @@
 namespace MapGeneratorTool
 {
 	HeightMap::HeightMap(const char* name, const NoiseMapData& data)
-		: Dimensions(data.width, data.height)
+		: MapComponent(data.width, data.height, name)
 	{
 		RegenerateHeightMap(data);
 		unsigned width = this->width();
@@ -43,49 +43,6 @@ namespace MapGeneratorTool
 	{
 
 	}
-
-	void HeightMap::SaveHeightMapToFile()
-	{
-		unsigned width = this->width();
-		unsigned height = this->height();
-		std::vector<sf::Uint8> image(width * height * 4);
-		for (unsigned y = 0; y < height; y++)
-		{
-			for (unsigned x = 0; x < width; x++)
-			{
-				double value = m_noiseValues[width * y + x];
-				image[4 * width * y + 4 * x + 0] = value * 255;
-				image[4 * width * y + 4 * x + 1] = value * 255;
-				image[4 * width * y + 4 * x + 2] = value * 255;
-				image[4 * width * y + 4 * x + 3] = 255;
-			}
-		}
-
-		rend::drawBuffer(image, m_texture, width, height);
-		rend::saveToFile(m_texture, "TestHeigh.png");
-	}
-
-	void HeightMap::SaveHeightMapToFile(const char* filename)
-	{
-		unsigned width = this->width();
-		unsigned height = this->height();
-		std::vector<sf::Uint8> image(width * height * 4);
-		for (unsigned y = 0; y < height; y++)
-		{
-			for (unsigned x = 0; x < width; x++)
-			{
-				double value = m_noiseValues[width * y + x];
-				image[4 * width * y + 4 * x + 0] = value * 255;
-				image[4 * width * y + 4 * x + 1] = value * 255;
-				image[4 * width * y + 4 * x + 2] = value * 255;
-				image[4 * width * y + 4 * x + 3] = 255;
-			}
-		}
-
-		rend::drawBuffer(image, m_texture, width, height);
-		rend::saveToFile(m_texture, filename);
-	}
-
 	void HeightMap::RegenerateHeightMap(const NoiseMapData& data)
 	{
 
@@ -175,6 +132,25 @@ namespace MapGeneratorTool
 
 		return heightMap;
     }
+
+	std::vector<sf::Uint8> HeightMap::CreateBuffer()
+	{
+		unsigned width = this->width();
+		unsigned height = this->height();
+		std::vector<sf::Uint8> image(width * height * 4);
+		for (unsigned y = 0; y < height; y++)
+		{
+			for (unsigned x = 0; x < width; x++)
+			{
+				double value = m_noiseValues[width * y + x];
+				image[4 * width * y + 4 * x + 0] = value * 255;
+				image[4 * width * y + 4 * x + 1] = value * 255;
+				image[4 * width * y + 4 * x + 2] = value * 255;
+				image[4 * width * y + 4 * x + 3] = 255;
+			}
+		}
+		return image;
+	}
 
 
 

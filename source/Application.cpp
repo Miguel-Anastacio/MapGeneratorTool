@@ -132,7 +132,7 @@ namespace MapGeneratorTool
 			return map.lookupTexture();
 			break;
 		case State::TerrainEditor:
-			return map.HeightMapTexture();
+			return map.TerrainMapTexture();
 			break;
 		default:
 			break;
