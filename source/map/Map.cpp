@@ -3,6 +3,8 @@
 #include "../ComputeGeometry.h"
 #include "../../thirdparty/lodepng/textureHandler.h"
 #include "../utils/Renderer.h"
+#include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
+#include "HeightMap.h"
 
 namespace MapGeneratorTool
 {
@@ -28,13 +30,14 @@ Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureNa
 {
 	geomt::lloydRelaxation(m_diagram, iterLloyd);
 	m_lookupTexture.create(width, height);
-	MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width, height);
+	rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width, height);
+
 }
 
 Map::~Map()
 {
 	//m_lookUpTexture->WriteTextureToFile();
-	SaveDiagramToFile();
+	SaveLookupMapToFile();
 }
 
 void Map::GenerateMap(const LookupMapData& data)
@@ -43,27 +46,13 @@ void Map::GenerateMap(const LookupMapData& data)
 	geomt::lloydRelaxation(m_diagram, data.lloyd);
 	m_lookupTexture.clear();
 	m_lookupTexture.create(data.width, data.height);
-	drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, data.width, data.height);
+	rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, data.width, data.height);
 }
 
-void Map::CreateLookUpTexture()
+void Map::GenerateHeightMap(const NoiseMapData& data)
 {
-	/*std::vector<Point> seeds = SimpleVoronoiDiagram::GenerateSeeds(m_divisions, width(), height());
-	int iterations = 2;
-	for (int i = 0; i < iterations; i++)
-	{
-		const std::vector<Point> diagram = SimpleVoronoiDiagram::GenerateDiagram(seeds, width(), height());
-		seeds = SimpleVoronoiDiagram::ComputeCentroids(diagram, width(), height(), seeds);
-	}
 
-	const std::vector<Point> finalDiagram = SimpleVoronoiDiagram::GenerateDiagram(seeds, width(), height());
-	const std::unordered_map<Point, Color> colorMap = SimpleVoronoiDiagram::GenerateColorMap(seeds);
-		
-	PopulateTexture(colorMap, finalDiagram, m_lookUpTexture.get());
-	OutputSeedPoints(seeds);*/
-
-
-
+	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", data);
 
 }
 
@@ -134,15 +123,20 @@ void Map::OutputSeedPoints(const std::vector<Point>& seeds) const
 
 }
 
-void Map::SaveDiagramToFile() const
+void Map::SaveLookupMapToFile() const
 {
 	/*MapGeneratorTool::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width(), height());*/
-	saveToFile(m_lookupTexture, m_lookupTextureName);
+	rend::saveToFile(m_lookupTexture, m_lookupTextureName);
 }
 
-void Map::SaveDiagramToFile(const char* filename) const
+void Map::SaveLookupMapToFile(const char* filename) const
 {
-	saveToFile(m_lookupTexture, filename);
+	rend::saveToFile(m_lookupTexture, filename);
+}
+
+void Map::SaveHeightMapToFile(const char* filename) const
+{
+	m_heightmap->SaveHeightMapToFile(filename);
 }
 
 void Map::PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const

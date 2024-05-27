@@ -18,7 +18,7 @@ namespace MapGeneratorTool
 			m_currentPanel = std::make_unique<ui::LookupEditor>("lookup", m_lookupData);
 			break;
 		case State::TerrainEditor:
-			m_currentPanel = std::make_unique<ui::TerrainEditor>("terrain");
+			m_currentPanel = std::make_unique<ui::TerrainEditor>("terrain", m_noiseMapData);
 			break;
 		default:
 			break;

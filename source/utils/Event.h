@@ -8,7 +8,6 @@ namespace MapGeneratorTool
 //	GenerateMap, GenerateTerrain
 //};
 
-class Map;
 class Event
 {
 public:
@@ -34,14 +33,39 @@ private:
 	LookupMapData m_data;
 };
 
-
-class SaveMapEvent : public Event
+class GeneratNoiseMapEvent : public Event
 {
 public:
-	SaveMapEvent(const char* name) : filename(name) {};
+	GeneratNoiseMapEvent(NoiseMapData data) : m_data(data) {}
+
 	void Execute(Map& map) const override
 	{
-		map.SaveDiagramToFile(filename);
+		map.GenerateHeightMap(m_data);
+	}
+private:
+	NoiseMapData m_data;
+};
+
+
+class SaveLookupMapEvent : public Event
+{
+public:
+	SaveLookupMapEvent(const char* name) : filename(name) {};
+	void Execute(Map& map) const override
+	{
+		map.SaveLookupMapToFile(filename);
+	}
+private:
+	const char* filename;
+};
+
+class SaveNoiseMapEvent : public Event
+{
+public:
+	SaveNoiseMapEvent(const char* name) : filename(name) {};
+	void Execute(Map& map) const override
+	{
+		map.SaveHeightMapToFile(filename);
 	}
 private:
 	const char* filename;

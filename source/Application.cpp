@@ -92,7 +92,6 @@ namespace MapGeneratorTool
 
 	void ProcessEvents(Map& map)
 	{
-		auto& test = StateManager::Get().EventQueue;
 		for (auto& event : StateManager::Get().EventQueue)
 		{
 			event->Execute(map);
@@ -125,6 +124,21 @@ namespace MapGeneratorTool
 		ImGui::PopStyleVar();
 	}
 
+	const sf::RenderTexture& UpdateTexture(const Map& map)
+	{
+		switch (StateManager::Get().CurrentState())
+		{
+		case State::DiagramEditor:
+			return map.lookupTexture();
+			break;
+		case State::TerrainEditor:
+			return map.HeightMapTexture();
+			break;
+		default:
+			break;
+		}
+	}
+
 
 	void Run()
 	{
@@ -143,22 +157,33 @@ namespace MapGeneratorTool
 		const unsigned width = 1024, height = 1024;
 		const int seedsNumber = 400;
 		Map newMap = Map(width, height, seedsNumber, "lookupmyGALnew.png");
+		newMap.GenerateHeightMap(NoiseMapData(width, height));
+
 		StateManager::Get().SetLookupData(LookupMapData(width, height, 0, seedsNumber));
+		StateManager::Get().SetNoiseData(NoiseMapData(width, height));
 		StateManager::Get().SwitchState(State::DiagramEditor);
+
+		// generate noise Map
 
 		sf::Clock deltaClock;
 		while (window.isOpen()) 
 		{
+			// events
 			ProccessWindowEvents(window, deltaClock);
-			ProcessEvents(newMap);
+
+			// update ui 
+			const sf::RenderTexture& texture = UpdateTexture(newMap);
+
+			// draw
 			ImGui::DockSpaceOverViewport();
-
 			nav.RenderNavBar();
-			RenderState(newMap.lookupTexture(), *StateManager::Get().CurrentPanel());
+			RenderState(texture, *StateManager::Get().CurrentPanel());
 
+			// display
 			window.clear();
 			ImGui::SFML::Render(window);
 			window.display();
+			ProcessEvents(newMap);
 		}
 
 		ImGui::SFML::Shutdown();
@@ -170,7 +195,8 @@ namespace MapGeneratorTool
 		std::srand(static_cast<unsigned int>(std::time(nullptr)));
 		const unsigned width = 1024, height = 1024;
 		const int seedsNumber = 400;
-		//FastNoiseLite noise;
+		FastNoiseLite noise;
+		//noise.setfre
 		//noise.SetSeed(100123);
 		//noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
 		//noise.SetFrequency(0.01f);

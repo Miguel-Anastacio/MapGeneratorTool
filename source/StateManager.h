@@ -25,6 +25,9 @@ namespace MapGeneratorTool
 		inline void SetLookupData(const LookupMapData& data) {
 			m_lookupData = data;
 		}
+		inline void SetNoiseData(const NoiseMapData& data) {
+			m_noiseMapData = data;
+		}
 
 		inline State CurrentState() const {
 			return m_currentState;
@@ -47,6 +50,7 @@ namespace MapGeneratorTool
 		State m_currentState;
 		std::unique_ptr<ui::BasePanel> m_currentPanel;
 		LookupMapData m_lookupData;
+		NoiseMapData m_noiseMapData;
 	};
 
 }

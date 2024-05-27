@@ -33,9 +33,10 @@ void LookupEditor::RenderPanel() const
     }
     static char text[256] = "test.png";
     ImGui::InputText("File Name", text, IM_ARRAYSIZE(text));
+    ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveMapEvent>(text));
+        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveLookupMapEvent>(text));
     }
 
     ImGui::End();
