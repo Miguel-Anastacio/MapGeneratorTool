@@ -8,9 +8,15 @@ namespace MapGeneratorTool
 	TerrainMap::TerrainMap(const char* name, const std::vector<double>& data, unsigned width, unsigned height)
 		: MapComponent(width, height, name)
 	{
-		m_terrainTypes.push_back(TerrainType(0.5, sf::Color::Blue, "Water"));
+	/*	m_terrainTypes.push_back(TerrainType(0.5, sf::Color::Blue, "Water"));
 		m_terrainTypes.push_back(TerrainType(0.85, sf::Color::Green, "Grass"));
-		m_terrainTypes.push_back(TerrainType(1.0, sf::Color::Yellow, "Rock"));
+		m_terrainTypes.push_back(TerrainType(1.0, sf::Color::Yellow, "Rock"));*/
+		RegenerateTerrain(data);
+	}
+
+	TerrainMap::TerrainMap(const char* name, const std::vector<double>& data, unsigned width, unsigned height, const std::vector<TerrainType>& terrain)
+		: MapComponent(width, height, name), m_terrainTypes(terrain)
+	{
 		RegenerateTerrain(data);
 	}
 
@@ -46,12 +52,16 @@ namespace MapGeneratorTool
 
 	sf::Color TerrainMap::GetColorFromHeight(const std::vector<TerrainType>& terrainTypes, double height) const
 	{
-		
+		if (terrainTypes.empty())
+			return sf::Color::Black;
+
 		for (auto ter : terrainTypes)
 		{
 			if (height <= ter.minHeight) 
 				return ter.color;
 		}
+
+		return terrainTypes.back().color;
 	}
 
 }

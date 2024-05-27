@@ -35,8 +35,27 @@ namespace MapGeneratorTool
 			return m_terrainmap->Texture();
 		}
 
+		inline const std::vector<double> NoiseMap() const
+		{
+			assert(m_heightmap != nullptr);
+			return m_heightmap->NoiseMap();
+		}
+
+		inline void AddTerrainType(const TerrainType& type)
+		{
+			m_terrainTypes.push_back(type);
+		}
+
+		inline const std::vector<TerrainType>& TerrainTypes() const
+		{
+			return m_terrainTypes;
+		}
+
 		void GenerateMap(const LookupMapData& data);
 		void GenerateHeightMap(const NoiseMapData& data);
+
+		void GenerateTerrainMap(const std::vector<double>& noiseMap);
+		void GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types);
 
 		void SaveLookupMapToFile() const;
 		void SaveLookupMapToFile(const char* filename) const;
@@ -65,6 +84,8 @@ namespace MapGeneratorTool
 
 		std::unique_ptr<HeightMap> m_heightmap;
 		std::unique_ptr<TerrainMap> m_terrainmap;
+
+		std::vector<TerrainType> m_terrainTypes;
 
 		//std::unique_ptr<Texture> m_lookUpTexture;
 	};

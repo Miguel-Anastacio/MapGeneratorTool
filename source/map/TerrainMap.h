@@ -1,17 +1,18 @@
 #pragma once
 #include <vector>
-#include "MapComponent.h"
 #include <cassert>
+#include <string>
+#include "MapComponent.h"
 #include "MapSpecs.h"
 namespace MapGeneratorTool
 {
 	struct TerrainType
 	{
-		double minHeight;
+		float minHeight;
 		sf::Color color;
-		const char* name;
+		std::string name;
 
-		TerrainType(double height = 0.0f, sf::Color col = sf::Color::Black, const char* nam = "default") : minHeight(height), color(col), name(nam) {};
+		TerrainType(float height = 0.0f, sf::Color col = sf::Color::Black, const std::string& nam = "default") : minHeight(height), color(col), name(nam) {};
 	};
 
 	using namespace Utils;
@@ -20,9 +21,15 @@ namespace MapGeneratorTool
 	{
 	public:
 		TerrainMap(const char* name, const std::vector<double>& noiseValues, unsigned width, unsigned height);
+		TerrainMap(const char* name, const std::vector<double>& noiseValues, unsigned width, unsigned height, const std::vector<TerrainType>& terrains);
 		//HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs);
 
 		void RegenerateTerrain(const std::vector<double>& noiseValues);
+
+		inline void AddTerrainType(const TerrainType& terrainT)
+		{
+			m_terrainTypes.push_back(terrainT);
+		}
 
 	private:
 		//std::vector<double> CreateHeightMap(const NoiseMapData& data) const;

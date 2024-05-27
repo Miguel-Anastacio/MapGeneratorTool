@@ -38,6 +38,8 @@ Map::~Map()
 {
 	//m_lookUpTexture->WriteTextureToFile();
 	SaveLookupMapToFile();
+	m_heightmap->SaveToFile("untitledHeight.png");
+	m_terrainmap->SaveToFile("untitledTerrain.png");
 }
 
 void Map::GenerateMap(const LookupMapData& data)
@@ -52,8 +54,18 @@ void Map::GenerateMap(const LookupMapData& data)
 void Map::GenerateHeightMap(const NoiseMapData& data)
 {
 	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", data);
-	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), data.width, data.height);
+	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), data.width, data.height, m_terrainTypes);
+}
 
+void Map::GenerateTerrainMap(const std::vector<double>& noiseMap)
+{
+	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), m_heightmap->width(), m_heightmap->height(), m_terrainTypes);
+}
+
+void Map::GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types)
+{
+	m_terrainTypes = types;
+	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), m_heightmap->width(), m_heightmap->height(), types);
 }
 
 void Map::CreateLookUpTextureFromMask(const Texture& mask)

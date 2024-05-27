@@ -12,9 +12,9 @@
 #include <SFML/Window/Event.hpp>
 #include <memory>
 #include "ui/navBar.h"
-#include "ui/basePanel.h"
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
+#include "ui/TexturePanel.h"
 
 #include "StateManager.h"
 namespace MapGeneratorTool
@@ -103,7 +103,6 @@ namespace MapGeneratorTool
 	void RenderState(const sf::RenderTexture& texture, const ui::BasePanel& panel)
 	{
 		panel.RenderPanel();
-
 		static ImVec2 viewportSize{ 500, 500 };
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.f, 10.f));
 		if (ImGui::Begin("Viewport")) {
@@ -132,18 +131,37 @@ namespace MapGeneratorTool
 			return map.lookupTexture();
 			break;
 		case State::TerrainEditor:
-			return map.TerrainMapTexture();
+			return map.HeightMapTexture();
 			break;
 		default:
 			break;
 		}
 	}
 
+	ui::TexturePanel UpdateTexturePanel( const Map& map)
+	{
+		ui::TexturePanel panel("Viewport");
+		switch (StateManager::Get().CurrentState())
+		{
+		case State::DiagramEditor:
+			panel.texturesStack.push_back(&map.lookupTexture());
+			break;
+		case State::TerrainEditor:
+			panel.texturesStack.push_back(&map.HeightMapTexture());
+			panel.texturesStack.push_back(&map.TerrainMapTexture());
+			break;
+		default:
+			break;
+		}
+
+		return panel;
+	}
+
 
 	void Run()
 	{
 		// INIT
-		sf::RenderWindow window(sf::VideoMode(1280, 720), "MapGeneratorTool");
+		sf::RenderWindow window(sf::VideoMode(1600, 1000), "MapGeneratorTool");
 		window.setFramerateLimit(60);
 		ImGui::SFML::Init(window);
 		// enable docking
@@ -154,7 +172,7 @@ namespace MapGeneratorTool
 		ui::NavBar nav;
 
 		// generate Map
-		const unsigned width = 1024, height = 1024;
+		const unsigned width = 1024, height = 512;
 		const int seedsNumber = 400;
 		Map newMap = Map(width, height, seedsNumber, "lookupmyGALnew.png");
 		newMap.GenerateHeightMap(NoiseMapData(width, height));
@@ -163,7 +181,6 @@ namespace MapGeneratorTool
 		StateManager::Get().SetNoiseData(NoiseMapData(width, height));
 		StateManager::Get().SwitchState(State::DiagramEditor);
 
-		// generate noise Map
 
 		sf::Clock deltaClock;
 		while (window.isOpen()) 
@@ -172,13 +189,16 @@ namespace MapGeneratorTool
 			ProccessWindowEvents(window, deltaClock);
 
 			// update ui 
-			const sf::RenderTexture& texture = UpdateTexture(newMap);
-
+			//const sf::RenderTexture& texture = UpdateTexture(newMap);
+			const ui::TexturePanel panelTexture = UpdateTexturePanel(newMap);
 			// draw
 			ImGui::DockSpaceOverViewport();
-			nav.RenderNavBar();
-			RenderState(texture, *StateManager::Get().CurrentPanel());
 
+			nav.RenderNavBar();
+			StateManager::Get().CurrentPanel()->RenderPanel();
+			panelTexture.RenderPanel();
+
+			ImGui::ShowDemoWindow();
 			// display
 			window.clear();
 			ImGui::SFML::Render(window);
