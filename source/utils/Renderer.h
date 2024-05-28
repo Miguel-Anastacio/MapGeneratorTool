@@ -3,8 +3,11 @@
 #include <iostream>
 #include <chrono>
 #include <MyGAL/Vector2.h>
+#include <MyGAL/Diagram.h>
 #include <unordered_set>
 #include "../utils/Color.h"
+constexpr double PointRadius = 0.005f;
+constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {
 namespace rend
@@ -56,7 +59,7 @@ namespace rend
 
     static void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
     {
-        auto start = std::chrono::steady_clock::now();
+        //auto start = std::chrono::steady_clock::now();
         if (renderTexture.getSize() == sf::Vector2u(0, 0))
         {
             if (!renderTexture.create(width, height))
@@ -80,8 +83,68 @@ namespace rend
         sf::Sprite sprite(texture);
         renderTexture.draw(sprite);
         renderTexture.display();
-        auto duration = std::chrono::steady_clock::now() - start;
-        std::cout << "draw buffer: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
+        //auto duration = std::chrono::steady_clock::now() - start;
+        //std::cout << "draw buffer: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
+    }
+
+
+    template<typename T>
+    void drawPoint(sf::RenderWindow& window, Vector2<T> point, sf::Color color)
+    {
+        auto shape = sf::CircleShape(PointRadius);
+        shape.setPosition(sf::Vector2f(point.x - PointRadius, 1.0 - point.y - PointRadius));
+        shape.setFillColor(color);
+        window.draw(shape);
+    }
+
+    template<typename T>
+    void drawEdge(sf::RenderTexture& window, Vector2<T> origin, Vector2<T> destination, sf::Color color, unsigned width, unsigned height)
+    {
+        auto line = std::array<sf::Vertex, 2>
+        {
+            sf::Vertex(sf::Vector2f(origin.x * width, origin.y * height), color),
+                sf::Vertex(sf::Vector2f(destination.x * width, destination.y * height), color)
+        };
+        window.draw(line.data(), 2, sf::Lines);
+    }
+
+    template<typename T>
+    void drawPoints(sf::RenderTexture& window, const Diagram<T>& diagram)
+    {
+        for (const auto& site : diagram.getSites())
+            drawPoint(window, site.point, sf::Color(100, 250, 50));
+    }
+
+    template<typename T>
+    void drawDiagram(sf::RenderTexture& window, const Diagram<T>& diagram, unsigned width, unsigned height)
+    {
+        for (const auto& site : diagram.getSites())
+        {
+            auto center = site.point;
+            auto face = site.face;
+            auto halfEdge = face->outerComponent;
+            if (halfEdge == nullptr)
+                continue;
+            while (halfEdge->prev != nullptr)
+            {
+                halfEdge = halfEdge->prev;
+                if (halfEdge == face->outerComponent)
+                    break;
+            }
+            auto start = halfEdge;
+            while (halfEdge != nullptr)
+            {
+                if (halfEdge->origin != nullptr && halfEdge->destination != nullptr)
+                {
+                    auto origin = (halfEdge->origin->point - center) * Offset + center;
+                    auto destination = (halfEdge->destination->point - center) * Offset + center;
+                    drawEdge(window, origin, destination, sf::Color::Red, width, height);
+                }
+                halfEdge = halfEdge->next;
+                if (halfEdge == start)
+                    break;
+            }
+        }
     }
 }
 }

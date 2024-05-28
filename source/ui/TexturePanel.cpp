@@ -19,10 +19,11 @@ namespace ui
 
 			for (auto image : texturesStack)
 			{
-				//ImGui::Image(*image, windowSize);
-				ImGui::Image(*image, ImVec2(halfWidth, height));
-				ImGui::Spacing();
-				ImGui::Spacing();
+				ImGui::Image(*image, windowSize);
+				//ImGui::SameLine();
+				//ImGui::Image(*image, ImVec2(halfWidth, height));
+				//ImGui::Spacing();
+				//ImGui::Spacing();
 			}
 		}
 		ImGui::End();

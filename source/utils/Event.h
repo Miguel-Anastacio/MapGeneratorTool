@@ -1,12 +1,13 @@
 #pragma once
 #include "../map/MapSpecs.h"
 #include "../map/Map.h"
+#include "Renderer.h"
 namespace MapGeneratorTool
 {
-//enum class EventType
-//{
-//	GenerateMap, GenerateTerrain
-//};
+enum class SaveType
+{
+	Lookup, Terrain, Noise
+};
 
 class Event
 {
@@ -68,28 +69,33 @@ private:
 
 };
 
-class SaveLookupMapEvent : public Event
+class SaveEvent : public Event
 {
 public:
-	SaveLookupMapEvent(const char* name) : filename(name) {};
+	SaveEvent(const char* name, SaveType t) : filename(name), type(t) {};
 	void Execute(Map& map) const override
 	{
-		map.SaveLookupMapToFile(filename);
+		switch (type)
+		{
+		case MapGeneratorTool::SaveType::Lookup:
+			rend::saveToFile(map.lookupTexture(), filename);
+			break;
+		case MapGeneratorTool::SaveType::Terrain:
+			rend::saveToFile(map.TerrainMapTexture(), filename);
+			break;
+		case MapGeneratorTool::SaveType::Noise:
+			rend::saveToFile(map.HeightMapTexture(), filename);
+
+			break;
+		default:
+			break;
+		}
 	}
 private:
 	const char* filename;
+	SaveType type;
 };
 
-class SaveNoiseMapEvent : public Event
-{
-public:
-	SaveNoiseMapEvent(const char* name) : filename(name) {};
-	void Execute(Map& map) const override
-	{
-		map.SaveHeightMapToFile(filename);
-	}
-private:
-	const char* filename;
-};
+
 
 }

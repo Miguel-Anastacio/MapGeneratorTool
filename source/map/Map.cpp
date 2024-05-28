@@ -30,7 +30,8 @@ Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureNa
 {
 	geomt::lloydRelaxation(m_diagram, iterLloyd);
 	m_lookupTexture.create(width, height);
-	rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width, height);
+	//rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width, height);
+	rend::drawDiagram(m_lookupTexture, m_diagram, width, height);
 
 }
 
@@ -48,24 +49,30 @@ void Map::GenerateMap(const LookupMapData& data)
 	geomt::lloydRelaxation(m_diagram, data.lloyd);
 	m_lookupTexture.clear();
 	m_lookupTexture.create(data.width, data.height);
-	rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, data.width, data.height);
+	//rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, data.width, data.height);
+	rend::drawDiagram(m_lookupTexture, m_diagram, data.width, data.height);
+
+	GenerateTerrainMap(m_heightmap->NoiseMap());
 }
 
 void Map::GenerateHeightMap(const NoiseMapData& data)
 {
 	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", data);
 	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), data.width, data.height, m_terrainTypes);
+	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, data.width, data.height);
 }
 
 void Map::GenerateTerrainMap(const std::vector<double>& noiseMap)
 {
 	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), m_heightmap->width(), m_heightmap->height(), m_terrainTypes);
+	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, width(), height());
 }
 
 void Map::GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types)
 {
 	m_terrainTypes = types;
 	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), m_heightmap->width(), m_heightmap->height(), types);
+	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, width(), height());
 }
 
 void Map::CreateLookUpTextureFromMask(const Texture& mask)

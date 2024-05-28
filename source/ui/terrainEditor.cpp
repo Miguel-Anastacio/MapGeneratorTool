@@ -22,20 +22,20 @@ void TerrainEditor::RenderPanel() const
         static int seed = m_data.seed;
         generate = generate || ImGui::SliderInt("Seed", &seed, -3000, 3000, "%d");
         static int octave = m_data.octaves;
-        generate = generate || ImGui::SliderInt("Octaves", &octave, 0, 100, "%d");
+        generate = generate || ImGui::SliderInt("Octaves", &octave, 1, 8, "%d");
         static float frequency = m_data.frequency;
         generate = generate || ImGui::DragFloat("Frequency", &frequency, 0.001f);
         static float scale = m_data.scale;
-        generate = generate || ImGui::SliderFloat("Scale", &scale, -100, 100, "%f");
+        generate = generate || ImGui::DragFloat("Scale", &scale, 0.5, -100, 100);
         static float lacunarity = m_data.lacunarity;
-        generate = generate || ImGui::SliderFloat("Lacunarity", &lacunarity, 1.0, 5.0, "%f");
+        generate = generate || ImGui::DragFloat("Lacunarity", &lacunarity, 0.1f, 1, 5);
 
-        static char text[256] = "test.png";
+        static char text[256] = "terrainNoise.png";
         ImGui::InputText("File Name", text, IM_ARRAYSIZE(text));
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
-            StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveNoiseMapEvent>(text));
+            StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Noise));
         }
 
         if (generate)
@@ -92,6 +92,14 @@ void TerrainEditor::renderTerrainEdit() const
     if (generate)
     {
         StateManager::Get().EventQueue.emplace_back(std::make_unique<GenerateTerrainMapEvent>(types));
+    }
+
+    static char textTerrain[256] = "terrainMask.png";
+    ImGui::InputText("File Name", textTerrain, IM_ARRAYSIZE(textTerrain));
+    ImGui::SameLine();
+    if (ImGui::Button("Save"))
+    {
+        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(textTerrain, SaveType::Terrain));
     }
 
 }

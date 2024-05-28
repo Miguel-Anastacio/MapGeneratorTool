@@ -36,7 +36,7 @@ void LookupEditor::RenderPanel() const
     ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveLookupMapEvent>(text));
+        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Lookup));
     }
 
     ImGui::End();

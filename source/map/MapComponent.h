@@ -17,6 +17,12 @@ public:
 		return m_texture;
 	}
 
+	inline sf::RenderTexture& Texture()
+	{
+		return m_texture;
+	}
+
+
 protected:
 	sf::RenderTexture m_texture;
 	const char* m_name;
