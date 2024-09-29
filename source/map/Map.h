@@ -9,8 +9,9 @@
 #include <MyGAL/Diagram.h>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include "MapSpecs.h"
-#include "HeightMap.h"
-#include "TerrainMap.h"
+#include "components/HeightMap.h"
+#include "components/TerrainMap.h"
+#include "components/MapMask.h"
 namespace MapGeneratorTool
 {
 	class Texture;
@@ -32,6 +33,10 @@ namespace MapGeneratorTool
 		inline const sf::RenderTexture& TerrainMapTexture() const
 		{
 			return m_terrainmap->Texture();
+		}
+		inline const sf::RenderTexture& MapMaskTexture () const
+		{
+			return m_maskmap->Texture();
 		}
 
 		inline const std::vector<double> NoiseMap() const
@@ -58,11 +63,11 @@ namespace MapGeneratorTool
 
 		//void SaveLookupMapToFile() const;
 		//void SaveLookupMapToFile(const char* filename) const;
-
 		//void SaveHeightMapToFile(const char* filename) const;
 
 		void GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer) const;
 
+		void GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 
 	private:
 		inline int valSeeds(int seeds) const
@@ -88,6 +93,7 @@ namespace MapGeneratorTool
 
 		std::unique_ptr<HeightMap> m_heightmap;
 		std::unique_ptr<TerrainMap> m_terrainmap;
+		std::unique_ptr<MapMask> m_maskmap;
 
 		std::vector<TerrainType> m_terrainTypes;
 

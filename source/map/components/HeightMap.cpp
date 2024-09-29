@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-#include "HeightMap.h"
+#include "components/HeightMap.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
 #include "Point.h"
 #include "../../thirdparty/MyGAL/Vector2.h"
@@ -45,7 +45,6 @@ namespace MapGeneratorTool
 	}
 	void HeightMap::RegenerateHeightMap(const NoiseMapData& data)
 	{
-
 		auto start = std::chrono::steady_clock::now();
 		m_elevation = CreateHeightMap(data);
 

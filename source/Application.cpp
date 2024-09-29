@@ -124,7 +124,7 @@ namespace MapGeneratorTool
 		}
 	}
 
-	static ui::TexturePanel& UpdateTexturePanel( const Map& map)
+	static ui::TexturePanel UpdateTexturePanel( const Map& map)
 	{
 		ui::TexturePanel panel("Viewport");
 		switch (ApplicationManager::Get().CurrentState())

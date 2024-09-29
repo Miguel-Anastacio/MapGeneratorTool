@@ -3,7 +3,7 @@
 #include "../../thirdparty/lodepng/textureHandler.h"
 #include "Renderer.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "HeightMap.h"
+#include "components/HeightMap.h"
 #include "Mask.h"
 namespace MapGeneratorTool
 {
@@ -24,9 +24,10 @@ Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureNa
 Map::~Map()
 {
 	//m_lookUpTexture->WriteTextureToFile();
-	m_heightmap->SaveToFile("untitledHeight.png");
+	m_maskmap->SaveToFile();
+	/*m_heightmap->SaveToFile("untitledHeight.png");
 	m_terrainmap->SaveToFile("untitledTerrain.png");
-	rend::saveToFile(m_lookupTexture, "untitledLookup.png");
+	rend::saveToFile(m_lookupTexture, "untitledLookup.png");*/
 }
 
 void Map::GenerateLookupMap(const LookupMapData& data)
@@ -79,6 +80,11 @@ void Map::GenerateLookupMapFromMask(const LookupMapData& data, const std::vector
 	//rend::drawPolygons(diagram.GetPolygons(), texture, data.width, data.height);
 	rend::drawPoints(texture, diagram, data.width, data.height);
 	rend::saveToFile(texture, "testPolNewWater0.png");
+}
+
+void Map::GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
+{
+	m_maskmap = std::make_unique<MapMask>("LandmassMask.png", textureBuffer, width(), height(), cutOffHeight);
 }
 
 void Map::CreateLookUpTextureFromMask(const Texture& mask)

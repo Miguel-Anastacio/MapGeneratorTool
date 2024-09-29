@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "../../thirdparty/MyGAL/Vector2.h"
 #include "Renderer.h"
-#include "TerrainMap.h"
+#include "components/TerrainMap.h"
 namespace MapGeneratorTool
 {
 	TerrainMap::TerrainMap(const char* name, const std::vector<double>& data, unsigned width, unsigned height)

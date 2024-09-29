@@ -1,5 +1,5 @@
 #pragma once
-#include "HeightMap.h"
+#include "components/HeightMap.h"
 #include "Map.h"
 #include "Renderer.h"
 namespace MapGeneratorTool
