@@ -1,6 +1,6 @@
 #pragma once
 #include "MapComponent.h"
-#include "../utils/Renderer.h"
+#include "Renderer.h"
 namespace MapGeneratorTool
 {
 	void MapComponent::SaveToFile() const

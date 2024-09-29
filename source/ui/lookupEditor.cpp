@@ -14,7 +14,6 @@ void LookupEditor::RenderPanel() const
 
     ImGuiSliderFlags_ flags;
    
-
     static int width = m_data.width;
     ImGui::SliderInt("Width", &width, 10, 2048, "%d");
     static int height = m_data.height;
@@ -51,5 +50,5 @@ void LookupEditor::SetMapProperties(int width, int height, int seed, int numberO
 }
 
 
-}
-}
+} // namespase ui
+} // namespace MapGeneratorTool

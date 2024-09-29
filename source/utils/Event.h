@@ -1,6 +1,6 @@
 #pragma once
-#include "map/HeightMap.h"
-#include "map/Map.h"
+#include "HeightMap.h"
+#include "Map.h"
 #include "Renderer.h"
 namespace MapGeneratorTool
 {

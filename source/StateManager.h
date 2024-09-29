@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include "ui/basePanel.h"
-#include "utils/Event.h"
+#include "Event.h"
 namespace MapGeneratorTool
 {
 	enum class State

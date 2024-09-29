@@ -3,8 +3,7 @@
 namespace MapGeneratorTool
 {
 namespace ui
-{
-		
+{	
 	void NavBar::RenderNavBar()
 	{
 		bool m_selection[MENUS] = { false };
@@ -26,7 +25,5 @@ namespace ui
             StateManager::Get().SwitchState(state);
         }
     }
-
-	
 }
 }

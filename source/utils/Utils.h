@@ -5,8 +5,6 @@ namespace MapGeneratorTool
 {
 	namespace Utils
 	{
-		
-
 		class Dimensions
 		{
 		public:
@@ -24,7 +22,7 @@ namespace MapGeneratorTool
 			inline void setDimensions(unsigned width, unsigned height) {
 				m_width = width;
 				m_height = height;
-			}
+			}		
 
 		private:
 			unsigned m_width;

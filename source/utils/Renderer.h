@@ -5,7 +5,7 @@
 #include <MyGAL/Vector2.h>
 #include <MyGAL/Diagram.h>
 #include <unordered_set>
-#include "../utils/Color.h"
+#include "Color.h"
 #include <delaunator/include/delaunator.hpp>
 constexpr double PointRadius = 0.1f;
 constexpr double Offset = 1.0f;

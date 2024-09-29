@@ -1,7 +1,7 @@
 #pragma once
 #include <algorithm>
 #include "../../thirdparty/MyGAL/Vector2.h"
-#include "../utils/Renderer.h"
+#include "Renderer.h"
 #include "TerrainMap.h"
 namespace MapGeneratorTool
 {

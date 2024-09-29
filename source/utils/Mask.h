@@ -20,8 +20,7 @@ struct Mask
     }
 
 	void SetMaskData(const std::vector<uint8_t>& buffer) 
-	{
-		
+	{	
 		for (unsigned y = 0; y < height; y++)
 		{
 			for (unsigned x = 0; x < width; x++)

@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utils.h"
+#include "Utils.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 namespace MapGeneratorTool
 {

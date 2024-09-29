@@ -13,7 +13,7 @@
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
 #include "ui/TexturePanel.h"
-#include "ComputeGeometry.h"
+//#include "ComputeGeometry.h"
 
 #include "StateManager.h"
 namespace MapGeneratorTool
@@ -156,7 +156,7 @@ namespace MapGeneratorTool
 		return panel;
 	}
 
-	void TestPoints()
+	/*void TestPoints()
 	{
 		sf::RenderTexture texture;
 		unsigned width = 250;
@@ -165,7 +165,7 @@ namespace MapGeneratorTool
 		texture.clear(sf::Color::Black);
 		rend::drawPointsBuffer(texture, rb::GeneratePoints(width, height, 0.5));
 		rend::saveToFile(texture, "points.png");
-	}
+	}*/
 
 
 	void Run()
@@ -179,7 +179,7 @@ namespace MapGeneratorTool
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		setFancyImguiStyle();
 
-		TestPoints();
+		//TestPoints();
 		ui::NavBar nav;
 
 		// generate Map
@@ -215,6 +215,7 @@ namespace MapGeneratorTool
 			window.clear();
 			ImGui::SFML::Render(window);
 			window.display();
+
 			ProcessEvents(newMap);
 		}
 

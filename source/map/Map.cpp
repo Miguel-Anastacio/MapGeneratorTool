@@ -1,10 +1,10 @@
 #include "Map.h"
-#include "../ComputeGeometry.h"
+#include "geometry/ComputeGeometry.h"
 #include "../../thirdparty/lodepng/textureHandler.h"
-#include "../utils/Renderer.h"
+#include "Renderer.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
 #include "HeightMap.h"
-#include "../utils/Mask.h"
+#include "Mask.h"
 namespace MapGeneratorTool
 {
 

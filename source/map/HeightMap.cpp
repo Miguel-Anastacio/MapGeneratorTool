@@ -2,9 +2,9 @@
 #include <algorithm>
 #include "HeightMap.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "../utils/Point.h"
+#include "Point.h"
 #include "../../thirdparty/MyGAL/Vector2.h"
-#include "../utils/Renderer.h"
+#include "Renderer.h"
 #include <execution>
 #include <thread>
 #include <numeric> // for std::transform
