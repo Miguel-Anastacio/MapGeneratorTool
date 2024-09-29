@@ -6,7 +6,8 @@
 #include <MyGAL/Diagram.h>
 #include <unordered_set>
 #include "../utils/Color.h"
-constexpr double PointRadius = 0.005f;
+#include <delaunator/include/delaunator.hpp>
+constexpr double PointRadius = 0.1f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {
@@ -46,10 +47,10 @@ namespace rend
             colorsInUse.emplace(color);
             convex.setFillColor(sf::Color(color.R, color.G, color.B));
             texture.draw(convex);
+            texture.display();
         }
 
         assert(colorsInUse.size() == polygons.size());
-        texture.display();
     }
 
     static void saveToFile(const sf::RenderTexture& texture, const char* filename)
@@ -89,12 +90,13 @@ namespace rend
 
 
     template<typename T>
-    void drawPoint(sf::RenderWindow& window, Vector2<T> point, sf::Color color)
+    void drawPoint(sf::RenderTexture& window, Vector2<T> point, sf::Color color, unsigned width, unsigned height)
     {
         auto shape = sf::CircleShape(PointRadius);
-        shape.setPosition(sf::Vector2f(point.x - PointRadius, 1.0 - point.y - PointRadius));
+        shape.setPosition(sf::Vector2f(point.x*width - PointRadius , point.y*height - PointRadius));
         shape.setFillColor(color);
         window.draw(shape);
+        window.display();
     }
 
     template<typename T>
@@ -106,13 +108,14 @@ namespace rend
                 sf::Vertex(sf::Vector2f(destination.x * width, destination.y * height), color)
         };
         window.draw(line.data(), 2, sf::Lines);
+        window.display();
     }
 
     template<typename T>
-    void drawPoints(sf::RenderTexture& window, const Diagram<T>& diagram)
+    void drawPoints(sf::RenderTexture& window, const Diagram<T>& diagram, unsigned width, unsigned height)
     {
         for (const auto& site : diagram.getSites())
-            drawPoint(window, site.point, sf::Color(100, 250, 50));
+            drawPoint(window, site.point, sf::Color(100, 250, 50), width, height);
     }
 
     template<typename T>
@@ -146,5 +149,18 @@ namespace rend
             }
         }
     }
+ 
+    static void drawPointsBuffer(sf::RenderTexture& rTex, const std::vector<delaunator::Point>& points, sf::Color color = sf::Color::Red)
+    {
+        for (auto pt : points)
+        {
+            auto shape = sf::CircleShape(PointRadius);
+            shape.setPosition(sf::Vector2f(pt.x() - PointRadius, pt.y() - PointRadius));
+            shape.setFillColor(color);
+            rTex.draw(shape);
+            rTex.display();
+        }
+    }
+
 }
 }

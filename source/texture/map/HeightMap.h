@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include "MapComponent.h"
-#include "../texture/Texture.h"
 #include <cassert>
 #include <algorithm>
 #include <memory>
@@ -22,14 +21,14 @@ namespace MapGeneratorTool
 		void RegenerateHeightMap(const NoiseMapData& data);
 		inline std::vector<double> NoiseMap() const 
 		{
-			return m_noiseValues;
+			return m_elevation;
 		}
 
 	private:
 		std::vector<double> CreateHeightMap(const NoiseMapData& data) const;
 		std::vector<sf::Uint8> CreateBuffer();
 
-		std::vector<double> m_noiseValues;
+		std::vector<double> m_elevation;
 
 		//double m_noiseScale;
 		//FastNoiseLite m_noise;

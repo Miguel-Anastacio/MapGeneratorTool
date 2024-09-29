@@ -18,7 +18,6 @@ namespace MapGeneratorTool
 	class Map : public Dimensions
 	{
 	public:
-		//Map(const char* maskFileName, int seeds, const char* lookUpTextureName,int iterLloyd);
 		Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName, int iterLloyd=0);
 		~Map();
 
@@ -51,31 +50,36 @@ namespace MapGeneratorTool
 			return m_terrainTypes;
 		}
 
-		void GenerateMap(const LookupMapData& data);
+		void GenerateLookupMap(const LookupMapData& data);
 		void GenerateHeightMap(const NoiseMapData& data);
 
 		void GenerateTerrainMap(const std::vector<double>& noiseMap);
 		void GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types);
 
-		void SaveLookupMapToFile() const;
-		void SaveLookupMapToFile(const char* filename) const;
+		//void SaveLookupMapToFile() const;
+		//void SaveLookupMapToFile(const char* filename) const;
 
-		void SaveHeightMapToFile(const char* filename) const;
+		//void SaveHeightMapToFile(const char* filename) const;
+
+		void GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer) const;
+
 
 	private:
-		inline int valSeeds(int seeds)
+		inline int valSeeds(int seeds) const
 		{
 			return std::clamp(seeds, 0, static_cast<int>(std::pow(256, 3)));
 		}
 
-		// not in use
 		void CreateLookUpTextureFromMask(const Texture& mask);
-		void PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const;
-		std::vector<uint8_t> GenerateMaskData(const Texture& mask) const;
-		void OutputSeedPoints(const std::vector<Point>& seeds) const;
+		// not in use
+		//void PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const;
+		//void OutputSeedPoints(const std::vector<Point>& seeds) const;
 		int m_divisions;
 		////////////////////////////
 		
+
+		//std::vector<sf CreatePointsOnLand(const std::vector<int8_t>& mask,)
+
 
 		const char* m_lookupTextureName;
 		mygal::Diagram<double> m_diagram;

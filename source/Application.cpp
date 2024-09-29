@@ -2,8 +2,6 @@
 #include "Application.h"
 #include "../thirdparty/lodepng/textureHandler.h"
 #include "../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "HeightMap.h"
-#include "texture/Texture.h"
 #include "map/Map.h"
 #include "imgui.h"
 #include "imgui-SFML.h"
@@ -15,6 +13,7 @@
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
 #include "ui/TexturePanel.h"
+#include "ComputeGeometry.h"
 
 #include "StateManager.h"
 namespace MapGeneratorTool
@@ -157,6 +156,17 @@ namespace MapGeneratorTool
 		return panel;
 	}
 
+	void TestPoints()
+	{
+		sf::RenderTexture texture;
+		unsigned width = 250;
+		unsigned height = 250;
+		texture.create(width, height);
+		texture.clear(sf::Color::Black);
+		rend::drawPointsBuffer(texture, rb::GeneratePoints(width, height, 0.5));
+		rend::saveToFile(texture, "points.png");
+	}
+
 
 	void Run()
 	{
@@ -169,13 +179,15 @@ namespace MapGeneratorTool
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		setFancyImguiStyle();
 
+		TestPoints();
 		ui::NavBar nav;
 
 		// generate Map
 		const unsigned width = 1024, height = 512;
-		const int seedsNumber = 400;
+		const int seedsNumber = 10;
 		Map newMap = Map(width, height, seedsNumber, "lookupmyGALnew.png");
 		newMap.GenerateHeightMap(NoiseMapData(width, height));
+		newMap.GenerateLookupMapFromMask(LookupMapData(width, height, 0, seedsNumber, 20), textureHandler::decodeOneStep("terrainMask.png"));
 
 		StateManager::Get().SetLookupData(LookupMapData(width, height, 0, seedsNumber));
 		StateManager::Get().SetNoiseData(NoiseMapData(width, height));

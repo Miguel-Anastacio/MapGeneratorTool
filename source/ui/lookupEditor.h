@@ -1,6 +1,6 @@
 #pragma once
 #include "basePanel.h"
-#include "../map/MapSpecs.h"
+#include "map/MapSpecs.h"
 #include <functional>
 namespace MapGeneratorTool
 {

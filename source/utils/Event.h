@@ -1,6 +1,6 @@
 #pragma once
-#include "../map/MapSpecs.h"
-#include "../map/Map.h"
+#include "map/HeightMap.h"
+#include "map/Map.h"
 #include "Renderer.h"
 namespace MapGeneratorTool
 {
@@ -27,7 +27,7 @@ public:
 
 	void Execute(Map& map) const override 
 	{
-		map.GenerateMap(m_data);
+		map.GenerateLookupMap(m_data);
 
 	}
 private:

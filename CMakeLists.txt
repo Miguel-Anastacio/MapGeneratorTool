@@ -39,6 +39,11 @@ add_subdirectory(thirdparty/fastNoiseLite)
 add_subdirectory(thirdparty/MyGAL)
 add_subdirectory(thirdparty)
 
+# Add the path to the delaunator-cpp header files
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/delaunator/include)
+# Add the delaunator.cpp source file
+set(DELAUNATOR_SRC ${CMAKE_SOURCE_DIR}/thirdparty/delaunator/delaunator.cpp)
+
 # Add source to this project's executable.
 
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
@@ -59,7 +64,7 @@ else()
 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} ${DELAUNATOR_SRC} )
 
 #target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")

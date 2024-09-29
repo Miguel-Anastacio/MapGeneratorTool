@@ -21,7 +21,7 @@ namespace MapGeneratorTool
 		{
 			for (unsigned x = 0; x < width; x++)
 			{
-				double value = m_noiseValues[width * y + x];
+				double value = m_elevation[width * y + x];
 				image[4 * width * y + 4 * x + 0] = value * 255;
 				image[4 * width * y + 4 * x + 1] = value * 255;
 				image[4 * width * y + 4 * x + 2] = value * 255;
@@ -47,7 +47,7 @@ namespace MapGeneratorTool
 	{
 
 		auto start = std::chrono::steady_clock::now();
-		m_noiseValues = CreateHeightMap(data);
+		m_elevation = CreateHeightMap(data);
 
 		auto duration = std::chrono::steady_clock::now() - start;
 		std::cout << "Noise generator: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
@@ -90,7 +90,7 @@ namespace MapGeneratorTool
 				{
 					const double xSample = (float)x * scaleFactor;
 					const double ySample = (float)y * scaleFactor;
-					const double noiseVal = noise.GetNoise(xSample, ySample);
+					const double noiseVal = noise.GetNoise(xSample, ySample) * 0.5 + 0.5;
 					heightMap[y * data.width + x] = noiseVal;
 
 					if (noiseVal > minMax[index].y) 
@@ -142,7 +142,7 @@ namespace MapGeneratorTool
 		{
 			for (unsigned x = 0; x < width; x++)
 			{
-				double value = m_noiseValues[width * y + x];
+				double value = m_elevation[width * y + x];
 				image[4 * width * y + 4 * x + 0] = value * 255;
 				image[4 * width * y + 4 * x + 1] = value * 255;
 				image[4 * width * y + 4 * x + 2] = value * 255;
