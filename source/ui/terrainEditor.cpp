@@ -1,7 +1,7 @@
 #pragma once
 #include "terrainEditor.h"
 #include "imgui.h"
-#include "../StateManager.h"
+#include "../AppManager.h"
 namespace MapGeneratorTool
 {
 namespace ui
@@ -35,12 +35,12 @@ void TerrainEditor::RenderPanel() const
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
-            StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Noise));
+            ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Noise));
         }
 
         if (generate)
         {
-            StateManager::Get().EventQueue.emplace_back(std::make_unique<GeneratNoiseMapEvent>(NoiseMapData(width, height, seed, octave, frequency, scale, lacunarity)));
+            ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<GeneratNoiseMapEvent>(NoiseMapData(width, height, seed, octave, frequency, scale, lacunarity)));
         }
 
         ImGui::TreePop();
@@ -91,7 +91,7 @@ void TerrainEditor::renderTerrainEdit() const
 
     if (generate)
     {
-        StateManager::Get().EventQueue.emplace_back(std::make_unique<GenerateTerrainMapEvent>(types));
+        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<GenerateTerrainMapEvent>(types));
     }
 
     static char textTerrain[256] = "terrainMask.png";
@@ -99,7 +99,7 @@ void TerrainEditor::renderTerrainEdit() const
     ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(textTerrain, SaveType::Terrain));
+        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(textTerrain, SaveType::Terrain));
     }
 
 }

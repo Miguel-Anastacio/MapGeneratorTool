@@ -3,6 +3,12 @@
 #include <vector>
 #include "ui/basePanel.h"
 #include "Event.h"
+/*
+*	Controls the application workflow, handles menus transitions 
+*	Connects the UI with the map creation logic 
+*	Handles user events 
+*/
+
 namespace MapGeneratorTool
 {
 	enum class State
@@ -11,14 +17,16 @@ namespace MapGeneratorTool
 		TerrainEditor
 	};
 
-	class StateManager
+	class ApplicationManager
 	{
 	public:
-		static StateManager& Get()
+		static ApplicationManager& Get()
 		{
-			static StateManager instance;
+			static ApplicationManager instance;
 			return instance;
 		}
+
+		void Init(unsigned width = 1024, unsigned height = 512);
 
 		void SwitchState(State newState);
 
@@ -38,19 +46,28 @@ namespace MapGeneratorTool
 			return m_currentPanel.get();
 		}
 
+		void ProcessEvents();
+
+		inline const Map& GetMap() const
+		{
+			return *(m_map.get());
+		}
+
 		std::vector<std::unique_ptr<Event>> EventQueue;
 
 	private:
-		StateManager();
-		~StateManager() = default;
-		StateManager(StateManager& other) = delete;
-		void operator = (const StateManager&) = delete;
-		StateManager(StateManager&&) = delete;
+		ApplicationManager();
+		~ApplicationManager() = default;
+		ApplicationManager(ApplicationManager& other) = delete;
+		void operator = (const ApplicationManager&) = delete;
+		ApplicationManager(ApplicationManager&&) = delete;
 
 		State m_currentState;
 		std::unique_ptr<ui::BasePanel> m_currentPanel;
 		LookupMapData m_lookupData;
 		NoiseMapData m_noiseMapData;
+
+		std::unique_ptr<Map> m_map;
 	};
 
 }

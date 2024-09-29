@@ -1,8 +1,6 @@
 #pragma once
 #include "Application.h"
-#include "../thirdparty/lodepng/textureHandler.h"
-#include "../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "map/Map.h"
+#include "map/Map.h" 
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include <SFML/Graphics.hpp>
@@ -13,9 +11,8 @@
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
 #include "ui/TexturePanel.h"
-//#include "ComputeGeometry.h"
 
-#include "StateManager.h"
+#include "AppManager.h"
 namespace MapGeneratorTool
 {
 	using namespace Utils;
@@ -89,17 +86,7 @@ namespace MapGeneratorTool
 		ImGui::SFML::Update(window, deltaClock.restart());
 	}
 
-	void ProcessEvents(Map& map)
-	{
-		for (auto& event : StateManager::Get().EventQueue)
-		{
-			event->Execute(map);
-		}
-
-		StateManager::Get().EventQueue.clear();
-	}
-
-	void RenderState(const sf::RenderTexture& texture, const ui::BasePanel& panel)
+	static void RenderState(const sf::RenderTexture& texture, const ui::BasePanel& panel)
 	{
 		panel.RenderPanel();
 		static ImVec2 viewportSize{ 500, 500 };
@@ -122,9 +109,9 @@ namespace MapGeneratorTool
 		ImGui::PopStyleVar();
 	}
 
-	const sf::RenderTexture& UpdateTexture(const Map& map)
+	static const sf::RenderTexture& UpdateTexture(const Map& map)
 	{
-		switch (StateManager::Get().CurrentState())
+		switch (ApplicationManager::Get().CurrentState())
 		{
 		case State::DiagramEditor:
 			return map.lookupTexture();
@@ -137,10 +124,10 @@ namespace MapGeneratorTool
 		}
 	}
 
-	ui::TexturePanel UpdateTexturePanel( const Map& map)
+	static ui::TexturePanel& UpdateTexturePanel( const Map& map)
 	{
 		ui::TexturePanel panel("Viewport");
-		switch (StateManager::Get().CurrentState())
+		switch (ApplicationManager::Get().CurrentState())
 		{
 		case State::DiagramEditor:
 			panel.texturesStack.push_back(&map.lookupTexture());
@@ -182,18 +169,8 @@ namespace MapGeneratorTool
 		//TestPoints();
 		ui::NavBar nav;
 
-		// generate Map
-		const unsigned width = 1024, height = 512;
-		const int seedsNumber = 10;
-		Map newMap = Map(width, height, seedsNumber, "lookupmyGALnew.png");
-		newMap.GenerateHeightMap(NoiseMapData(width, height));
-		newMap.GenerateLookupMapFromMask(LookupMapData(width, height, 0, seedsNumber, 20), textureHandler::decodeOneStep("terrainMask.png"));
-
-		StateManager::Get().SetLookupData(LookupMapData(width, height, 0, seedsNumber));
-		StateManager::Get().SetNoiseData(NoiseMapData(width, height));
-		StateManager::Get().SwitchState(State::DiagramEditor);
-
-
+		ApplicationManager::Get().Init();
+		
 		sf::Clock deltaClock;
 		while (window.isOpen()) 
 		{
@@ -202,12 +179,13 @@ namespace MapGeneratorTool
 
 			// update ui 
 			//const sf::RenderTexture& texture = UpdateTexture(newMap);
-			const ui::TexturePanel panelTexture = UpdateTexturePanel(newMap);
 			// draw
 			ImGui::DockSpaceOverViewport();
 
 			nav.RenderNavBar();
-			StateManager::Get().CurrentPanel()->RenderPanel();
+			ApplicationManager::Get().CurrentPanel()->RenderPanel();
+
+			const ui::TexturePanel panelTexture = UpdateTexturePanel(ApplicationManager::Get().GetMap());
 			panelTexture.RenderPanel();
 
 			ImGui::ShowDemoWindow();
@@ -216,7 +194,7 @@ namespace MapGeneratorTool
 			ImGui::SFML::Render(window);
 			window.display();
 
-			ProcessEvents(newMap);
+			ApplicationManager::Get().ProcessEvents();
 		}
 
 		ImGui::SFML::Shutdown();
@@ -228,7 +206,7 @@ namespace MapGeneratorTool
 		std::srand(static_cast<unsigned int>(std::time(nullptr)));
 		const unsigned width = 1024, height = 1024;
 		const int seedsNumber = 400;
-		FastNoiseLite noise;
+		//FastNoiseLite noise;
 		//noise.setfre
 		//noise.SetSeed(100123);
 		//noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
@@ -247,14 +225,14 @@ namespace MapGeneratorTool
 		//map2.SaveHeightMapToFile();
 		//map3.SaveHeightMapToFile();
 
-		Map newMap = Map(width, height, seedsNumber, "lookupmyGAL.png");
+		//Map newMap = Map(width, height, seedsNumber, "lookupmyGAL.png");
 		//std::vector<Vector2> points = FortuneAlgo::generatePoints(seedsNumber);
 		//VoronoiDiagram diagram = FortuneAlgo::generateRandomDiagram(seedsNumber);
 		//FortuneAlgo::drawDiagram(diagram);
 		//Map mapWithMask = Map("mask.png", seedsNumber, "lookup3mask.png");
 
 
-		/*auto points = generatePoints<double>(1000);
+		/*auto points = generatePoints<double>(1000);5
 		mygal::Diagram diagram = generateDiagram(points);
 		auto polygons = diagram.GetPolygons();*/
 

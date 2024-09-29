@@ -1,7 +1,7 @@
 #pragma once
 #include "lookupEditor.h"
 #include "imgui.h"
-#include "../StateManager.h"
+#include "../AppManager.h"
 namespace MapGeneratorTool
 {
 namespace ui
@@ -28,14 +28,14 @@ void LookupEditor::RenderPanel() const
 
     if (ImGui::Button("Generate"))
     {
-        StateManager::Get().EventQueue.emplace_back(std::make_unique<GenerateLookupMapEvent>(LookupMapData(width, height, seed, numberOfSeeds, lloyd)));
+        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<GenerateLookupMapEvent>(LookupMapData(width, height, seed, numberOfSeeds, lloyd)));
     }
     static char text[256] = "test.png";
     ImGui::InputText("File Name", text, IM_ARRAYSIZE(text));
     ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        StateManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Lookup));
+        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Lookup));
     }
 
     ImGui::End();

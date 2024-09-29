@@ -1,5 +1,5 @@
 #pragma once
-#include "../StateManager.h"
+#include "../AppManager.h"
 constexpr const int MENUS = 2;
 namespace MapGeneratorTool
 {
