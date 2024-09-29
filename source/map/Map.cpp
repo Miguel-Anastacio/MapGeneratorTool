@@ -14,31 +14,25 @@ Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureNa
 	m_divisions(valSeeds(seeds)),
 	m_diagram(std::move(geomt::generateDiagram(geomt::generatePoints<double>(seeds))))
 {
-	geomt::lloydRelaxation(m_diagram, iterLloyd);
+	//geomt::lloydRelaxation(m_diagram, iterLloyd);
 	m_lookupTexture.create(width, height);
 	//rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, width, height);
-	rend::drawDiagram(m_lookupTexture, m_diagram, width, height);
+	//rend::drawDiagram(m_lookupTexture, m_diagram, width, height);
 
 }
 
 Map::~Map()
 {
 	//m_lookUpTexture->WriteTextureToFile();
-	m_maskmap->SaveToFile();
-	/*m_heightmap->SaveToFile("untitledHeight.png");
+	m_maskmap->SaveToFile("untitledmask.png");
+	m_heightmap->SaveToFile("untitledHeight.png");
 	m_terrainmap->SaveToFile("untitledTerrain.png");
-	rend::saveToFile(m_lookupTexture, "untitledLookup.png");*/
+	rend::saveToFile(m_lookupTexture, "untitledLookup.png");
 }
 
 void Map::GenerateLookupMap(const LookupMapData& data)
 {
-	m_diagram = std::move(geomt::generateDiagram(geomt::generatePoints<double>(data.numberOfSeeds, data.seed)));
-	geomt::lloydRelaxation(m_diagram, data.lloyd);
-	m_lookupTexture.clear();
-	m_lookupTexture.create(data.width, data.height);
-	//rend::drawPolygons(m_diagram.GetPolygons(), m_lookupTexture, data.width, data.height);
-	rend::drawDiagram(m_lookupTexture, m_diagram, data.width, data.height);
-
+	GenerateLookupMapFromMask(data, m_maskmap->GetMaskBuffer());
 	GenerateTerrainMap(m_heightmap->NoiseMap());
 }
 
@@ -62,9 +56,8 @@ void Map::GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vec
 	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, width(), height());
 }
 
-void Map::GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer) const
+void Map::GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer) 
 {
-
 	Mask mask(data.width, data.height, buffer);
 	auto points = geomt::generatePoints<double>(data.numberOfSeeds, data.seed);
 	auto pointsCOntr = geomt::generatePointsConstrained<double>(data.numberOfSeeds, data.seed, false, mask);
@@ -74,17 +67,21 @@ void Map::GenerateLookupMapFromMask(const LookupMapData& data, const std::vector
 	//geomt::lloydRelaxation(diagramNorm, data.lloyd);
 
 	sf::RenderTexture texture;
-	texture.create(data.width, data.height);
-	rend::drawBuffer(buffer, texture, data.width, data.height);
-	rend::drawDiagram(texture, diagram, data.width, data.height);
+	m_lookupTexture.clear();
+	m_lookupTexture.create(data.width, data.height);
+	rend::drawBuffer(buffer, m_lookupTexture, data.width, data.height);
+	//rend::drawDiagram(m_lookupTexture, diagram, data.width, data.height);
 	//rend::drawPolygons(diagram.GetPolygons(), texture, data.width, data.height);
-	rend::drawPoints(texture, diagram, data.width, data.height);
-	rend::saveToFile(texture, "testPolNewWater0.png");
+	rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
+	rend::saveToFile(m_lookupTexture, "testPolNewWater0.png");
+
 }
 
 void Map::GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
 {
-	m_maskmap = std::make_unique<MapMask>("LandmassMask.png", textureBuffer, width(), height(), cutOffHeight);
+	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, width(), height(), cutOffHeight);
+	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", width(), height(), m_maskmap->MoveElevation());
+	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), width(), height(), m_terrainTypes);
 }
 
 void Map::CreateLookUpTextureFromMask(const Texture& mask)

@@ -20,8 +20,9 @@ namespace MapGeneratorTool
 		m_map = std::make_unique<Map>(width, height, seedsNumber, "Test.png");
 
 		//m_map->GenerateHeightMap(NoiseMapData(width, height));
-		//m_map->GenerateLookupMapFromMask(LookupMapData(width, height, 0, seedsNumber, 20), textureHandler::decodeOneStep("terrainMask.png"));
+		m_map->GenerateLookupMapFromMask(LookupMapData(width, height, 0, seedsNumber, 20), textureHandler::decodeOneStep("LandmassMask.png"));
 		m_map->GenerateMaskFromHeightMapTexture(heightMapBuffer, 0.001f);
+		
 
 		SetLookupData(LookupMapData(width, height, 0, seedsNumber));
 		SetNoiseData(NoiseMapData(width, height));

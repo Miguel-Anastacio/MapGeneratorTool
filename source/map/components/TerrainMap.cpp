@@ -25,7 +25,6 @@ namespace MapGeneratorTool
 		rend::drawBuffer(CreateBuffer(data), m_texture, this->width(), this->height());
 	}
 
-	
 	std::vector<sf::Uint8> TerrainMap::CreateBuffer(const std::vector<double>& data) const
 	{
 		unsigned width = this->width();
@@ -47,8 +46,6 @@ namespace MapGeneratorTool
 		}
 		return image;
 	}
-
-
 
 	sf::Color TerrainMap::GetColorFromHeight(const std::vector<TerrainType>& terrainTypes, double height) const
 	{

@@ -65,7 +65,7 @@ namespace MapGeneratorTool
 		//void SaveLookupMapToFile(const char* filename) const;
 		//void SaveHeightMapToFile(const char* filename) const;
 
-		void GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer) const;
+		void GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer);
 
 		void GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 

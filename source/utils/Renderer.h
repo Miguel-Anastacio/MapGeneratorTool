@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include "Color.h"
 #include <delaunator/include/delaunator.hpp>
-constexpr double PointRadius = 0.1f;
+constexpr double PointRadius = 1.0f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {
@@ -115,7 +115,7 @@ namespace rend
     void drawPoints(sf::RenderTexture& window, const Diagram<T>& diagram, unsigned width, unsigned height)
     {
         for (const auto& site : diagram.getSites())
-            drawPoint(window, site.point, sf::Color(100, 250, 50), width, height);
+            drawPoint(window, site.point, sf::Color(255, 0, 0), width, height);
     }
 
     template<typename T>
