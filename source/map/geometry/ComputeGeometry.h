@@ -60,7 +60,7 @@ namespace MapGeneratorTool
 				int maskX = static_cast<int>(x * mask.width);
 				int maskY = static_cast<int>(y * mask.height);
 
-				if (mask.isLand(maskX, maskY) == state) 
+				if (mask.isInMask(maskX, maskY)) 
 				{
 					points.emplace_back(x, y);
 				}

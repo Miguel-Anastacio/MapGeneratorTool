@@ -6,15 +6,16 @@
 #include "MapMask.h"
 namespace MapGeneratorTool
 {
-	MapMask::MapMask(const char* name, const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height, float cutOffHeight)
+	MapMask::MapMask(const char* name, const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height, float cutOffHeight, bool mode)
 		: MapComponent(width, height, name)
 	{
 		m_elevation = ExtractHeightMapFromTexture(textureBuffer, width, height);
-		m_buffer = CreateBuffer(m_elevation, cutOffHeight);
-		rend::drawBuffer(m_buffer, m_texture, width, height);
+		m_maskBuffer = CreateBuffer(m_elevation, cutOffHeight, mode);
+		rend::drawBuffer(m_maskBuffer, m_texture, width, height);
+		rend::saveToFile(m_texture, name);
 	}
 
-	std::vector<uint8_t> MapMask::CreateBuffer(const std::vector<double>& data, float cutOffHeight) const
+	std::vector<uint8_t> MapMask::CreateBuffer(const std::vector<double>& data, float cutOffHeight, bool mode, uint8_t alpha) const
 	{
 		unsigned width = this->width();
 		unsigned height = this->height();
@@ -25,20 +26,15 @@ namespace MapGeneratorTool
 			{
 				double value = data[width * y + x];
 
-				if (value < cutOffHeight)
-				{
-					image[4 * width * y + 4 * x + 0] = 255;
-					image[4 * width * y + 4 * x + 1] = 255;
-					image[4 * width * y + 4 * x + 2] = 255;
-					image[4 * width * y + 4 * x + 3] = 255;
-				}
-				else
-				{
-					image[4 * width * y + 4 * x + 0] = 0;
-					image[4 * width * y + 4 * x + 1] = 0;
-					image[4 * width * y + 4 * x + 2] = 0;
-					image[4 * width * y + 4 * x + 3] = 255;
-				}
+				bool condition = mode ? (value > cutOffHeight) : (value < cutOffHeight);
+				uint8_t pixelValue = condition ? 255 : 0;
+				uint8_t alphaValue = condition ? 255 : alpha;
+
+				image[4 * width * y + 4 * x + 0] = pixelValue;  // Red
+				image[4 * width * y + 4 * x + 1] = pixelValue;  // Green
+				image[4 * width * y + 4 * x + 2] = pixelValue;  // Blue
+				image[4 * width * y + 4 * x + 3] = alphaValue;  // Alpha
+
 			}
 		}
 		return image;

@@ -27,7 +27,7 @@ public:
 
 	void Execute(Map& map) const override 
 	{
-		map.GenerateLookupMap(m_data);
+		map.RegenerateLookUp(m_data);
 
 	}
 private:

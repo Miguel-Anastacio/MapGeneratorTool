@@ -65,9 +65,14 @@ namespace MapGeneratorTool
 		//void SaveLookupMapToFile(const char* filename) const;
 		//void SaveHeightMapToFile(const char* filename) const;
 
-		void GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer);
 
-		void GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
+		void RegenerateLookUp(const LookupMapData& data);
+		std::vector<uint8_t> GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer, const char* name = "example.png");
+
+		void GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight); 
+
+		void GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
+		
 
 	private:
 		inline int valSeeds(int seeds) const
@@ -94,6 +99,8 @@ namespace MapGeneratorTool
 		std::unique_ptr<HeightMap> m_heightmap;
 		std::unique_ptr<TerrainMap> m_terrainmap;
 		std::unique_ptr<MapMask> m_maskmap;
+		std::unique_ptr<MapMask> m_landMask;
+		std::unique_ptr<MapMask> m_oceanMask;
 
 		std::vector<TerrainType> m_terrainTypes;
 
