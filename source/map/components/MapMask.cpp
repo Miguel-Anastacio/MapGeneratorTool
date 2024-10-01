@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "components/MapMask.h"
 #include "MapMask.h"
+
 namespace MapGeneratorTool
 {
 	MapMask::MapMask(const char* name, const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height, float cutOffHeight, bool mode)

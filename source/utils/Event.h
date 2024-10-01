@@ -28,7 +28,6 @@ public:
 	void Execute(Map& map) const override 
 	{
 		map.RegenerateLookUp(m_data);
-
 	}
 private:
 	LookupMapData m_data;
@@ -75,7 +74,8 @@ public:
 	SaveEvent(const char* name, SaveType t) : filename(name), type(t) {};
 	void Execute(Map& map) const override
 	{
-		switch (type)
+		map.SaveMap();
+		/*switch (type)
 		{
 		case MapGeneratorTool::SaveType::Lookup:
 			rend::saveToFile(map.lookupTexture(), filename);
@@ -85,11 +85,10 @@ public:
 			break;
 		case MapGeneratorTool::SaveType::Noise:
 			rend::saveToFile(map.HeightMapTexture(), filename);
-
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 private:
 	const char* filename;

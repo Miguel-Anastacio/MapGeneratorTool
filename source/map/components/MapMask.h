@@ -18,7 +18,7 @@ namespace MapGeneratorTool
 			return std::move(m_elevation);
 		}
 
-		inline std::vector<uint8_t> GetMaskBuffer()
+		inline std::vector<uint8_t> GetMaskBuffer() const
 		{
 			return m_maskBuffer;
 		}

@@ -12,6 +12,7 @@
 #include "components/HeightMap.h"
 #include "components/TerrainMap.h"
 #include "components/MapMask.h"
+#include "components/LookupMap.h"
 namespace MapGeneratorTool
 {
 	class Texture;
@@ -24,7 +25,10 @@ namespace MapGeneratorTool
 
 		inline const sf::RenderTexture& lookupTexture() const
 		{
-			return m_lookupTexture;
+			if(m_lookupmap)
+				return m_lookupmap->Texture();
+
+			return sf::RenderTexture();
 		}
 		inline const sf::RenderTexture& HeightMapTexture() const
 		{
@@ -55,7 +59,6 @@ namespace MapGeneratorTool
 			return m_terrainTypes;
 		}
 
-		void GenerateLookupMap(const LookupMapData& data);
 		void GenerateHeightMap(const NoiseMapData& data);
 
 		void GenerateTerrainMap(const std::vector<double>& noiseMap);
@@ -67,35 +70,27 @@ namespace MapGeneratorTool
 
 
 		void RegenerateLookUp(const LookupMapData& data);
-		std::vector<uint8_t> GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer, const char* name = "example.png");
 
 		void GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight); 
 
 		void GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 		
+		void SaveMap();
+		//void ClearAll();
 
 	private:
+		void SaveMapComponent(MapComponent* component);
 		inline int valSeeds(int seeds) const
 		{
 			return std::clamp(seeds, 0, static_cast<int>(std::pow(256, 3)));
 		}
 
 		void CreateLookUpTextureFromMask(const Texture& mask);
-		// not in use
-		//void PopulateTexture(const std::unordered_map<Point, Color>& colorMap, const std::vector<Point>& diagram, Texture* texture) const;
-		//void OutputSeedPoints(const std::vector<Point>& seeds) const;
-		int m_divisions;
-		////////////////////////////
 		
-
-		//std::vector<sf CreatePointsOnLand(const std::vector<int8_t>& mask,)
-
-
 		const char* m_lookupTextureName;
-		mygal::Diagram<double> m_diagram;
-		sf::RenderTexture m_lookupTexture;
-		
 
+
+		std::unique_ptr<LookupMap> m_lookupmap;
 		std::unique_ptr<HeightMap> m_heightmap;
 		std::unique_ptr<TerrainMap> m_terrainmap;
 		std::unique_ptr<MapMask> m_maskmap;
