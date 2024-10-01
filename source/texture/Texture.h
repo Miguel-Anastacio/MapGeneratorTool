@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../Utils.h"
+#include "Utils.h"
 namespace MapGeneratorTool
 {
 	using namespace Utils;
@@ -10,7 +10,7 @@ namespace MapGeneratorTool
 		Texture(unsigned width, unsigned height, const char* name) :
 			Dimensions(width, height), m_name(name), m_buffer(width* height * 4) {};
 		Texture(const char* filename);
-		Texture(const Texture& other) : Dimensions(other.width(), other.height()), m_name(other.m_name), m_buffer(other.m_buffer) {};
+		Texture(const Texture& other) : Dimensions(other.Width(), other.Height()), m_name(other.m_name), m_buffer(other.m_buffer) {};
 		~Texture() {};
 
 		void ReadTextureFromFile(const char* filename);

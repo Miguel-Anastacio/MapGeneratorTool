@@ -37,7 +37,7 @@ project ("MapGeneratorTool")
 add_subdirectory(thirdparty/lodepng)
 add_subdirectory(thirdparty/fastNoiseLite)
 add_subdirectory(thirdparty/MyGAL)
-add_subdirectory(thirdparty)
+add_subdirectory(thirdparty/)
 
 # Add the path to the delaunator-cpp header files
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/delaunator/include)
@@ -69,10 +69,23 @@ target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} ${DELAUNATOR_SRC} )
 #target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/map/")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/utils")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/")
+
+# Add the nlohmann_json dependency
+include(FetchContent)
+
+FetchContent_Declare(
+    nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.10.5 # Choose the version you need
+)
+
+FetchContent_MakeAvailable(nlohmann_json)
 
 target_link_libraries(MapGeneratorTool PUBLIC lodepng)
 target_link_libraries(MapGeneratorTool PUBLIC fastNoiseLite)
+target_link_libraries(MapGeneratorTool PRIVATE nlohmann_json::nlohmann_json)
 #target_link_libraries(MapGeneratorTool PRIVATE sfml-graphics)
 
 target_link_libraries(MapGeneratorTool

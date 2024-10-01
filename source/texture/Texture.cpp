@@ -26,11 +26,11 @@ namespace MapGeneratorTool
 	}
 	void Texture::WriteTextureToFile(const char* filename) const
 	{
-		textureHandler::encodeOneStep(filename, m_buffer, width(), height());
+		textureHandler::encodeOneStep(filename, m_buffer, Width(), Height());
 	}
 	void Texture::WriteTextureToFile() const
 	{
-		textureHandler::encodeOneStep(m_name, m_buffer, width(), height());
+		textureHandler::encodeOneStep(m_name, m_buffer, Width(), Height());
 	}
 	//Texture::Texture(int width, int height, const char* name);
 }

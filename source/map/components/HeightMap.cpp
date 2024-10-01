@@ -1,10 +1,10 @@
 #pragma once
 #include <algorithm>
-#include "HeightMap.h"
+#include "components/HeightMap.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "../utils/Point.h"
+#include "Point.h"
 #include "../../thirdparty/MyGAL/Vector2.h"
-#include "../utils/Renderer.h"
+#include "Renderer.h"
 #include <execution>
 #include <thread>
 #include <numeric> // for std::transform
@@ -14,38 +14,28 @@ namespace MapGeneratorTool
 		: MapComponent(data.width, data.height, name)
 	{
 		RegenerateHeightMap(data);
-		unsigned width = this->width();
-		unsigned height = this->height();
-		std::vector<sf::Uint8> image(width * height * 4);
-		for (unsigned y = 0; y < height; y++)
-		{
-			for (unsigned x = 0; x < width; x++)
-			{
-				double value = m_elevation[width * y + x];
-				image[4 * width * y + 4 * x + 0] = value * 255;
-				image[4 * width * y + 4 * x + 1] = value * 255;
-				image[4 * width * y + 4 * x + 2] = value * 255;
-				image[4 * width * y + 4 * x + 3] = 255;
-			}
-		}
-
-		rend::drawBuffer(image, m_texture, width, height);
-		//SaveHeightMapToFile();
+		rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
 	}
-		
-	//HeightMap::HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs)
-	//	: m_texture(texture), m_noiseScale(noiseScale), m_noise(noise), m_noiseSpecs(specs)
-	//{
 
-	//}
+	HeightMap::HeightMap(const char* name, unsigned width, unsigned height, std::vector<double>&& elevation)
+		: MapComponent(width, height, name)
+	{
+		SetNoiseMap(std::move(elevation));
+	}
 
 	HeightMap::~HeightMap()
 	{
 
 	}
+
+	void HeightMap::SetNoiseMap(std::vector<double>&& elevation)
+	{
+		m_elevation = std::move(elevation);
+		rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
+	}
+
 	void HeightMap::RegenerateHeightMap(const NoiseMapData& data)
 	{
-
 		auto start = std::chrono::steady_clock::now();
 		m_elevation = CreateHeightMap(data);
 
@@ -53,8 +43,6 @@ namespace MapGeneratorTool
 		std::cout << "Noise generator: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
 		//SaveHeightMapToFile();
 	}
-
-	
 
 	std::vector<double> HeightMap::CreateHeightMap(const NoiseMapData& data) const
     {
@@ -135,8 +123,8 @@ namespace MapGeneratorTool
 
 	std::vector<sf::Uint8> HeightMap::CreateBuffer()
 	{
-		unsigned width = this->width();
-		unsigned height = this->height();
+		unsigned width = this->Width();
+		unsigned height = this->Height();
 		std::vector<sf::Uint8> image(width * height * 4);
 		for (unsigned y = 0; y < height; y++)
 		{

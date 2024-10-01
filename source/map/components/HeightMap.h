@@ -15,6 +15,7 @@ namespace MapGeneratorTool
 	{
 	public:
 		HeightMap(const char* name, const NoiseMapData& data);
+		HeightMap(const char* name, unsigned width, unsigned height, std::vector<double>&& elevation);
 		//HeightMap(const Texture& texture, double noiseScale, const siv::PerlinNoise& noise, const NoiseSpecs& specs);
 		~HeightMap();
 
@@ -23,6 +24,10 @@ namespace MapGeneratorTool
 		{
 			return m_elevation;
 		}
+
+		void SetNoiseMap(std::vector<double>&& elevation);
+
+
 
 	private:
 		std::vector<double> CreateHeightMap(const NoiseMapData& data) const;

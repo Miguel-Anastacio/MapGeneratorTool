@@ -5,9 +5,9 @@
 #include <MyGAL/Vector2.h>
 #include <MyGAL/Diagram.h>
 #include <unordered_set>
-#include "../utils/Color.h"
+#include "Color.h"
 #include <delaunator/include/delaunator.hpp>
-constexpr double PointRadius = 0.1f;
+constexpr double PointRadius = 1.0f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {
@@ -51,6 +51,44 @@ namespace rend
         }
 
         assert(colorsInUse.size() == polygons.size());
+    }
+
+    template<typename T>
+    void drawPolygons(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<Utils::Color>& colorsInUse)
+    {
+        if (texture.getSize() == sf::Vector2u(0, 0))
+        {
+            if (!texture.create(width, height))
+            {
+                // error...
+                std::cout << "Error creating texture to draw polygons to map" << "\n";
+                return;
+            }
+        }
+
+        // drawing uses the same functions
+        texture.clear();
+        for (const std::vector<Vector2<T>>& pol : polygons)
+        {
+            sf::ConvexShape convex;
+            convex.setPointCount(pol.size());
+            for (int i = 0; i < pol.size(); i++)
+            {
+                sf::Vector2f point(pol[i].x * width, pol[i].y * height);
+                convex.setPoint(i, point);
+            }
+            Utils::Color color;
+            do {
+                color.RandColor();
+            } while (colorsInUse.contains(color));
+
+            colorsInUse.emplace(color);
+            convex.setFillColor(sf::Color(color.R, color.G, color.B));
+            texture.draw(convex);
+            texture.display();
+        }
+
+        //assert(colorsInUse.size() == polygons.size());
     }
 
     static void saveToFile(const sf::RenderTexture& texture, const char* filename)
@@ -115,7 +153,7 @@ namespace rend
     void drawPoints(sf::RenderTexture& window, const Diagram<T>& diagram, unsigned width, unsigned height)
     {
         for (const auto& site : diagram.getSites())
-            drawPoint(window, site.point, sf::Color(100, 250, 50), width, height);
+            drawPoint(window, site.point, sf::Color(255, 0, 0), width, height);
     }
 
     template<typename T>

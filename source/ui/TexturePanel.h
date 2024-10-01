@@ -6,6 +6,7 @@ namespace MapGeneratorTool
 {
 namespace ui
 {
+	static int mainImage = 0;
 class TexturePanel : public BasePanel
 {
 public:

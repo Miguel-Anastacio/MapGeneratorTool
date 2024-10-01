@@ -3,8 +3,7 @@
 namespace MapGeneratorTool
 {
 namespace ui
-{
-		
+{	
 	void NavBar::RenderNavBar()
 	{
 		bool m_selection[MENUS] = { false };
@@ -23,10 +22,8 @@ namespace ui
         size.y = size.y * 1.5;
         if (ImGui::Selectable(text, flagToUpdate, flag, size))
         {
-            StateManager::Get().SwitchState(state);
+            ApplicationManager::Get().SwitchState(state);
         }
     }
-
-	
 }
 }

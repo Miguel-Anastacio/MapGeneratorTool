@@ -1,7 +1,7 @@
 #pragma once
 #include "basePanel.h"
-#include "map/MapSpecs.h"
-#include "../utils/Event.h"
+//#include "map/MapSpecs.h"
+#include "Event.h"
 namespace MapGeneratorTool
 {
 namespace ui

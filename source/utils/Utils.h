@@ -5,18 +5,16 @@ namespace MapGeneratorTool
 {
 	namespace Utils
 	{
-		
-
 		class Dimensions
 		{
 		public:
 			Dimensions(unsigned width, unsigned height) : m_width(width), m_height(height) {};
 			Dimensions() : m_width(1), m_height(1) {};
 
-			inline unsigned width()  const {
+			inline unsigned Width()  const {
 				return m_width;
 			}
-			inline unsigned height()  const {
+			inline unsigned Height()  const {
 				return m_height;
 			}
 
@@ -24,7 +22,7 @@ namespace MapGeneratorTool
 			inline void setDimensions(unsigned width, unsigned height) {
 				m_width = width;
 				m_height = height;
-			}
+			}		
 
 		private:
 			unsigned m_width;

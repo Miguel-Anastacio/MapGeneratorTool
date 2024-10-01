@@ -1,8 +1,8 @@
 #pragma once
 #include <algorithm>
 #include "../../thirdparty/MyGAL/Vector2.h"
-#include "../utils/Renderer.h"
-#include "TerrainMap.h"
+#include "Renderer.h"
+#include "components/TerrainMap.h"
 namespace MapGeneratorTool
 {
 	TerrainMap::TerrainMap(const char* name, const std::vector<double>& data, unsigned width, unsigned height)
@@ -22,14 +22,13 @@ namespace MapGeneratorTool
 
 	void TerrainMap::RegenerateTerrain(const std::vector<double>& data)
 	{
-		rend::drawBuffer(CreateBuffer(data), m_texture, this->width(), this->height());
+		rend::drawBuffer(CreateBuffer(data), m_texture, this->Width(), this->Height());
 	}
 
-	
 	std::vector<sf::Uint8> TerrainMap::CreateBuffer(const std::vector<double>& data) const
 	{
-		unsigned width = this->width();
-		unsigned height = this->height();
+		unsigned width = this->Width();
+		unsigned height = this->Height();
 		std::vector<sf::Uint8> image(width * height * 4);
 		for (unsigned y = 0; y < height; y++)
 		{
@@ -47,8 +46,6 @@ namespace MapGeneratorTool
 		}
 		return image;
 	}
-
-
 
 	sf::Color TerrainMap::GetColorFromHeight(const std::vector<TerrainType>& terrainTypes, double height) const
 	{

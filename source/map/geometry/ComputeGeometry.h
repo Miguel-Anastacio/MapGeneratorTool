@@ -3,38 +3,13 @@
 #include <random>
 #include <chrono>
 #include <iostream>
-#include "utils/Color.h"
+#include "Color.h"
 #include "MyGAL/Diagram.h"
 #include "MyGAL/FortuneAlgorithm.h"
-#include "utils/Mask.h"
+#include "Mask.h"
 #include "delaunator/include/delaunator.hpp"
 namespace MapGeneratorTool
 {
-	//namespace SimpleVoronoiDiagram
-	//{
-	//using namespace Utils;
-	//using ::std::vector;
-	//using ::std::unordered_map;
-
-	//vector<Utils::Point> GenerateSeeds(int numberOfSeeds, int width, int height);
-	////unordered_map<Utils::Point, Utils::Color> GenerateColorMap(const vector<Point>& seeds);
-
-	//vector<Point> GenerateDiagram(const vector<Point>& seeds, int width, int height);
-
-	//vector<Point> GenerateDiagramFromMask(const vector<Point>& seeds, int width, int height, const vector<uint8_t> mask);
-
-	//vector<Point> ComputeCentroids(const vector<Point>& diagram, int width, int height, const vector<Point>& seeds);
-
-	//template <typename T>
-	//void WriteDiagramToTexture(const Texture& texture, mygal::Diagram<T>& diagram);
-
-	//template<typename T>
-	//void WriteDiagramToTexture(const Texture& texture, mygal::Diagram<T>& diagram)
-	//{
-
-	//}
-
-	//}
 
 	namespace geomt
 	{
@@ -85,14 +60,12 @@ namespace MapGeneratorTool
 				int maskX = static_cast<int>(x * mask.width);
 				int maskY = static_cast<int>(y * mask.height);
 
-				if (mask.isLand(maskX, maskY) == state) 
+				if (mask.isInMask(maskX, maskY)) 
 				{
 					points.emplace_back(x, y);
 				}
 			}
 
-			
-			
 			return points;
 		}
 

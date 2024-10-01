@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include <format>
 namespace MapGeneratorTool
 {
 	namespace Utils
@@ -46,6 +48,19 @@ namespace MapGeneratorTool
 				G = static_cast<uint8_t>(rand() % 255);
 				B = static_cast<uint8_t>(rand() % 255);
 				A = 255;
+			}
+
+			std::string ConvertToHex() const 
+			{
+				/*std::stringstream stream;
+				stream << "#";
+				stream << std::hex << std::setw(2) << std::setfill('0') << R;
+				stream << std::hex << std::setw(2) << std::setfill('0') << G;
+				stream << std::hex << std::setw(2) << std::setfill('0') << B;
+				stream << std::hex << std::setw(2) << std::setfill('0') << A;
+				return stream.str();*/
+
+				return std::format("#{:02x}{:02x}{:02x}{:02x}", R, G, B, A);
 			}
 
 		};
