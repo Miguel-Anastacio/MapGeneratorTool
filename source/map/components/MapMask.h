@@ -17,11 +17,17 @@ namespace MapGeneratorTool
 		{
 			return std::move(m_elevation);
 		}
+		inline std::vector<double> GetElevation()
+		{
+			return m_elevation;
+		}
 
 		inline std::vector<uint8_t> GetMaskBuffer() const
 		{
 			return m_maskBuffer;
 		}
+
+		void RegenerateMask(float cutOffHeight, bool mode = true);
 	
 	private:
 		//std::vector<double> CreateHeightMap(const NoiseMapData& data) const;

@@ -14,7 +14,7 @@ namespace MapGeneratorTool
 		: MapComponent(data.width, data.height, name)
 	{
 		RegenerateHeightMap(data);
-		rend::drawBuffer(CreateBuffer(), m_texture, this->width(), this->height());
+		rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
 	}
 
 	HeightMap::HeightMap(const char* name, unsigned width, unsigned height, std::vector<double>&& elevation)
@@ -31,7 +31,7 @@ namespace MapGeneratorTool
 	void HeightMap::SetNoiseMap(std::vector<double>&& elevation)
 	{
 		m_elevation = std::move(elevation);
-		rend::drawBuffer(CreateBuffer(), m_texture, this->width(), this->height());
+		rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
 	}
 
 	void HeightMap::RegenerateHeightMap(const NoiseMapData& data)
@@ -123,8 +123,8 @@ namespace MapGeneratorTool
 
 	std::vector<sf::Uint8> HeightMap::CreateBuffer()
 	{
-		unsigned width = this->width();
-		unsigned height = this->height();
+		unsigned width = this->Width();
+		unsigned height = this->Height();
 		std::vector<sf::Uint8> image(width * height * 4);
 		for (unsigned y = 0; y < height; y++)
 		{

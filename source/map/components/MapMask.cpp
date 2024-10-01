@@ -13,13 +13,13 @@ namespace MapGeneratorTool
 		m_elevation = ExtractHeightMapFromTexture(textureBuffer, width, height);
 		m_maskBuffer = CreateBuffer(m_elevation, cutOffHeight, mode);
 		rend::drawBuffer(m_maskBuffer, m_texture, width, height);
-		rend::saveToFile(m_texture, name);
+		//rend::saveToFile(m_texture, name);
 	}
 
 	std::vector<uint8_t> MapMask::CreateBuffer(const std::vector<double>& data, float cutOffHeight, bool mode, uint8_t alpha) const
 	{
-		unsigned width = this->width();
-		unsigned height = this->height();
+		unsigned width = this->Width();
+		unsigned height = this->Height();
 		std::vector<uint8_t> image(width * height * 4);
 		for (unsigned y = 0; y < height; y++)
 		{
@@ -39,6 +39,12 @@ namespace MapGeneratorTool
 			}
 		}
 		return image;
+	}
+
+	void MapMask::RegenerateMask(float cutOffHeight, bool mode)
+	{
+		Texture().clear();
+		m_maskBuffer = CreateBuffer(m_elevation, cutOffHeight, mode);
 	}
 
 	std::vector<double> MapGeneratorTool::MapMask::ExtractHeightMapFromTexture(const std::vector<uint8_t>& buffer, unsigned width, unsigned height) const

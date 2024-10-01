@@ -1,6 +1,7 @@
 #pragma once
 #include "TexturePanel.h"
 #include "imgui-SFML.h"
+#include <iostream>
 namespace MapGeneratorTool
 {
 namespace ui
@@ -11,20 +12,26 @@ namespace ui
 		static ImVec2 viewportSize{ 500, 500 };
 		if (ImGui::Begin("Viewport")) 
 		{
-			ImVec2 windowSize = ImGui::GetContentRegionAvail();
+			auto images = texturesStack;
+			ImVec2 windowSize(400, 300);
+			// Set up a horizontal layout for large and small images
+			ImGui::BeginChild("Large Image", ImVec2(850, 0), true); // Left side for the large image
+			ImGui::Image(*images[mainImage], ImVec2(800, 600)); // Display the large image
+			ImGui::EndChild();
 
-			// Calculate half the width of the window
-			float halfWidth = windowSize.x / texturesStack.size();
-			float height = windowSize.y / texturesStack.size();
+			ImGui::SameLine(); // Place the small images next to the large image
+			ImGui::BeginChild("Small Images", ImVec2(0, 0), true); // Right side for small images
 
-			for (auto image : texturesStack)
+			// Display the small images as buttons
+			for (int i = 0; i < images.size(); i++)
 			{
-				ImGui::Image(*image, windowSize);
-				//ImGui::SameLine();
-				//ImGui::Image(*image, ImVec2(halfWidth, height));
-				//ImGui::Spacing();
-				//ImGui::Spacing();
+				if (ImGui::ImageButton(("ban" + std::to_string(i)).c_str(), *images[i], ImVec2(100, 100)))
+				{
+					mainImage = i;
+				}
 			}
+
+			ImGui::EndChild(); // End the small images child
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();

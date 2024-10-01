@@ -15,18 +15,25 @@ namespace MapGeneratorTool
 
 	}
 
-	void LookupMap::RegenerateLookUp(const LookupMapData& data, const MapMask* landMask, const MapMask* oceanMask)
+	void LookupMap::RegenerateLookUp(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
 	{
+		const auto width = Width();
+		const auto height = Height();
 		m_colorsInUse.clear();
-		std::vector<uint8_t> llmBuffer = GenerateLookupMapFromMask(LookupMapData(width(), height(), data.seed, data.numberOfSeeds, data.lloyd), landMask->GetMaskBuffer(), "landMaskLookUp.png");
-		std::vector<uint8_t> lloBuffer = GenerateLookupMapFromMask(LookupMapData(width(), height(), data.seed, data.numberOfSeeds, data.lloyd), oceanMask->GetMaskBuffer(), "oceanMaskLookUp.png");
+		std::vector<uint8_t> llmBuffer = GenerateLookupMapFromMask(data.land, landMask, "landMaskLookUp.png");
+		std::vector<uint8_t> lloBuffer = GenerateLookupMapFromMask(data.ocean, oceanMask, "oceanMaskLookUp.png");
 
-		std::vector<uint8_t> temp(width() * height() * 4);
-		for (int y = 0; y < height(); y++)
+		landMask->Texture().clear();
+		oceanMask->Texture().clear();
+		rend::drawBuffer(llmBuffer, landMask->Texture(), width, height);
+		rend::drawBuffer(lloBuffer, oceanMask->Texture(), width, height);
+
+		std::vector<uint8_t> temp(width * height * 4);
+		for (int y = 0; y < height; y++)
 		{
-			for (int x = 0; x < width(); x++)
+			for (int x = 0; x < width; x++)
 			{
-				unsigned int index = (y * width() + x) * 4;
+				unsigned int index = (y * width + x) * 4;
 
 				if (llmBuffer[index + 3] > lloBuffer[index + 3])
 				{
@@ -46,45 +53,47 @@ namespace MapGeneratorTool
 		}
 
 		m_texture.clear();
-		rend::drawBuffer(temp, m_texture, width(), height());
+		rend::drawBuffer(temp, m_texture, width, height);
 		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
-		rend::saveToFile(m_texture, "finalLookup.png");
+		//rend::saveToFile(m_texture, "finalLookup.png");
 	}
 
-	std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupMapData& data, const std::vector<uint8_t>& buffer, const char* name)
+	std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
 	{
-		Mask mask(data.width, data.height, buffer);
-		auto pointsContr = geomt::generatePointsConstrained<double>(data.numberOfSeeds, data.seed, true, mask);
-		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(geomt::generatePointsConstrained<double>(data.numberOfSeeds, data.seed, false, mask)));
+		const auto width = Width();
+		const auto height = Height();
+		const auto buffer = mapMask->GetMaskBuffer();
+
+		Mask mask(width, height, buffer);
+		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask);
+		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
 		geomt::lloydRelaxation(diagram, data.lloyd);
 
 		// write diagram to image to get a pixel array
 		sf::RenderTexture texture;
 		texture.clear();
-		texture.create(data.width, data.height);
-		rend::drawPolygons(diagram.GetPolygons(), texture, data.width, data.height, m_colorsInUse);
+		texture.create(width, height);
+		rend::drawPolygons(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
 		sf::Image image = texture.getTexture().copyToImage();
 
 		// Get the pixel array (RGBA values)
 		const sf::Uint8* pixels = image.getPixelsPtr();
 
-		std::vector<uint8_t> temp(width() * height() * 4);
-		for (int y = 0; y < height(); y++)
+		std::vector<uint8_t> temp(width * height * 4);
+		for (int y = 0; y < height; y++)
 		{
-			for (int x = 0; x < width(); x++)
+			for (int x = 0; x < width; x++)
 			{
-				unsigned int index = (y * width() + x) * 4;
+				unsigned int index = (y * width + x) * 4;
 				temp[index + 0] = pixels[index] * (buffer[index + 0] / 255);
 				temp[index + 1] = pixels[index + 1] * (buffer[index + 1] / 255);
 				temp[index + 2] = pixels[index + 2] * (buffer[index + 2] / 255);
 				temp[index + 3] = pixels[index + 3] * (buffer[index + 3] / 255);
 			}
 		}
-		texture.clear();
-		rend::drawBuffer(temp, texture, width(), height());
-
 		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
-		rend::saveToFile(texture, name);
+		//rend::saveToFile(texture, name);
+
 
 		return temp;
 

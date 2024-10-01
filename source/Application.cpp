@@ -114,7 +114,7 @@ namespace MapGeneratorTool
 		switch (ApplicationManager::Get().CurrentState())
 		{
 		case State::DiagramEditor:
-			return map.lookupTexture();
+			return map.LookupTexture();
 			break;
 		case State::TerrainEditor:
 			return map.HeightMapTexture();
@@ -130,7 +130,10 @@ namespace MapGeneratorTool
 		switch (ApplicationManager::Get().CurrentState())
 		{
 		case State::DiagramEditor:
-			panel.texturesStack.push_back(&map.lookupTexture());
+			panel.texturesStack.emplace_back(&map.LookupTexture());
+			panel.texturesStack.emplace_back(&map.MapMaskTexture());
+			panel.texturesStack.emplace_back(&map.LandMapMaskTexture());
+			panel.texturesStack.emplace_back(&map.OceanMapMaskTexture());
 			break;
 		case State::TerrainEditor:
 			panel.texturesStack.push_back(&map.HeightMapTexture());
@@ -177,9 +180,6 @@ namespace MapGeneratorTool
 			// events
 			ProccessWindowEvents(window, deltaClock);
 
-			// update ui 
-			//const sf::RenderTexture& texture = UpdateTexture(newMap);
-			// draw
 			ImGui::DockSpaceOverViewport();
 
 			nav.RenderNavBar();

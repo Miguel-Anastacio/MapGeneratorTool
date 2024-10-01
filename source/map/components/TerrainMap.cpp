@@ -22,13 +22,13 @@ namespace MapGeneratorTool
 
 	void TerrainMap::RegenerateTerrain(const std::vector<double>& data)
 	{
-		rend::drawBuffer(CreateBuffer(data), m_texture, this->width(), this->height());
+		rend::drawBuffer(CreateBuffer(data), m_texture, this->Width(), this->Height());
 	}
 
 	std::vector<sf::Uint8> TerrainMap::CreateBuffer(const std::vector<double>& data) const
 	{
-		unsigned width = this->width();
-		unsigned height = this->height();
+		unsigned width = this->Width();
+		unsigned height = this->Height();
 		std::vector<sf::Uint8> image(width * height * 4);
 		for (unsigned y = 0; y < height; y++)
 		{

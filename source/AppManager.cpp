@@ -26,7 +26,7 @@ namespace MapGeneratorTool
 		//m_map->GenerateMaskFromHeightMapTexture(heightMapBuffer, 0.001f);
 		
 
-		SetLookupData(LookupMapData(width, height, 0, seedsNumber));
+		SetLookupData(LookupMapData(width, height, LookupFeatures(), LookupFeatures(), 0.001f));
 		SetNoiseData(NoiseMapData(width, height));
 		SwitchState(State::DiagramEditor);
 	}
