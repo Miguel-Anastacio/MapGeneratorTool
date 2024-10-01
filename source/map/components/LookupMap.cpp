@@ -6,6 +6,8 @@
 #include "components/MapMask.h"
 #include "geometry/ComputeGeometry.h"
 #include "Mask.h"
+#include "json.hpp"
+#include <fstream> 
 namespace MapGeneratorTool
 {
 
@@ -54,6 +56,7 @@ namespace MapGeneratorTool
 
 		m_texture.clear();
 		rend::drawBuffer(temp, m_texture, width, height);
+		OutputLookupTable();
 		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
 		//rend::saveToFile(m_texture, "finalLookup.png");
 	}
@@ -97,6 +100,30 @@ namespace MapGeneratorTool
 
 		return temp;
 
+	}
+
+	void LookupMap::OutputLookupTable() const
+	{
+		/// print a json file whit an id associated with a colour
+		nlohmann::ordered_json jsonArray = nlohmann::ordered_json::array();
+
+		int i = 0;
+		for (auto color : m_colorsInUse)
+		{
+			jsonArray.push_back({ {"Name", i}, {"Color", color.ConvertToHex()}});
+			i++;
+		}
+		//std::cout << jsonArray.dump(4) << std::endl;
+
+		// Write the JSON array to a file
+		std::ofstream outFile("output.json"); // Open file in write mode
+		if (outFile.is_open()) {
+			outFile << jsonArray.dump(4);  // Write to file with indentation
+			outFile.close();  // Close the file after writing
+		}
+		else {
+			std::cerr << "Could not open the file for writing!" << std::endl;
+		}
 	}
 
 }

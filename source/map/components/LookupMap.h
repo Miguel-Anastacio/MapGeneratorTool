@@ -4,6 +4,7 @@
 #include <string>
 #include "MapComponent.h"
 #include "MapSpecs.h"
+
 namespace MapGeneratorTool
 {
 
@@ -18,6 +19,8 @@ namespace MapGeneratorTool
 
 		void RegenerateLookUp(const LookupMapData& data, MapMask* landMask,  MapMask* oceanMask);
 		std::vector<uint8_t> GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mask, const char* name = "example.png");
+
+		void OutputLookupTable() const ; 
 
 	private:
 		//std::vector<double> CreateHeightMap(const NoiseMapData& data) const;
