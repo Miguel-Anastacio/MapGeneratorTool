@@ -13,5 +13,11 @@ namespace MapGeneratorTool
 		rend::saveToFile(m_texture, filename);
 	}
 
+	void MapComponent::SaveToFile(const std::string& filepath) const
+	{
+		std::string name = filepath + "\\" + m_name;
+		rend::saveToFile(m_texture, name.c_str());
+	}
+
 
 }

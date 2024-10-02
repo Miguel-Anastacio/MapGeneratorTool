@@ -27,8 +27,6 @@ namespace MapGeneratorTool
 
 		void SetNoiseMap(std::vector<double>&& elevation);
 
-
-
 	private:
 		std::vector<double> CreateHeightMap(const NoiseMapData& data) const;
 		std::vector<sf::Uint8> CreateBuffer();

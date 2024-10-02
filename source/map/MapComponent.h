@@ -11,6 +11,7 @@ public:
 
 	void SaveToFile() const;
 	void SaveToFile(const char* filename) const;
+	void SaveToFile(const std::string& filepath) const;
 
 	inline const sf::RenderTexture& Texture() const
 	{
@@ -20,6 +21,13 @@ public:
 	inline sf::RenderTexture& Texture()
 	{
 		return m_texture;
+	}
+
+
+
+	void Clear()
+	{
+
 	}
 
 

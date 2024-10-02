@@ -35,7 +35,7 @@ void TerrainEditor::RenderPanel() const
         ImGui::SameLine();
         if (ImGui::Button("Save"))
         {
-            ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Noise));
+            //ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Noise));
         }
 
         if (generate)
@@ -99,7 +99,7 @@ void TerrainEditor::renderTerrainEdit() const
     ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(textTerrain, SaveType::Terrain));
+        //ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(textTerrain, SaveType::Terrain));
     }
 
 }

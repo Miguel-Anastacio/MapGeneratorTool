@@ -20,7 +20,7 @@ namespace MapGeneratorTool
 	class Map : public Dimensions
 	{
 	public:
-		Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName, int iterLloyd=0);
+		Map(unsigned width, unsigned height);
 		~Map();
 
 		inline const sf::RenderTexture& LookupTexture() const
@@ -95,24 +95,20 @@ namespace MapGeneratorTool
 
 		void RegenerateLookUp(const LookupMapData& data);
 
-		void GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight); 
+		void GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height); 
 
 		void GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 		
-		void SaveMap();
-		//void ClearAll();
+		//void SaveMap(const char* filePath);
+		void SaveMap(const std::string& filePath) const;
+		void Reset();
 
 	private:
-		void SaveMapComponent(MapComponent* component);
-		inline int valSeeds(int seeds) const
-		{
-			return std::clamp(seeds, 0, static_cast<int>(std::pow(256, 3)));
-		}
-
-		void CreateLookUpTextureFromMask(const Texture& mask);
+		//void SaveMapComponent(MapComponent* component, const char* filePath, const char* message = "map component");
+		void SaveMapComponent(MapComponent* component, const std::string& filePath, const char* message = "map component") const;
+		void ClearMapComponent(MapComponent* component, const char* message = "map component");
 		
 		std::vector<TerrainType> m_terrainTypes; 
-		const char* m_lookupTextureName;
 
 		std::unique_ptr<LookupMap> m_lookupmap;
 		std::unique_ptr<HeightMap> m_heightmap;

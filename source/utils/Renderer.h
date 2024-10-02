@@ -91,6 +91,59 @@ namespace rend
         //assert(colorsInUse.size() == polygons.size());
     }
 
+    // Function to calculate cross product of vectors (P1P2) and (P1P)
+    template<typename T>
+    float crossProduct(const Vector2<T>& P1, const Vector2<T>& P2, const Vector2<int>& P, unsigned width, unsigned height)
+    {
+        Vector2<T> p1 = P1;
+        Vector2<T> p2 = P2;
+        //const Vector2<T> p = P;
+        p1.x*=width;
+        p2.x*=width;
+        //p3.x*=width;
+
+        p1.y *= height;
+        p2.y *= height;
+        //p3.y *= height;
+
+        return (p2.x - p1.x) * (P.y - p1.y) - (p2.y - p1.y) * (P.x - p1.x);
+    }
+
+    template<typename T>
+    bool isPointInsidePolygon(const std::vector <Vector2<T>>& polygon, Vector2<int> point, unsigned width, unsigned height)
+    {
+        int n = polygon.size();
+        if (n < 3) return false;  // A polygon must have at least 3 points
+
+        bool allPositive = false;
+        bool allNegative = false;
+
+        for (int i = 0; i < n; ++i) 
+        {
+            // Get the current vertex and the next vertex (loop back at the end)
+            const auto& P1 = polygon[i];
+            const auto& P2 = polygon[(i + 1) % n];
+
+            // Calculate cross product
+            float cross = crossProduct(P1, P2, point, width, height);
+            if (i == 0) 
+            {
+                // Initialize the sign of the first cross product
+                if (cross > 0) allPositive = true;
+                else if (cross < 0) allNegative = true;
+            }
+            else {
+                // Ensure that all cross products have the same sign
+                if (allPositive && cross < 0) return false;
+                if (allNegative && cross > 0) return false;
+            }
+        }
+
+        // If all cross products are positive or all are negative, the point is inside
+        return true;
+    }
+
+
     static void saveToFile(const sf::RenderTexture& texture, const char* filename)
     {
         texture.getTexture().copyToImage().saveToFile(filename);
@@ -124,6 +177,53 @@ namespace rend
         renderTexture.display();
         //auto duration = std::chrono::steady_clock::now() - start;
         //std::cout << "draw buffer: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
+    }
+
+    template<typename T>
+    void drawPolygonsByBuffer(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<Utils::Color>& colorsInUse)
+    {
+        std::vector<uint8_t> buffer(width * height * 4);
+
+        if (texture.getSize() == sf::Vector2u(0, 0))
+        {
+            if (!texture.create(width, height))
+            {
+                // error...
+                std::cout << "Error creating texture to draw polygons to map" << "\n";
+                return;
+            }
+        }
+
+        // drawing uses the same functions
+        texture.clear();
+        for (const std::vector<Vector2<T>>& pol : polygons)
+        {
+            Utils::Color color;
+            do {
+                color.RandColor();
+            } while (colorsInUse.contains(color));
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (isPointInsidePolygon(pol, Vector2(x, y), width, height))
+                    {
+                        unsigned int index = (y * width + x) * 4;
+                        colorsInUse.emplace(color);
+                        buffer[index] = color.R;
+                        buffer[index + 1] = color.G;
+                        buffer[index + 2] = color.B;
+                        buffer[index + 3] = color.A;
+
+                        break;
+                    }
+                }
+
+            }
+        }
+         
+        drawBuffer(buffer, texture, width, height);
     }
 
 

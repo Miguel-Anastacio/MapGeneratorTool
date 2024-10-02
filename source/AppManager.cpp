@@ -15,14 +15,13 @@ namespace MapGeneratorTool
 	void ApplicationManager::Init(unsigned width, unsigned height)
 	{
 		// generate Map
-		auto heightMapBuffer = textureHandler::decodeOneStep("heightmapearth.png", width, height);
-		const int seedsNumber = 10;
-		m_map = std::make_unique<Map>(width, height, seedsNumber, "Test.png");
+		//auto heightMapBuffer = textureHandler::decodeOneStep("heightmapearth.png", width, height);
+		m_map = std::make_unique<Map>(width, height);
 
 		//m_map->GenerateHeightMap(NoiseMapData(width, height));
 		//m_map->GenerateLookupMapFromMask(LookupMapData(width, height, 0, seedsNumber, 20), textureHandler::decodeOneStep("LandmassMask.png"));
 		
-		m_map->GenerateMap(heightMapBuffer, 0.001f);
+		//m_map->GenerateMap(heightMapBuffer, 0.001f);
 		//m_map->GenerateMaskFromHeightMapTexture(heightMapBuffer, 0.001f);
 		
 

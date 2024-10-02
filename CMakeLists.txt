@@ -15,12 +15,6 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
-#include(FetchContent)
-#FetchContent_Declare(SFML
-#    GIT_REPOSITORY https://github.com/SFML/SFML.git
-#    GIT_TAG 2.6.x)
-#FetchContent_MakeAvailable(SFML)
-
 #set this to true to ship the game!
 #! ! ! ! ! ! !
 #DELETE THE OUT FOLDER AFTER CHANGING THIS BECAUSE VISUAL STUDIO DOESN'T SEEM TO RECOGNIZE THIS CHANGE AND REBUILD!
@@ -70,6 +64,7 @@ target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} ${DELAUNATOR_SRC} )
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/map/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/utils")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/fileIO")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/")
 
 # Add the nlohmann_json dependency

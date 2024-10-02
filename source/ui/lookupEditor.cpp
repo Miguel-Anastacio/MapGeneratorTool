@@ -38,7 +38,7 @@ void LookupEditor::RenderPanel() const
     if (ImGui::TreeNode("Ocean Settings"))
     {
         ImGui::SliderInt("Seed", &data.ocean.seed, 0, 400000, "%d");
-        ImGui::SliderInt("Number of Tiles", &data.ocean.tiles, 0, 500, "%d");
+        ImGui::SliderInt("Number of Tiles", &data.ocean.tiles, 0, 10000, "%d");
         ImGui::SliderInt("Lloyd Iterations ", &data.ocean.lloyd, 0, 20);
         ImGui::TreePop();
     }
@@ -53,7 +53,7 @@ void LookupEditor::RenderPanel() const
     ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Lookup));
+        //ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(text, SaveType::Lookup));
     }
 
     ImGui::End();

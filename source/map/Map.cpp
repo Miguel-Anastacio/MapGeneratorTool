@@ -8,8 +8,8 @@ namespace MapGeneratorTool
 {
 
 
-Map::Map(unsigned width, unsigned height, int seeds, const char* lookUpTextureName, int iterLloyd)
-	: Dimensions(width, height), m_lookupTextureName(lookUpTextureName)
+Map::Map(unsigned width, unsigned height)
+	: Dimensions(width, height)
 {
 
 }
@@ -62,20 +62,16 @@ void Map::RegenerateLookUp(const LookupMapData& data)
 	rend::drawBuffer(m_maskmap->GetMaskBuffer(), m_maskmap->Texture(), Width(), Height());
 }
 
-void Map::GenerateMaskFromHeightMapTexture(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
+void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height)
 {
-	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, Width(), Height(), cutOffHeight);
-	m_landMask = std::make_unique<MapMask>("landMask.png", textureBuffer, Width(), Height(), cutOffHeight);
-	m_oceanMask = std::make_unique<MapMask>("oceanMask.png", textureBuffer, Width(), Height(), cutOffHeight, false);
-
-	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", Width(), Height(), m_maskmap->MoveElevation());
-	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), Width(), Height(), m_terrainTypes);
+	setDimensions(width, height);
+	GenerateMap(textureBuffer, m_cutOffHeight);
 }
 
 void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
 {
-	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, Width(), Height(), cutOffHeight);
 	m_cutOffHeight = cutOffHeight;
+	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, Width(), Height(), cutOffHeight);
 	m_landMask = std::make_unique<MapMask>("landMask.png", textureBuffer, Width(), Height(), cutOffHeight);
 	m_oceanMask = std::make_unique<MapMask>("oceamMask.png", textureBuffer, Width(), Height(), cutOffHeight, false);
 
@@ -87,20 +83,61 @@ void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHei
 	m_heightmap = std::make_unique<HeightMap>("heightMap1.png", Width(), Height(), m_landMask->GetElevation());
 	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), Width(), Height(), m_terrainTypes);
 }
-void Map::SaveMap()
+
+//void Map::SaveMap(const char* filePath)
+//{
+//	SaveMapComponent(m_lookupmap.get());
+//	SaveMapComponent(m_heightmap.get());
+//	SaveMapComponent(m_terrainmap.get());
+//	SaveMapComponent(m_landMask.get());
+//	SaveMapComponent(m_maskmap.get());
+//	SaveMapComponent(m_oceanMask.get());
+//}
+
+void Map::SaveMap(const std::string& filePath) const
 {
-	SaveMapComponent(m_lookupmap.get());
-	SaveMapComponent(m_heightmap.get());
-	SaveMapComponent(m_terrainmap.get());
-	SaveMapComponent(m_landMask.get());
-	SaveMapComponent(m_maskmap.get());
-	SaveMapComponent(m_oceanMask.get());
+	SaveMapComponent(m_lookupmap.get(), filePath);
+	SaveMapComponent(m_heightmap.get(), filePath);
+	SaveMapComponent(m_terrainmap.get(), filePath);
+	SaveMapComponent(m_landMask.get(), filePath);
+	SaveMapComponent(m_maskmap.get(), filePath);
+	SaveMapComponent(m_oceanMask.get(), filePath);
 }
-void Map::SaveMapComponent(MapComponent* component)
+
+
+
+void Map::Reset() 
+{
+	ClearMapComponent(m_lookupmap.get());
+	ClearMapComponent(m_heightmap.get());
+	ClearMapComponent(m_terrainmap.get());
+	ClearMapComponent(m_landMask.get());
+	ClearMapComponent(m_maskmap.get());
+	ClearMapComponent(m_oceanMask.get());
+
+	//m_terrainTypes.
+	m_cutOffHeight = 0.01f;
+}
+//void Map::SaveMapComponent(MapComponent* component, const char* filePath, const char* message)
+//{
+//	if (component)
+//		component->SaveToFile();
+//	else
+//		std::cout << "ERROR - save " << message << std::endl;
+//}
+void Map::SaveMapComponent(MapComponent* component, const std::string& filePath, const char* message) const
 {
 	if (component)
-		component->SaveToFile();
+		component->SaveToFile(filePath);
 	else
-		std::cout << "ERROR saving map component\n";
+		std::cout << "ERROR - save " << message << std::endl;
+}
+
+void Map::ClearMapComponent(MapComponent* component, const char* message)
+{
+	if (component)
+		component->Clear();
+	else
+		std::cout << "ERROR - clear " << message << std::endl;
 }
 }

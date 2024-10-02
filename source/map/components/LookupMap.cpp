@@ -77,6 +77,7 @@ namespace MapGeneratorTool
 		texture.clear();
 		texture.create(width, height);
 		rend::drawPolygons(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
+		//rend::drawPolygonsByBuffer(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
 		sf::Image image = texture.getTexture().copyToImage();
 
 		// Get the pixel array (RGBA values)

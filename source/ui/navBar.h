@@ -12,6 +12,8 @@ namespace ui
 		
 	private:
 		void renderSelectable(bool& flagToUpdate, const char* text, State state);
+
+		void renderFileMenu();
 	};
 
 }

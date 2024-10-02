@@ -2,6 +2,7 @@
 #include "components/HeightMap.h"
 #include "Map.h"
 #include "Renderer.h"
+#include "lodepng/textureHandler.h"
 namespace MapGeneratorTool
 {
 enum class SaveType
@@ -12,7 +13,7 @@ enum class SaveType
 class Event
 {
 public:
-	Event() {};
+	 Event() {};
 	~Event() = default;
 
 	virtual void Execute(Map& map) const = 0;
@@ -71,10 +72,10 @@ private:
 class SaveEvent : public Event
 {
 public:
-	SaveEvent(const char* name, SaveType t) : filename(name), type(t) {};
+	SaveEvent(const std::string& path) : filepath(path){};
 	void Execute(Map& map) const override
 	{
-		map.SaveMap();
+		map.SaveMap(filepath);
 		/*switch (type)
 		{
 		case MapGeneratorTool::SaveType::Lookup:
@@ -91,9 +92,26 @@ public:
 		}*/
 	}
 private:
-	const char* filename;
+	std::string filepath;
 	SaveType type;
 };
+
+class LoadHeightMapEvent : public Event
+{
+public:
+	LoadHeightMapEvent(const std::string& name) : filename(name) {};
+	void Execute(Map& map) const override
+	{
+		map.Reset();
+		unsigned width, height = 0;
+		auto heightMapBuffer = textureHandler::decodeOneStep(filename.c_str(), width, height);
+		map.GenerateMap(heightMapBuffer, width, height);
+
+	}
+private:
+	std::string filename;
+};
+
 
 
 
