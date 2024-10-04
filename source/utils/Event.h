@@ -93,7 +93,7 @@ public:
 	}
 private:
 	std::string filepath;
-	SaveType type;
+	//SaveType type;
 };
 
 class LoadHeightMapEvent : public Event
