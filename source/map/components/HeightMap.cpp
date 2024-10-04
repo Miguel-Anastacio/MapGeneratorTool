@@ -5,22 +5,26 @@
 #include "Point.h"
 #include "../../thirdparty/MyGAL/Vector2.h"
 #include "Renderer.h"
+#include "Rasterizer.h"
 #include <execution>
 #include <thread>
 #include <numeric> // for std::transform
+#include <geometry/ComputeGeometry.h>
 namespace MapGeneratorTool
 {
 	HeightMap::HeightMap(const char* name, const NoiseMapData& data)
-		: MapComponent(data.width, data.height, name)
+		: MapComponent(1024, 512, name)
 	{
-		RegenerateHeightMap(data);
-		rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
+		//RegenerateHeightMap(data);
+		CreateHeightTectonicPlates(data);
+		//rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
 	}
 
 	HeightMap::HeightMap(const char* name, unsigned width, unsigned height, std::vector<double>&& elevation)
 		: MapComponent(width, height, name)
 	{
 		SetNoiseMap(std::move(elevation));
+		CreateHeightTectonicPlates();
 	}
 
 	HeightMap::~HeightMap()
@@ -31,20 +35,22 @@ namespace MapGeneratorTool
 	void HeightMap::SetNoiseMap(std::vector<double>&& elevation)
 	{
 		m_elevation = std::move(elevation);
-		rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
+		//rend::drawBuffer(CreateBuffer(), m_texture, this->Width(), this->Height());
 	}
 
 	void HeightMap::RegenerateHeightMap(const NoiseMapData& data)
 	{
-		auto start = std::chrono::steady_clock::now();
-		m_elevation = CreateHeightMap(data);
+		/*auto start = std::chrono::steady_clock::now();
+		m_elevation = CreateHeightMapFromNoise(data);
 
 		auto duration = std::chrono::steady_clock::now() - start;
-		std::cout << "Noise generator: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
+		std::cout << "Noise generator: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';*/
+
+
 		//SaveHeightMapToFile();
 	}
 
-	std::vector<double> HeightMap::CreateHeightMap(const NoiseMapData& data) const
+	std::vector<double> HeightMap::CreateHeightMapFromNoise(const NoiseMapData& data) const
     {
 		float scaleFactor = 1.0f / data.scale;
 
@@ -120,6 +126,38 @@ namespace MapGeneratorTool
 
 		return heightMap;
     }
+
+	void HeightMap::CreateHeightTectonicPlates(const NoiseMapData& data)
+	{
+		int seed = 0;
+		int lloyd = 10;
+		int points = 50;
+
+		auto pointsContr = geomt::generatePoints<double>(points, seed);
+		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
+		geomt::lloydRelaxation(diagram, lloyd);
+
+		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), data.scale);
+		m_texture.clear();
+		rend::drawTileMap(m_texture, tileMap, Utils::Color(255, 0, 0, 255), Width(), Height());
+		rend::saveToFile(m_texture, "testweekacs.png");
+	}
+
+	void HeightMap::CreateHeightTectonicPlates()
+	{
+		int seed = 0;
+		int lloyd = 10;
+		int points = 50;
+
+		auto pointsContr = geomt::generatePoints<double>(points, seed);
+		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
+		geomt::lloydRelaxation(diagram, lloyd);
+
+		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height());
+		m_texture.clear();
+		rend::drawTileMap(m_texture, tileMap, Utils::Color(255, 0, 0, 255), Width(), Height());
+		rend::saveToFile(m_texture, "testweekacs.png");
+	}
 
 	std::vector<sf::Uint8> HeightMap::CreateBuffer()
 	{

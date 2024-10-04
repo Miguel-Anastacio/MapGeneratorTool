@@ -10,6 +10,8 @@ namespace MapGeneratorTool
 	ApplicationManager::ApplicationManager()
 	{
 		m_currentPanel = std::make_unique<ui::LookupEditor>("lookup");
+		std::srand(time(0));
+
 	}
 
 	void ApplicationManager::Init(unsigned width, unsigned height)

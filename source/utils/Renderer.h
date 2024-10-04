@@ -300,5 +300,31 @@ namespace rend
         }
     }
 
+
+    static void drawTileMap(sf::RenderTexture& rTex, const std::vector<int>& tileMap, Utils::Color color, unsigned width, unsigned height)
+    {
+        std::vector<uint8_t> buffer;
+        buffer.reserve(tileMap.size() * 4);
+        for (size_t i = 0; i < tileMap.size(); i++)
+        {
+            if (tileMap[i] == 1)
+            {
+                buffer.emplace_back(color.R);
+                buffer.emplace_back(color.B);
+                buffer.emplace_back(color.G);
+                buffer.emplace_back(color.A);
+            }
+            else
+            {
+                buffer.emplace_back(0);
+                buffer.emplace_back(0);
+                buffer.emplace_back(0);
+                buffer.emplace_back(0);
+            }
+        }
+
+        drawBuffer(buffer, rTex, width, height);
+    }
+
 }
 }

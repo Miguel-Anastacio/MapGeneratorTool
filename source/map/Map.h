@@ -84,6 +84,8 @@ namespace MapGeneratorTool
 		}
 
 		void GenerateHeightMap(const NoiseMapData& data);
+		void GenerateHeightMapTectonic();
+		void GenerateHeightMapTectonic(const NoiseMapData& data);
 
 		void GenerateTerrainMap(const std::vector<double>& noiseMap);
 		void GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types);
