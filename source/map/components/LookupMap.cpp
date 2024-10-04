@@ -76,7 +76,19 @@ namespace MapGeneratorTool
 		sf::RenderTexture texture;
 		texture.clear();
 		texture.create(width, height);
+
+		/*auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), 1.0f);
+
+		std::vector<mygal::Vector2<double>> centroids;
+		centroids.reserve(diagram.getSites().size());
+		for (auto& site : diagram.getSites())
+		{
+			centroids.emplace_back(site.point);
+		}
+
+		rend::floodFill(tileMap, centroids, Width(), Height());*/
 		rend::drawPolygons(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
+
 		//rend::drawPolygonsByBuffer(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
 		sf::Image image = texture.getTexture().copyToImage();
 

@@ -5,8 +5,9 @@
 #include <MyGAL/Vector2.h>
 #include <MyGAL/Diagram.h>
 #include <unordered_set>
+#include <stack>
 #include "Color.h"
-#include <delaunator/include/delaunator.hpp>
+#include "Rasterizer.h"
 constexpr double PointRadius = 1.0f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
@@ -98,8 +99,8 @@ namespace rend
         Vector2<T> p1 = P1;
         Vector2<T> p2 = P2;
         //const Vector2<T> p = P;
-        p1.x*=width;
-        p2.x*=width;
+        p1.x *= width;
+        p2.x *= width;
         //p3.x*=width;
 
         p1.y *= height;
@@ -118,7 +119,7 @@ namespace rend
         bool allPositive = false;
         bool allNegative = false;
 
-        for (int i = 0; i < n; ++i) 
+        for (int i = 0; i < n; ++i)
         {
             // Get the current vertex and the next vertex (loop back at the end)
             const auto& P1 = polygon[i];
@@ -126,7 +127,7 @@ namespace rend
 
             // Calculate cross product
             float cross = crossProduct(P1, P2, point, width, height);
-            if (i == 0) 
+            if (i == 0)
             {
                 // Initialize the sign of the first cross product
                 if (cross > 0) allPositive = true;
@@ -164,7 +165,7 @@ namespace rend
         // Create a texture
         sf::Texture texture;
         if (!texture.create(width, height)) {
-            return ; // Error handling
+            return; // Error handling
         }
 
         // Update the texture with the pixel buffer
@@ -222,7 +223,7 @@ namespace rend
 
             }
         }
-         
+
         drawBuffer(buffer, texture, width, height);
     }
 
@@ -231,7 +232,7 @@ namespace rend
     void drawPoint(sf::RenderTexture& window, Vector2<T> point, sf::Color color, unsigned width, unsigned height)
     {
         auto shape = sf::CircleShape(PointRadius);
-        shape.setPosition(sf::Vector2f(point.x*width - PointRadius , point.y*height - PointRadius));
+        shape.setPosition(sf::Vector2f(point.x * width - PointRadius, point.y * height - PointRadius));
         shape.setFillColor(color);
         window.draw(shape);
         window.display();
@@ -242,8 +243,8 @@ namespace rend
     {
         auto line = std::array<sf::Vertex, 2>
         {
-            sf::Vertex(sf::Vector2f(origin.x * width, origin.y * height), color),
-                sf::Vertex(sf::Vector2f(destination.x * width, destination.y * height), color)
+            sf::Vertex(sf::Vector2f(origin.x* width, origin.y* height), color),
+                sf::Vertex(sf::Vector2f(destination.x* width, destination.y* height), color)
         };
         window.draw(line.data(), 2, sf::Lines);
         window.display();
@@ -287,8 +288,8 @@ namespace rend
             }
         }
     }
- 
-    static void drawPointsBuffer(sf::RenderTexture& rTex, const std::vector<delaunator::Point>& points, sf::Color color = sf::Color::Red)
+
+   /* static void drawPointsBuffer(sf::RenderTexture& rTex, const std::vector<delaunator::Point>& points, sf::Color color = sf::Color::Red)
     {
         for (auto pt : points)
         {
@@ -298,33 +299,77 @@ namespace rend
             rTex.draw(shape);
             rTex.display();
         }
-    }
+    }*/
 
 
-    static void drawTileMap(sf::RenderTexture& rTex, const std::vector<int>& tileMap, Utils::Color color, unsigned width, unsigned height)
+    static void drawTileMap(sf::RenderTexture& rTex, const std::vector<rasterizer::Tile>& tileMap, Utils::Color color, unsigned width, unsigned height)
     {
-        std::vector<uint8_t> buffer;
-        buffer.reserve(tileMap.size() * 4);
-        for (size_t i = 0; i < tileMap.size(); i++)
-        {
-            if (tileMap[i] == 1)
-            {
-                buffer.emplace_back(color.R);
-                buffer.emplace_back(color.B);
-                buffer.emplace_back(color.G);
-                buffer.emplace_back(color.A);
-            }
-            else
-            {
-                buffer.emplace_back(0);
-                buffer.emplace_back(0);
-                buffer.emplace_back(0);
-                buffer.emplace_back(0);
-            }
-        }
-
+        //floodFill(tileMap, )
+        std::vector<uint8_t> buffer = rasterizer::ConvertTileMapToBuffer(tileMap);
         drawBuffer(buffer, rTex, width, height);
     }
+
+
+    static bool fill(int x, int y, std::vector<rasterizer::Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height)
+    {
+
+        if (x >= width || x < 0 || y >= height || y < 0 || tileMap[y * width + x].color == newColor || tileMap[y * width + x].visited)
+        {
+            return false;
+        }
+
+        // Stack for iterative approach
+        std::stack<std::pair<int, int>> stack;
+        stack.push({ x, y });
+
+        while (!stack.empty())
+        {
+            auto [cx, cy] = stack.top();
+            stack.pop();
+
+            // Check boundary conditions again and ensure tile hasn't been visited
+            if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
+            rasterizer::Tile& tile = tileMap[cy * width + cx];
+
+            if (tile.visited || tile.color == newColor) continue;
+
+            // Mark tile as visited and set its color
+            tile.color = newColor;
+            tile.visited = true;
+
+            // Push neighboring tiles onto the stack
+            stack.push({ cx + 1, cy });
+            stack.push({ cx - 1, cy });
+            stack.push({ cx, cy + 1 });
+            stack.push({ cx, cy - 1 });
+        }
+
+        return true;
+
+    }
+
+    static void floodFill(std::vector<rasterizer::Tile>& tileMap, std::vector<mygal::Vector2<double>>& centroids, unsigned width, unsigned height)
+    {
+        std::vector<uint8_t> buffer(tileMap.size() * 4);
+        std::unordered_set<Utils::Color> colorsInUse;
+
+
+        for (auto center : centroids)
+        {
+            auto x = static_cast<int>(center.x * width);
+            auto y = static_cast<int>(center.y * height);
+            Utils::Color color;
+            do {
+                color.RandColor();
+            } while (colorsInUse.contains(color));
+
+            if(fill(x, y, tileMap, color, width, height))
+                colorsInUse.insert(color);
+        }
+
+    }
+    
+
 
 }
 }

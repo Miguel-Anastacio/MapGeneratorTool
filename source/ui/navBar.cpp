@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <FileIO.hpp>
 #include "Utils.h"
+#include "TexturePanel.h"
 namespace MapGeneratorTool
 {
 namespace ui
@@ -26,6 +27,7 @@ namespace ui
         if (ImGui::Selectable(text, flagToUpdate, flag, size))
         {
             ApplicationManager::Get().SwitchState(state);
+            mainImage = 0;
         }
     }
     void NavBar::renderFileMenu()

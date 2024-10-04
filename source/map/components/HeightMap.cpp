@@ -138,6 +138,16 @@ namespace MapGeneratorTool
 		geomt::lloydRelaxation(diagram, lloyd);
 
 		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), data.scale);
+
+		std::vector<mygal::Vector2<double>> centroids;
+		centroids.reserve(diagram.getSites().size());
+		for (auto& site : diagram.getSites())
+		{
+			centroids.emplace_back(site.point);
+		}
+
+		rend::floodFill(tileMap, centroids, Width(), Height());
+
 		m_texture.clear();
 		rend::drawTileMap(m_texture, tileMap, Utils::Color(255, 0, 0, 255), Width(), Height());
 		rend::saveToFile(m_texture, "testweekacs.png");

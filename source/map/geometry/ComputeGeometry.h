@@ -163,11 +163,10 @@ namespace MapGeneratorTool
 		}
 
 		template<typename T>
-		static void DeformLine(std::vector<mygal::Vector2<T>>& line, float noiseScale = 25.0f)
+		static void DeformLine(std::vector<mygal::Vector2<T>>& line, FastNoiseLite& noise, float noiseScale = 25.0f)
 		{
 			// Initialize the noise generator
 			//int seed = std::rand();
-			FastNoiseLite noise(std::rand());
 			noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
 			// Parameters

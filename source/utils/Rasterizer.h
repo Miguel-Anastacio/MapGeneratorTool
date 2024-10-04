@@ -3,28 +3,53 @@
 #include <vector>
 #include <MyGAL/Diagram.h>
 #include <geometry/ComputeGeometry.h>
+#include "Color.h"
 namespace MapGeneratorTool
 {
 
 namespace rasterizer
 {
-	static void plotTile(int x, int y, unsigned width, unsigned height, std::vector<int>& tileMap)
+	struct Tile
+	{
+		Utils::Color color;
+		bool visited;
+
+		Tile(bool state, const Utils::Color& col) : color(col), visited(state){}
+		Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false) {}
+
+
+	};
+
+	static std::vector<uint8_t> ConvertTileMapToBuffer(const std::vector<Tile>& tileMap) 
+	{
+		std::vector<uint8_t> buffer;
+		buffer.reserve(tileMap.size() * 4);
+		for(auto& tile: tileMap)
+		{
+			buffer.emplace_back(tile.color.R);
+			buffer.emplace_back(tile.color.G);
+			buffer.emplace_back(tile.color.B);
+			buffer.emplace_back(tile.color.A);
+		}
+
+		return buffer;
+	}
+	static void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap)
 	{
 		if (x >= 0 && x < width && y >= 0 && y < height) 
 		{
 			int index = y * width + x;
-			tileMap[index] = 1; // Mark the tile as visited
+			tileMap[index].visited = true; // Mark the tile as visited
 		}
 	}
 
-	
-
 	template <typename T>
-	static void Line(const mygal::Vector2<T>& start, const mygal::Vector2<T>& end, std::vector<int>& tileMap, unsigned width, unsigned height, float noiseScale)
+	static void Line(const mygal::Vector2<T>& start, const mygal::Vector2<T>& end, std::vector<Tile>& tileMap, unsigned width, unsigned height, 
+		FastNoiseLite& noise, float noiseScale)
 	{
 		// Create line
-		T dx = (end.x - start.x) * width;
-		T dy = (end.y - start.y) * height;
+		T dx = (end.x - start.x);
+		T dy = (end.y - start.y);
 		T length = std::sqrt(dx * dx + dy * dy);  // Line length
 		T stepSize = std::sqrt(2.0f) / 2.0f;      // Step size
 		int numSteps = std::ceil(length / stepSize);  // Number of steps
@@ -34,16 +59,58 @@ namespace rasterizer
 		for (int i = 0; i <= numSteps; ++i) 
 		{
 			T t = i / static_cast<float>(numSteps);
-			T x = start.x * width + t * dx;
-			T y = start.y * height + t * dy;
+			T x = start.x + t * dx;
+			T y = start.y + t * dy;
 			line[i] = mygal::Vector2(x, y);
 		}
 
-		geomt::DeformLine(line, noiseScale);
+		geomt::DeformLine(line, noise, noiseScale);
 
 		for (auto& point : line)
 		{
 			plotTile(static_cast<int>(point.x), static_cast<int>(point.y), width, height, tileMap); // Cast coordinates to integers and plot
+		}
+	}
+
+	// Function to compute the normal vector for a given line
+	template <typename T>
+	static std::array<const mygal::Vector2<T>, 4> createParallelogram(const mygal::Vector2<T> p1, const mygal::Vector2<T> p2, float width)
+	{
+		// Compute the direction vector of the line
+		float dx = p2.x - p1.x;
+		float dy = p2.y - p1.y;
+
+		// Compute the normal vector to the line
+		float length = std::sqrt(dx * dx + dy * dy);
+		float nx = -(dy / length) * (width / 2);
+		float ny = (dx / length) * (width / 2);
+
+		// Define the four corners of the parallelogram
+		const mygal::Vector2<T> p1Prime = { p1.x + nx, p1.y + ny }; // Top-left corner
+		const mygal::Vector2<T> p1DoublePrime = { p1.x - nx, p1.y - ny }; // Bottom-left corner
+		const mygal::Vector2<T> p2Prime = { p2.x + nx, p2.y + ny }; // Top-right corner
+		const mygal::Vector2<T> p2DoublePrime = { p2.x - nx, p2.y - ny }; // Bottom-right corner
+
+		return { p1Prime, p1DoublePrime, p2Prime, p2DoublePrime };
+	}
+
+	template <typename T>
+	static void rasterizeParallelogram(const mygal::Vector2<T> p1Prime, const mygal::Vector2<T> p1DoublePrime, const mygal::Vector2<T> p2Prime, const mygal::Vector2<T> p2DoublePrime, 
+		std::vector<Tile>& tileMap, unsigned width, unsigned height, float noiseScale, FastNoiseLite& noise)
+	{
+		// Rasterize two triangles
+		Line(p1Prime, p2Prime, tileMap, width, height, noise, noiseScale); // Top line
+		Line(p1DoublePrime, p2DoublePrime, tileMap, width, height, noise, noiseScale); // Bottom line
+
+		// Fill in the interior of the parallelogram (simple naive horizontal stepping)
+		float stepSize = std::sqrt(2.0f) / 2.0f;
+		for (float t = 0; t <= 1.0f; t += stepSize) 
+		{
+			mygal::Vector2<T> top (p1Prime.x + t * (p2Prime.x - p1Prime.x), p1Prime.y + t * (p2Prime.y - p1Prime.y));
+			mygal::Vector2<T> bottom (p1DoublePrime.x + t * (p2DoublePrime.x - p1DoublePrime.x), p1DoublePrime.y + t * (p2DoublePrime.y - p1DoublePrime.y));
+
+
+			Line(top, bottom, tileMap, width, height, noise,noiseScale);
 		}
 	}
 
@@ -63,44 +130,9 @@ namespace rasterizer
 	};
 
 	template <typename T>
-	static std::vector<int> CreateTileFromDiagram(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, float noiseScale = 25.0f)
+	static std::vector<Tile> CreateTileFromDiagram(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, float noiseScale = 25.0f)
 	{
-		std::vector<int> tileMap(width * height, 0);
-		//std:
-
-		//for (const auto& site : diagram.getSites())
-		//{
-		//	mygal::Vector2 center = site.point;
-		//	auto face = site.face;
-		//	auto halfEdge = face->outerComponent;
-		//	if (halfEdge == nullptr)
-		//		continue;
-		//	while (halfEdge->prev != nullptr)
-		//	{
-		//		halfEdge = halfEdge->prev;
-		//		if (halfEdge == face->outerComponent)
-		//			break;
-		//	}
-		//	auto start = halfEdge;
-		//	while (halfEdge != nullptr)
-		//	{
-		//		if (halfEdge->origin != nullptr && halfEdge->destination != nullptr)
-		//		{
-		//			auto origin = halfEdge->origin->point;
-		//			auto destination = (halfEdge->destination->point;
-		//			Line(origin, destination, tileMap, width, height, noiseScale);
-		//		}
-		//	/*	else if (halfEdge->origin != nullptr && halfEdge->destination == nullptr)
-		//		{
-		//			auto origin = (halfEdge->origin->point - center) + center;
-		//			auto destination = (halfEdge->start->point - center) + center;
-		//		}*/
-		//		halfEdge = halfEdge->next;
-		//		if (halfEdge == start)
-		//			break;
-		//	}
-		//}
-
+		std::vector<Tile> tileMap(width * height, Tile());
 		std::unordered_set<LineData<T>> linesPlotted;
 
 		for (const auto& halfEdge : diagram.getHalfEdges())
@@ -116,19 +148,24 @@ namespace rasterizer
 
 					if (!linesPlotted.contains(LineData(origin, destination)))
 					{
-						Line(origin, destination, tileMap, width, height, noiseScale);
+						auto start = origin;
+						auto end = destination;
+						start.x *= width;
+						start.y *= height;
+						end.x *= width;
+						end.y *= height;
+						FastNoiseLite noise(std::rand());
+						//auto parallelogram = createParallelogram(start, end, 3.0f);
+						//rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], tileMap, width, height, noiseScale, noise);
+						Line(start, end, tileMap, width, height, noise, noiseScale);
 						linesPlotted.insert(LineData(origin, destination));
 					}
-
-
 				}
 				it = it->next;
 				if (it == start)
 					break;
 			}
 		}
-
-
 		return tileMap;
 	}
 }
