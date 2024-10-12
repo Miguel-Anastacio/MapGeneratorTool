@@ -13,9 +13,12 @@ namespace rasterizer
 	{
 		Utils::Color color;
 		bool visited;
-
-		Tile(bool state, const Utils::Color& col) : color(col), visited(state){}
-		Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false) {}
+		bool land;
+		bool isBorder;
+		mygal::Vector2<int> centroid;
+			
+		Tile(bool state, const Utils::Color& col, bool l, const mygal::Vector2<int>& centroid) : color(col), visited(state), land(l), isBorder(false){}
+		Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false), land(true), isBorder(false), centroid(0, 0) {}
 
 
 	};
@@ -40,6 +43,8 @@ namespace rasterizer
 		{
 			int index = y * width + x;
 			tileMap[index].visited = true; // Mark the tile as visited
+			tileMap[index].isBorder = true; // Mark the tile as visited
+
 		}
 	}
 

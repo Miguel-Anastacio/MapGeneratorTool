@@ -44,8 +44,7 @@ namespace ui
                     auto string = Utils::WStringToString(paths[0]);
                     ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<LoadHeightMapEvent>(string));
                 }
-                
-
+                 
             }
             if (ImGui::MenuItem("Load Generated", "Ctrl+O")) 
             {

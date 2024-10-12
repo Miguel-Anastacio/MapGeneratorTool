@@ -8,6 +8,7 @@
 #include "Mask.h"
 #include "json.hpp"
 #include <fstream> 
+#include <queue>
 namespace MapGeneratorTool
 {
 
@@ -56,7 +57,10 @@ namespace MapGeneratorTool
 
 		m_texture.clear();
 		rend::drawBuffer(temp, m_texture, width, height);
-		OutputLookupTable();
+		//OutputLookupTable();
+
+
+		//CreateLookupWithTileMap(data, landMask, oceanMask);
 		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
 		//rend::saveToFile(m_texture, "finalLookup.png");
 	}
@@ -77,7 +81,17 @@ namespace MapGeneratorTool
 		texture.clear();
 		texture.create(width, height);
 
-		/*auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), 1.0f);
+		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), 20.0f);
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				tileMap[y * width + x].land = mask.isInMask(x, y);
+
+				if (!mask.isInMask(x, y))
+					tileMap[y * width + x].visited = true;
+			}
+		}
 
 		std::vector<mygal::Vector2<double>> centroids;
 		centroids.reserve(diagram.getSites().size());
@@ -85,34 +99,219 @@ namespace MapGeneratorTool
 		{
 			centroids.emplace_back(site.point);
 		}
+		rend::floodFill(tileMap, centroids, Width(), Height());
 
-		rend::floodFill(tileMap, centroids, Width(), Height());*/
-		rend::drawPolygons(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
 
-		//rend::drawPolygonsByBuffer(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
-		sf::Image image = texture.getTexture().copyToImage();
-
-		// Get the pixel array (RGBA values)
-		const sf::Uint8* pixels = image.getPixelsPtr();
-
-		std::vector<uint8_t> temp(width * height * 4);
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				unsigned int index = (y * width + x) * 4;
-				temp[index + 0] = pixels[index] * (buffer[index + 0] / 255);
-				temp[index + 1] = pixels[index + 1] * (buffer[index + 1] / 255);
-				temp[index + 2] = pixels[index + 2] * (buffer[index + 2] / 255);
-				temp[index + 3] = pixels[index + 3] * (buffer[index + 3] / 255);
+				auto index = y * width + x;
+				if (!tileMap[index].visited)
+				{
+					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+					if (color != Utils::Color(0, 0, 0, 0))
+						rend::fill(x, y, tileMap, color, width, height);
+					//break;
+					//tileMap[index].visited = true;
+				}
 			}
 		}
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				auto index = y * width + x;
+				if (!tileMap[index].visited)
+				{
+					tileMap[index].color = Utils::Color(255, 0, 0, 255);
+				}
+			}
+		}
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				auto index = y * width + x;
+				if (tileMap[index].isBorder)
+				{
+					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+					if(color != Utils::Color(0, 0, 0, 0))
+						rend::fill(x, y, tileMap, color, width, height);
+					//break;
+					//tileMap[index].visited = true;
+				}
+			}
+		}
+
+		rend::drawTileMap(texture, tileMap, width, height);
+		//rend::drawPolygons(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
+
+		//rend::drawPolygonsByBuffer(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
+		//sf::Image image = texture.getTexture().copyToImage();
+
+		//// Get the pixel array (RGBA values)
+		//const sf::Uint8* pixels = image.getPixelsPtr();
+
+		//std::vector<uint8_t> temp(width * height * 4);
+		//for (int y = 0; y < height; y++)
+		//{
+		//	for (int x = 0; x < width; x++)
+		//	{
+		//		unsigned int index = (y * width + x) * 4;
+		//		temp[index + 0] = pixels[index] * (buffer[index + 0] / 255);
+		//		temp[index + 1] = pixels[index + 1] * (buffer[index + 1] / 255);
+		//		temp[index + 2] = pixels[index + 2] * (buffer[index + 2] / 255);
+		//		temp[index + 3] = pixels[index + 3] * (buffer[index + 3] / 255);
+		//	}
+		//}
 		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
 		//rend::saveToFile(texture, name);
 
 
-		return temp;
+		return ConvertTileMapToBuffer(tileMap);
 
+	}
+
+
+
+	void LookupMap::CreateLookupWithTileMap(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
+	{
+		const auto width = Width();
+		const auto height = Height();
+
+		const auto buffer = landMask->GetMaskBuffer();
+		Mask mask(width, height, buffer);
+		auto points = geomt::generatePointsConstrained<double>(data.land.tiles, data.land.seed, true, mask);
+		mygal::Diagram<double>  diagramLand = std::move(geomt::generateDiagram(points));
+		geomt::lloydRelaxation(diagramLand, data.land.lloyd);
+
+		const auto buffer1 = oceanMask->GetMaskBuffer();
+		Mask maskOcean(width, height, buffer1);
+		auto pointsOcean = geomt::generatePointsConstrained<double>(data.ocean.tiles, data.ocean.seed, true, maskOcean);
+		mygal::Diagram<double>  diagramOcean = std::move(geomt::generateDiagram(pointsOcean));
+		geomt::lloydRelaxation(diagramOcean, data.ocean.lloyd);
+
+		auto landTileMap = rasterizer::CreateTileFromDiagram(diagramLand, Width(), Height(), 1.0f);
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				landTileMap[y * width + x].land = mask.isInMask(x, y);
+				
+			}
+		}
+
+		auto oceanTileMap = rasterizer::CreateTileFromDiagram(diagramOcean, Width(), Height(), 1.0f);
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				landTileMap[y * width + x].land = maskOcean.isInMask(x, y);
+
+			}
+		}
+
+		std::vector<mygal::Vector2<double>> centroids;
+		centroids.reserve(diagramOcean.getSites().size());
+		for (auto& site : diagramOcean.getSites())
+		{
+			centroids.emplace_back(site.point);
+		}
+		centroids.reserve(diagramLand.getSites().size());
+		for (auto& site : diagramLand.getSites())
+		{
+			centroids.emplace_back(site.point);
+		}
+
+		rend::floodFill(landTileMap, centroids, width, height);
+
+	/*	for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				auto index = y * width + x;
+				if (tileMap[index].isBorder)
+				{
+					auto centroid = tileMap[index].centroid;
+					tileMap[index].color = tileMap[centroid.y * width + centroid.x].color;
+				}
+			}
+		}
+
+		rend::drawTileMap(m_texture, tileMap, width, height);*/
+
+
+	/*	rend::floodFill(tileMap, centroids, width, height);
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				auto index = y * width + x;
+				if (tileMap[index].isBorder)
+				{
+					auto centroid = tileMap[index].centroid;
+					tileMap[index].color = tileMap[centroid.y * width + centroid.x].color;
+				}
+			}
+		}*/
+
+		//rend::drawTileMap(m_texture, tileMap, width, height);
+	}
+
+	void LookupMap::GenerateTileMap(const LookupFeatures& data, const MapMask* mask, std::vector<rasterizer::Tile>& tileMap, const char* name)
+	{
+		const auto width = Width();
+		const auto height = Height();
+		const auto buffer = mask->GetMaskBuffer();
+
+		Mask maskData(width, height, buffer);
+		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, maskData);
+		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
+		geomt::lloydRelaxation(diagram, data.lloyd);
+
+
+
+
+
+	}
+
+	Utils::Color LookupMap::FindClosestTileOfSameType(const std::vector<rasterizer::Tile>& tileMap, int x, int y, unsigned width, unsigned height) const
+	{
+		std::unordered_set<mygal::Vector2<int>> tilesVisited;
+		const  int startIdx = y * width + x;
+		auto targetType = tileMap[startIdx].land;
+		std::stack<std::pair<int, int>> stack;
+
+		// Initialize BFS queue with the starting position
+		stack.push({ x, y });
+
+		while (!stack.empty()) 
+		{
+			auto [cx, cy] = stack.top();
+			stack.pop();
+			if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
+			if (tilesVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
+
+			const rasterizer::Tile& tile = tileMap[cy * width + cx];
+
+			if (tile.land == targetType && (tile.visited) && (!tile.isBorder))
+				return tile.color;
+			else
+				tilesVisited.insert(mygal::Vector2<int>(cx, cy));
+
+			stack.push({ cx + 1, cy });
+			stack.push({ cx - 1, cy });
+			stack.push({ cx, cy + 1 });
+			stack.push({ cx, cy - 1 });
+
+			
+		}
+
+		return Utils::Color();
 	}
 
 	void LookupMap::OutputLookupTable() const

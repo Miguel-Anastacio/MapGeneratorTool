@@ -302,7 +302,7 @@ namespace rend
     }*/
 
 
-    static void drawTileMap(sf::RenderTexture& rTex, const std::vector<rasterizer::Tile>& tileMap, Utils::Color color, unsigned width, unsigned height)
+    static void drawTileMap(sf::RenderTexture& rTex, const std::vector<rasterizer::Tile>& tileMap, unsigned width, unsigned height)
     {
         //floodFill(tileMap, )
         std::vector<uint8_t> buffer = rasterizer::ConvertTileMapToBuffer(tileMap);
@@ -312,8 +312,14 @@ namespace rend
 
     static bool fill(int x, int y, std::vector<rasterizer::Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height)
     {
+        const int index = y * width + x;
+        const bool tileType = tileMap[index].land;
 
-        if (x >= width || x < 0 || y >= height || y < 0 || tileMap[y * width + x].color == newColor || tileMap[y * width + x].visited)
+        
+        if(tileMap[index].isBorder)
+            tileMap[index].centroid = mygal::Vector2<int>(x, y);
+
+        if (x >= width || x < 0 || y >= height || y < 0 || tileMap[index].color == newColor || tileMap[index].visited)
         {
             return false;
         }
@@ -331,11 +337,17 @@ namespace rend
             if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
             rasterizer::Tile& tile = tileMap[cy * width + cx];
 
+            if(tile.isBorder)
+                tile.centroid = mygal::Vector2<int>(x, y);
+
             if (tile.visited || tile.color == newColor) continue;
+
+            if (tile.land != tileType) continue;
 
             // Mark tile as visited and set its color
             tile.color = newColor;
             tile.visited = true;
+            tile.centroid = mygal::Vector2<int>(x, y);
 
             // Push neighboring tiles onto the stack
             stack.push({ cx + 1, cy });
@@ -347,6 +359,8 @@ namespace rend
         return true;
 
     }
+
+    
 
     static void floodFill(std::vector<rasterizer::Tile>& tileMap, std::vector<mygal::Vector2<double>>& centroids, unsigned width, unsigned height)
     {
@@ -363,8 +377,9 @@ namespace rend
                 color.RandColor();
             } while (colorsInUse.contains(color));
 
-            if(fill(x, y, tileMap, color, width, height))
-                colorsInUse.insert(color);
+            if (fill(x, y, tileMap, color, width, height))
+                colorsInUse.insert(color);     
+
         }
 
     }

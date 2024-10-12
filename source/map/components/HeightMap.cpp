@@ -149,7 +149,7 @@ namespace MapGeneratorTool
 		rend::floodFill(tileMap, centroids, Width(), Height());
 
 		m_texture.clear();
-		rend::drawTileMap(m_texture, tileMap, Utils::Color(255, 0, 0, 255), Width(), Height());
+		rend::drawTileMap(m_texture, tileMap, Width(), Height());
 		rend::saveToFile(m_texture, "testweekacs.png");
 	}
 
@@ -165,7 +165,7 @@ namespace MapGeneratorTool
 
 		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height());
 		m_texture.clear();
-		rend::drawTileMap(m_texture, tileMap, Utils::Color(255, 0, 0, 255), Width(), Height());
+		rend::drawTileMap(m_texture, tileMap, Width(), Height());
 		rend::saveToFile(m_texture, "testweekacs.png");
 	}
 
