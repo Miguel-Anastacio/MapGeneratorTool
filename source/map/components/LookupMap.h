@@ -21,6 +21,7 @@ namespace MapGeneratorTool
 		void RegenerateLookUp(const LookupMapData& data, MapMask* landMask,  MapMask* oceanMask);
 		
 		std::vector<uint8_t> GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mask, const char* name = "example.png");
+		std::vector<rasterizer::Tile> GenerateTileMapFromMask(const LookupFeatures& data, const MapMask* mask, const char* name = "example.png");
 
 		void CreateLookupWithTileMap(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask);
 		void GenerateTileMap (const LookupFeatures& data, const MapMask* mask, std::vector<rasterizer::Tile>& tileMap, const char* name = "example.png");

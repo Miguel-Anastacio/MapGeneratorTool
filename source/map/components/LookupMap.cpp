@@ -23,49 +23,129 @@ namespace MapGeneratorTool
 		const auto width = Width();
 		const auto height = Height();
 		m_colorsInUse.clear();
-		std::vector<uint8_t> llmBuffer = GenerateLookupMapFromMask(data.land, landMask, "landMaskLookUp.png");
-		std::vector<uint8_t> lloBuffer = GenerateLookupMapFromMask(data.ocean, oceanMask, "oceanMaskLookUp.png");
+		auto landTileMap = GenerateTileMapFromMask(data.land, landMask, "landMaskLookUp.png");
+		auto oceanTileMap = GenerateTileMapFromMask(data.ocean, oceanMask, "oceanMaskLookUp.png");
 
 		landMask->Texture().clear();
 		oceanMask->Texture().clear();
-		rend::drawBuffer(llmBuffer, landMask->Texture(), width, height);
-		rend::drawBuffer(lloBuffer, oceanMask->Texture(), width, height);
+		rend::drawTileMap(landMask->Texture(), landTileMap,  width, height);
+		rend::drawTileMap(oceanMask->Texture(), oceanTileMap, width, height);
 
 		std::vector<uint8_t> temp(width * height * 4);
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				unsigned int index = (y * width + x) * 4;
-
-				if (llmBuffer[index + 3] > lloBuffer[index + 3])
+				const int index = y * width + x;
+				const int bufferIndex = (y * width + x) * 4;
+				Utils::Color color;
+				if (landTileMap[index].land)
 				{
-					temp[index + 0] = llmBuffer[index];
-					temp[index + 1] = llmBuffer[index + 1];
-					temp[index + 2] = llmBuffer[index + 2];
-					temp[index + 3] = llmBuffer[index + 3];
+					color = landTileMap[index].color;
 				}
-				else
+				else if (oceanTileMap[index].land)
 				{
-					temp[index + 0] = lloBuffer[index];
-					temp[index + 1] = lloBuffer[index + 1];
-					temp[index + 2] = lloBuffer[index + 2];
-					temp[index + 3] = lloBuffer[index + 3];
+					color = oceanTileMap[index].color;
+
+				}
+
+				temp[bufferIndex + 0] = color.R;
+				temp[bufferIndex + 1] = color.G;
+				temp[bufferIndex + 2] = color.B;
+				temp[bufferIndex + 3] = color.A;
+			}
+		}
+		m_texture.clear();
+		rend::drawBuffer(temp, m_texture, width, height);
+
+
+
+		OutputLookupTable();
+	}
+
+	std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
+	{
+		const auto width = Width();
+		const auto height = Height();
+		const auto buffer = mapMask->GetMaskBuffer();
+
+		Mask mask(width, height, buffer);
+		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask);
+		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
+		geomt::lloydRelaxation(diagram, data.lloyd);
+
+		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), 40.0f);
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				tileMap[y * width + x].land = mask.isInMask(x, y);
+
+				if (!mask.isInMask(x, y))
+					tileMap[y * width + x].visited = true;
+			}
+		}
+
+		std::vector<mygal::Vector2<double>> centroids;
+		centroids.reserve(diagram.getSites().size());
+		for (auto& site : diagram.getSites())
+		{
+			centroids.emplace_back(site.point);
+		}
+		rend::floodFill(tileMap, centroids, Width(), Height());
+
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				auto index = y * width + x;
+				if (!tileMap[index].visited)
+				{
+					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+					if (color != Utils::Color(0, 0, 0, 0))
+						rend::fill(x, y, tileMap, color, width, height);
+					//break;
+					//tileMap[index].visited = true;
 				}
 			}
 		}
 
-		m_texture.clear();
-		rend::drawBuffer(temp, m_texture, width, height);
-		//OutputLookupTable();
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				auto index = y * width + x;
+				if (!tileMap[index].visited)
+				{
+					tileMap[index].color = Utils::Color(255, 0, 0, 255);
+				}
+			}
+		}
 
+		//for (int y = 0; y < height; y++)
+		//{
+		//	for (int x = 0; x < width; x++)
+		//	{
+		//		auto index = y * width + x;
+		//		if (tileMap[index].isBorder)
+		//		{
+		//			auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+		//			if(color != Utils::Color(0, 0, 0, 0))
+		//				rend::fill(x, y, tileMap, color, width, height);
+		//			//break;
+		//			//tileMap[index].visited = true;
+		//		}
+		//	}
+		//}
 
-		//CreateLookupWithTileMap(data, landMask, oceanMask);
-		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
-		//rend::saveToFile(m_texture, "finalLookup.png");
+		//rend::drawTileMap(texture, tileMap, width, height);
+
+		return ConvertTileMapToBuffer(tileMap);
+
 	}
 
-	std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
+	std::vector<rasterizer::Tile> LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
 	{
 		const auto width = Width();
 		const auto height = Height();
@@ -139,43 +219,16 @@ namespace MapGeneratorTool
 				{
 					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
 					if(color != Utils::Color(0, 0, 0, 0))
-						rend::fill(x, y, tileMap, color, width, height);
+						tileMap[index].color = color;
+						
 					//break;
-					//tileMap[index].visited = true;
 				}
 			}
 		}
 
 		rend::drawTileMap(texture, tileMap, width, height);
-		//rend::drawPolygons(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
-
-		//rend::drawPolygonsByBuffer(diagram.GetPolygons(), texture, width, height, m_colorsInUse);
-		//sf::Image image = texture.getTexture().copyToImage();
-
-		//// Get the pixel array (RGBA values)
-		//const sf::Uint8* pixels = image.getPixelsPtr();
-
-		//std::vector<uint8_t> temp(width * height * 4);
-		//for (int y = 0; y < height; y++)
-		//{
-		//	for (int x = 0; x < width; x++)
-		//	{
-		//		unsigned int index = (y * width + x) * 4;
-		//		temp[index + 0] = pixels[index] * (buffer[index + 0] / 255);
-		//		temp[index + 1] = pixels[index + 1] * (buffer[index + 1] / 255);
-		//		temp[index + 2] = pixels[index + 2] * (buffer[index + 2] / 255);
-		//		temp[index + 3] = pixels[index + 3] * (buffer[index + 3] / 255);
-		//	}
-		//}
-		//rend::drawPoints(m_lookupTexture, diagram, data.width, data.height);
-		//rend::saveToFile(texture, name);
-
-
-		return ConvertTileMapToBuffer(tileMap);
-
+		return tileMap;
 	}
-
-
 
 	void LookupMap::CreateLookupWithTileMap(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
 	{
