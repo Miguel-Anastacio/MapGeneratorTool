@@ -9,6 +9,7 @@
 #include "json.hpp"
 #include <fstream> 
 #include <queue>
+#include "Algo.h"
 namespace MapGeneratorTool
 {
 
@@ -28,8 +29,8 @@ namespace MapGeneratorTool
 
 		landMask->Texture().clear();
 		oceanMask->Texture().clear();
-		rend::drawTileMap(landMask->Texture(), landTileMap,  width, height);
-		rend::drawTileMap(oceanMask->Texture(), oceanTileMap, width, height);
+		//rend::drawTileMap(landMask->Texture(), landTileMap,  width, height);
+		//rend::drawTileMap(oceanMask->Texture(), oceanTileMap, width, height);
 
 		std::vector<uint8_t> temp(width * height * 4);
 		for (int y = 0; y < height; y++)
@@ -92,7 +93,7 @@ namespace MapGeneratorTool
 		{
 			centroids.emplace_back(site.point);
 		}
-		rend::floodFill(tileMap, centroids, Width(), Height());
+		algo::floodFill(tileMap, centroids, Width(), Height());
 
 
 		for (int y = 0; y < height; y++)
@@ -104,14 +105,14 @@ namespace MapGeneratorTool
 				{
 					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
 					if (color != Utils::Color(0, 0, 0, 0))
-						rend::fill(x, y, tileMap, color, width, height);
+						algo::fill(x, y, tileMap, color, width, height);
 					//break;
 					//tileMap[index].visited = true;
 				}
 			}
 		}
 
-		for (int y = 0; y < height; y++)
+		/*for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
@@ -121,25 +122,7 @@ namespace MapGeneratorTool
 					tileMap[index].color = Utils::Color(255, 0, 0, 255);
 				}
 			}
-		}
-
-		//for (int y = 0; y < height; y++)
-		//{
-		//	for (int x = 0; x < width; x++)
-		//	{
-		//		auto index = y * width + x;
-		//		if (tileMap[index].isBorder)
-		//		{
-		//			auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
-		//			if(color != Utils::Color(0, 0, 0, 0))
-		//				rend::fill(x, y, tileMap, color, width, height);
-		//			//break;
-		//			//tileMap[index].visited = true;
-		//		}
-		//	}
-		//}
-
-		//rend::drawTileMap(texture, tileMap, width, height);
+		}*/
 
 		return ConvertTileMapToBuffer(tileMap);
 
@@ -179,7 +162,7 @@ namespace MapGeneratorTool
 		{
 			centroids.emplace_back(site.point);
 		}
-		rend::floodFill(tileMap, centroids, Width(), Height());
+		algo::floodFill(tileMap, centroids, Width(), Height());
 
 
 		for (int y = 0; y < height; y++)
@@ -191,24 +174,24 @@ namespace MapGeneratorTool
 				{
 					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
 					if (color != Utils::Color(0, 0, 0, 0))
-						rend::fill(x, y, tileMap, color, width, height);
+						algo::fill(x, y, tileMap, color, width, height);
 					//break;
 					//tileMap[index].visited = true;
 				}
 			}
 		}
 
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (!tileMap[index].visited)
-				{
-					tileMap[index].color = Utils::Color(255, 0, 0, 255);
-				}
-			}
-		}
+		//for (int y = 0; y < height; y++)
+		//{
+		//	for (int x = 0; x < width; x++)
+		//	{
+		//		auto index = y * width + x;
+		//		if (!tileMap[index].visited)
+		//		{
+		//			tileMap[index].color = Utils::Color(255, 0, 0, 255);
+		//		}
+		//	}
+		//}
 
 		for (int y = 0; y < height; y++)
 		{
@@ -226,111 +209,9 @@ namespace MapGeneratorTool
 			}
 		}
 
-		rend::drawTileMap(texture, tileMap, width, height);
 		return tileMap;
 	}
 
-	void LookupMap::CreateLookupWithTileMap(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
-	{
-		const auto width = Width();
-		const auto height = Height();
-
-		const auto buffer = landMask->GetMaskBuffer();
-		Mask mask(width, height, buffer);
-		auto points = geomt::generatePointsConstrained<double>(data.land.tiles, data.land.seed, true, mask);
-		mygal::Diagram<double>  diagramLand = std::move(geomt::generateDiagram(points));
-		geomt::lloydRelaxation(diagramLand, data.land.lloyd);
-
-		const auto buffer1 = oceanMask->GetMaskBuffer();
-		Mask maskOcean(width, height, buffer1);
-		auto pointsOcean = geomt::generatePointsConstrained<double>(data.ocean.tiles, data.ocean.seed, true, maskOcean);
-		mygal::Diagram<double>  diagramOcean = std::move(geomt::generateDiagram(pointsOcean));
-		geomt::lloydRelaxation(diagramOcean, data.ocean.lloyd);
-
-		auto landTileMap = rasterizer::CreateTileFromDiagram(diagramLand, Width(), Height(), 1.0f);
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				landTileMap[y * width + x].land = mask.isInMask(x, y);
-				
-			}
-		}
-
-		auto oceanTileMap = rasterizer::CreateTileFromDiagram(diagramOcean, Width(), Height(), 1.0f);
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				landTileMap[y * width + x].land = maskOcean.isInMask(x, y);
-
-			}
-		}
-
-		std::vector<mygal::Vector2<double>> centroids;
-		centroids.reserve(diagramOcean.getSites().size());
-		for (auto& site : diagramOcean.getSites())
-		{
-			centroids.emplace_back(site.point);
-		}
-		centroids.reserve(diagramLand.getSites().size());
-		for (auto& site : diagramLand.getSites())
-		{
-			centroids.emplace_back(site.point);
-		}
-
-		rend::floodFill(landTileMap, centroids, width, height);
-
-	/*	for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (tileMap[index].isBorder)
-				{
-					auto centroid = tileMap[index].centroid;
-					tileMap[index].color = tileMap[centroid.y * width + centroid.x].color;
-				}
-			}
-		}
-
-		rend::drawTileMap(m_texture, tileMap, width, height);*/
-
-
-	/*	rend::floodFill(tileMap, centroids, width, height);
-
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (tileMap[index].isBorder)
-				{
-					auto centroid = tileMap[index].centroid;
-					tileMap[index].color = tileMap[centroid.y * width + centroid.x].color;
-				}
-			}
-		}*/
-
-		//rend::drawTileMap(m_texture, tileMap, width, height);
-	}
-
-	void LookupMap::GenerateTileMap(const LookupFeatures& data, const MapMask* mask, std::vector<rasterizer::Tile>& tileMap, const char* name)
-	{
-		const auto width = Width();
-		const auto height = Height();
-		const auto buffer = mask->GetMaskBuffer();
-
-		Mask maskData(width, height, buffer);
-		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, maskData);
-		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
-		geomt::lloydRelaxation(diagram, data.lloyd);
-
-
-
-
-
-	}
 
 	Utils::Color LookupMap::FindClosestTileOfSameType(const std::vector<rasterizer::Tile>& tileMap, int x, int y, unsigned width, unsigned height) const
 	{

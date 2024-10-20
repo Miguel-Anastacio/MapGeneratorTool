@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+//#include "MyGAL/Vector2.h"
 namespace MapGeneratorTool
 {
 	namespace Utils
@@ -57,7 +58,6 @@ namespace MapGeneratorTool
 			return keys;
 		}
 
-
 		static std::string WStringToString(const std::wstring& wstr)
 		{
 			std::string str;
@@ -66,6 +66,60 @@ namespace MapGeneratorTool
 			wcstombs_s(&size, &str[0], str.size() + 1, wstr.c_str(), wstr.size());
 			return str;
 		}
+
+		//using namespace  mygal;
+		// Function to calculate cross product of vectors (P1P2) and (P1P)
+		//template<typename T>
+		//float crossProduct(const Vector2<T>& P1, const Vector2<T>& P2, const Vector2<int>& P, unsigned width, unsigned height)
+		//{
+		//	Vector2<T> p1 = P1;
+		//	Vector2<T> p2 = P2;
+		//	//const Vector2<T> p = P;
+		//	p1.x *= width;
+		//	p2.x *= width;
+		//	//p3.x*=width;
+
+		//	p1.y *= height;
+		//	p2.y *= height;
+		//	//p3.y *= height;
+
+		//	return (p2.x - p1.x) * (P.y - p1.y) - (p2.y - p1.y) * (P.x - p1.x);
+		//}
+
+		//template<typename T>
+		//bool isPointInsidePolygon(const std::vector <Vector2<T>>& polygon, Vector2<int> point, unsigned width, unsigned height)
+		//{
+		//	int n = polygon.size();
+		//	if (n < 3) return false;  // A polygon must have at least 3 points
+
+		//	bool allPositive = false;
+		//	bool allNegative = false;
+
+		//	for (int i = 0; i < n; ++i)
+		//	{
+		//		// Get the current vertex and the next vertex (loop back at the end)
+		//		const auto& P1 = polygon[i];
+		//		const auto& P2 = polygon[(i + 1) % n];
+
+		//		// Calculate cross product
+		//		float cross = crossProduct(P1, P2, point, width, height);
+		//		if (i == 0)
+		//		{
+		//			// Initialize the sign of the first cross product
+		//			if (cross > 0) allPositive = true;
+		//			else if (cross < 0) allNegative = true;
+		//		}
+		//		else {
+		//			// Ensure that all cross products have the same sign
+		//			if (allPositive && cross < 0) return false;
+		//			if (allNegative && cross > 0) return false;
+		//		}
+		//	}
+
+		//	// If all cross products are positive or all are negative, the point is inside
+		//	return true;
+		//}
+
 	}
 
 }

@@ -37,16 +37,8 @@ namespace rasterizer
 
 		return buffer;
 	}
-	static void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap)
-	{
-		if (x >= 0 && x < width && y >= 0 && y < height) 
-		{
-			int index = y * width + x;
-			tileMap[index].visited = true; // Mark the tile as visited
-			tileMap[index].isBorder = true; // Mark the tile as visited
 
-		}
-	}
+	static void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap);
 
 	template <typename T>
 	static void Line(const mygal::Vector2<T>& start, const mygal::Vector2<T>& end, std::vector<Tile>& tileMap, unsigned width, unsigned height, 
@@ -77,7 +69,6 @@ namespace rasterizer
 		}
 	}
 
-	// Function to compute the normal vector for a given line
 	template <typename T>
 	static std::array<const mygal::Vector2<T>, 4> createParallelogram(const mygal::Vector2<T> p1, const mygal::Vector2<T> p2, float width)
 	{

@@ -70,9 +70,6 @@ void Map::RegenerateLookUp(const LookupMapData& data)
 	//m_heightmap-
 	m_maskmap->Texture().clear();
 	rend::drawBuffer(m_maskmap->GetMaskBuffer(), m_maskmap->Texture(), Width(), Height());
-
-
-
 }
 
 void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height)
@@ -117,8 +114,6 @@ void Map::SaveMap(const std::string& filePath) const
 	SaveMapComponent(m_maskmap.get(), filePath);
 	SaveMapComponent(m_oceanMask.get(), filePath);
 }
-
-
 
 void Map::Reset() 
 {
