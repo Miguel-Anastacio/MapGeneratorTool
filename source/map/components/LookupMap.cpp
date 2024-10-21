@@ -24,47 +24,22 @@ namespace MapGeneratorTool
 		const auto width = Width();
 		const auto height = Height();
 		m_colorsInUse.clear();
-		auto landTileMap = GenerateTileMapFromMask(data.land, landMask, "landMaskLookUp.png");
-		auto oceanTileMap = GenerateTileMapFromMask(data.ocean, oceanMask, "oceanMaskLookUp.png");
+		auto landTileMap = GenerateTileMapFromMask(data.land, landMask, TileType::LAND, "landMaskLookUp.png");
+		auto oceanTileMap = GenerateTileMapFromMask(data.ocean, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
 
 		landMask->Texture().clear();
 		oceanMask->Texture().clear();
-		//rend::drawTileMap(landMask->Texture(), landTileMap,  width, height);
-		//rend::drawTileMap(oceanMask->Texture(), oceanTileMap, width, height);
+		rend::drawTileMap(landTileMap, landMask->Texture(), width, height);
+		rend::drawTileMap(oceanTileMap, oceanMask->Texture(), width, height);
 
-		std::vector<uint8_t> temp(width * height * 4);
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				const int index = y * width + x;
-				const int bufferIndex = (y * width + x) * 4;
-				Utils::Color color;
-				if (landTileMap[index].land)
-				{
-					color = landTileMap[index].color;
-				}
-				else if (oceanTileMap[index].land)
-				{
-					color = oceanTileMap[index].color;
-
-				}
-
-				temp[bufferIndex + 0] = color.R;
-				temp[bufferIndex + 1] = color.G;
-				temp[bufferIndex + 2] = color.B;
-				temp[bufferIndex + 3] = color.A;
-			}
-		}
+		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
 		m_texture.clear();
-		rend::drawBuffer(temp, m_texture, width, height);
-
-
+		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
 
 		OutputLookupTable();
 	}
 
-	std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
+	/*std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
 	{
 		const auto width = Width();
 		const auto height = Height();
@@ -75,7 +50,11 @@ namespace MapGeneratorTool
 		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
 		geomt::lloydRelaxation(diagram, data.lloyd);
 
-		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), 40.0f);
+		TileMap maskTileMap(width, height);
+
+		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, 40.0f);
+		auto tileMap = maskTileMap.GetTilesRef();
+
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
@@ -106,29 +85,14 @@ namespace MapGeneratorTool
 					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
 					if (color != Utils::Color(0, 0, 0, 0))
 						algo::fill(x, y, tileMap, color, width, height);
-					//break;
-					//tileMap[index].visited = true;
 				}
 			}
 		}
+		return maskTileMap.ConvertTileMapToBuffer();
 
-		/*for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (!tileMap[index].visited)
-				{
-					tileMap[index].color = Utils::Color(255, 0, 0, 255);
-				}
-			}
-		}*/
+	}*/
 
-		return ConvertTileMapToBuffer(tileMap);
-
-	}
-
-	std::vector<rasterizer::Tile> LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
+	TileMap LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const MapMask* mapMask, TileType type, const char* name)
 	{
 		const auto width = Width();
 		const auto height = Height();
@@ -144,15 +108,22 @@ namespace MapGeneratorTool
 		texture.clear();
 		texture.create(width, height);
 
-		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), 20.0f);
+		TileMap maskTileMap(width, height);
+		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, 20.0f);
+		auto& tileMap = maskTileMap.GetTilesRef();
+
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				tileMap[y * width + x].land = mask.isInMask(x, y);
-
 				if (!mask.isInMask(x, y))
+				{
 					tileMap[y * width + x].visited = true;
+				}
+				else
+				{
+					tileMap[y * width + x].type = type;
+				}
 			}
 		}
 
@@ -181,17 +152,6 @@ namespace MapGeneratorTool
 			}
 		}
 
-		//for (int y = 0; y < height; y++)
-		//{
-		//	for (int x = 0; x < width; x++)
-		//	{
-		//		auto index = y * width + x;
-		//		if (!tileMap[index].visited)
-		//		{
-		//			tileMap[index].color = Utils::Color(255, 0, 0, 255);
-		//		}
-		//	}
-		//}
 
 		for (int y = 0; y < height; y++)
 		{
@@ -209,15 +169,15 @@ namespace MapGeneratorTool
 			}
 		}
 
-		return tileMap;
+		return maskTileMap;
 	}
 
 
-	Utils::Color LookupMap::FindClosestTileOfSameType(const std::vector<rasterizer::Tile>& tileMap, int x, int y, unsigned width, unsigned height) const
+	Utils::Color LookupMap::FindClosestTileOfSameType(const std::vector<Tile>& tileMap, int x, int y, unsigned width, unsigned height) const
 	{
 		std::unordered_set<mygal::Vector2<int>> tilesVisited;
 		const  int startIdx = y * width + x;
-		auto targetType = tileMap[startIdx].land;
+		auto targetType = tileMap[startIdx].type;
 		std::stack<std::pair<int, int>> stack;
 
 		// Initialize BFS queue with the starting position
@@ -230,9 +190,9 @@ namespace MapGeneratorTool
 			if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
 			if (tilesVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
 
-			const rasterizer::Tile& tile = tileMap[cy * width + cx];
+			const Tile& tile = tileMap[cy * width + cx];
 
-			if (tile.land == targetType && (tile.visited) && (!tile.isBorder))
+			if (tile.type == targetType && (tile.visited) && (!tile.isBorder))
 				return tile.color;
 			else
 				tilesVisited.insert(mygal::Vector2<int>(cx, cy));

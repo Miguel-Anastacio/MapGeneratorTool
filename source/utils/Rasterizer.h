@@ -4,41 +4,14 @@
 #include <MyGAL/Diagram.h>
 #include <geometry/ComputeGeometry.h>
 #include "Color.h"
+#include "TileMap.h"
 namespace MapGeneratorTool
 {
 
 namespace rasterizer
 {
-	struct Tile
-	{
-		Utils::Color color;
-		bool visited;
-		bool land;
-		bool isBorder;
-		mygal::Vector2<int> centroid;
-			
-		Tile(bool state, const Utils::Color& col, bool l, const mygal::Vector2<int>& centroid) : color(col), visited(state), land(l), isBorder(false){}
-		Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false), land(true), isBorder(false), centroid(0, 0) {}
 
-
-	};
-
-	static std::vector<uint8_t> ConvertTileMapToBuffer(const std::vector<Tile>& tileMap) 
-	{
-		std::vector<uint8_t> buffer;
-		buffer.reserve(tileMap.size() * 4);
-		for(auto& tile: tileMap)
-		{
-			buffer.emplace_back(tile.color.R);
-			buffer.emplace_back(tile.color.G);
-			buffer.emplace_back(tile.color.B);
-			buffer.emplace_back(tile.color.A);
-		}
-
-		return buffer;
-	}
-
-	static void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap);
+	void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap);
 
 	template <typename T>
 	static void Line(const mygal::Vector2<T>& start, const mygal::Vector2<T>& end, std::vector<Tile>& tileMap, unsigned width, unsigned height, 
@@ -126,9 +99,9 @@ namespace rasterizer
 	};
 
 	template <typename T>
-	static std::vector<Tile> CreateTileFromDiagram(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, float noiseScale = 25.0f)
+	static void RasterizeDiagramToTileMap(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, TileMap& tileMap, float noiseScale = 25.0f)
 	{
-		std::vector<Tile> tileMap(width * height, Tile());
+		std::vector<Tile>& tileMapVector = tileMap.GetTilesRef();
 		std::unordered_set<LineData<T>> linesPlotted;
 
 		for (const auto& halfEdge : diagram.getHalfEdges())
@@ -153,7 +126,7 @@ namespace rasterizer
 						FastNoiseLite noise(std::rand());
 						//auto parallelogram = createParallelogram(start, end, 3.0f);
 						//rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], tileMap, width, height, noiseScale, noise);
-						Line(start, end, tileMap, width, height, noise, noiseScale);
+						Line(start, end, tileMapVector, width, height, noise, noiseScale);
 						linesPlotted.insert(LineData(origin, destination));
 					}
 				}
@@ -162,7 +135,7 @@ namespace rasterizer
 					break;
 			}
 		}
-		return tileMap;
+		//return tileMap;
 	}
 }
 }

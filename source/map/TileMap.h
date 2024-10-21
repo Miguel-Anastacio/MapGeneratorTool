@@ -7,20 +7,21 @@ namespace MapGeneratorTool
 {
 enum class TileType : uint8_t
 {
-	LAND = 0,
-	WATER = 1
+	UNDEFINED = 0,
+	LAND = 1,
+	WATER = 2
 };
 
 struct Tile
 {
 	Utils::Color color;
 	bool visited;
-	bool land;
+	TileType type;
 	bool isBorder;
 	mygal::Vector2<int> centroid;
 
-	Tile(bool state, const Utils::Color& col, bool l, const mygal::Vector2<int>& centroid) : color(col), visited(state), land(l), isBorder(false) {}
-	Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false), land(true), isBorder(false), centroid(0, 0) {}
+	Tile(bool state, const Utils::Color& col, TileType typ, const mygal::Vector2<int>& centroid) : color(col), visited(state), type(typ), isBorder(false) {}
+	Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false), type(TileType::UNDEFINED), isBorder(false), centroid(0, 0) {}
 
 };
 
@@ -32,10 +33,23 @@ public:
 
 
 	std::vector<uint8_t> ConvertTileMapToBuffer() const;
+	inline std::vector<Tile>& GetTilesRef()
+	{
+		return m_tiles;
+	}
 
+	inline std::vector<Tile> GetTiles() const
+	{
+		return m_tiles;
+	}
+
+	static TileMap BlendTileMap(const TileMap& tileMap1, TileType type1, const TileMap& tileMap2, TileType type2);
 private:
 	std::vector<Tile> m_tiles;
+
+
 };
+
 
 } // namespace MapGeneratorTool
 

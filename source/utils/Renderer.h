@@ -15,10 +15,10 @@ namespace MapGeneratorTool
 class TileMap;
 namespace rend
 {
-    static void saveToFile(const sf::RenderTexture& texture, const char* filename);
-    static void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
+    void saveToFile(const sf::RenderTexture& texture, const char* filename);
+    void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
     
-    static void drawTileMap(const TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
+    void drawTileMap(const TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
 
     using namespace  mygal;
     template<typename T>

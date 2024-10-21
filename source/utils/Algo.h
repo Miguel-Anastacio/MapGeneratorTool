@@ -8,10 +8,10 @@ namespace MapGeneratorTool
 namespace algo
 { 
     
-static bool fill(int x, int y, std::vector<rasterizer::Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height)
+static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height)
 {
     const int index = y * width + x;
-    const bool tileType = tileMap[index].land;
+    const auto tileType = tileMap[index].type;
 
 
     if (tileMap[index].isBorder)
@@ -33,14 +33,14 @@ static bool fill(int x, int y, std::vector<rasterizer::Tile>& tileMap, const Uti
 
         // Check boundary conditions again and ensure tile hasn't been visited
         if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
-        rasterizer::Tile& tile = tileMap[cy * width + cx];
+        Tile& tile = tileMap[cy * width + cx];
 
         if (tile.isBorder)
             tile.centroid = mygal::Vector2<int>(x, y);
 
         if (tile.visited || tile.color == newColor) continue;
 
-        if (tile.land != tileType) continue;
+        if (tile.type != tileType) continue;
 
         // Mark tile as visited and set its color
         tile.color = newColor;
@@ -58,7 +58,7 @@ static bool fill(int x, int y, std::vector<rasterizer::Tile>& tileMap, const Uti
 
 }
 
-static void floodFill(std::vector<rasterizer::Tile>& tileMap, std::vector<mygal::Vector2<double>>& centroids, unsigned width, unsigned height)
+static void floodFill(std::vector<Tile>& tileMap, std::vector<mygal::Vector2<double>>& centroids, unsigned width, unsigned height)
 {
     std::vector<uint8_t> buffer(tileMap.size() * 4);
     std::unordered_set<Utils::Color> colorsInUse;

@@ -4,12 +4,12 @@ namespace MapGeneratorTool
 {
 namespace rend
 {
-    static void saveToFile(const sf::RenderTexture& texture, const char* filename)
+    void saveToFile(const sf::RenderTexture& texture, const char* filename)
     {
         texture.getTexture().copyToImage().saveToFile(filename);
     }
 
-    static void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
+    void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
     {
         //auto start = std::chrono::steady_clock::now();
         if (renderTexture.getSize() == sf::Vector2u(0, 0))

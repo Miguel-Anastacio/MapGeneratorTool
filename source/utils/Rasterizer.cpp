@@ -3,7 +3,7 @@ namespace MapGeneratorTool
 {
 namespace rasterizer
 {
-	static void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap)
+	void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap)
 	{
 		if (x >= 0 && x < width && y >= 0 && y < height)
 		{

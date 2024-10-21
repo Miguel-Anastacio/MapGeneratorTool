@@ -137,7 +137,7 @@ namespace MapGeneratorTool
 		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
 		geomt::lloydRelaxation(diagram, lloyd);
 
-		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height(), data.scale);
+		/*auto tileMap = rasterizer::(diagram, Width(), Height(), data.scale);
 
 		std::vector<mygal::Vector2<double>> centroids;
 		centroids.reserve(diagram.getSites().size());
@@ -146,16 +146,16 @@ namespace MapGeneratorTool
 			centroids.emplace_back(site.point);
 		}
 
-		rend::floodFill(tileMap, centroids, Width(), Height());
+		algo::floodFill(tileMap, centroids, Width(), Height());
 
 		m_texture.clear();
 		rend::drawTileMap(m_texture, tileMap, Width(), Height());
-		rend::saveToFile(m_texture, "testweekacs.png");
+		rend::saveToFile(m_texture, "testweekacs.png");*/
 	}
 
 	void HeightMap::CreateHeightTectonicPlates()
 	{
-		int seed = 0;
+	/*	int seed = 0;
 		int lloyd = 10;
 		int points = 50;
 
@@ -166,7 +166,7 @@ namespace MapGeneratorTool
 		auto tileMap = rasterizer::CreateTileFromDiagram(diagram, Width(), Height());
 		m_texture.clear();
 		rend::drawTileMap(m_texture, tileMap, Width(), Height());
-		rend::saveToFile(m_texture, "testweekacs.png");
+		rend::saveToFile(m_texture, "testweekacs.png");*/
 	}
 
 	std::vector<sf::Uint8> HeightMap::CreateBuffer()
