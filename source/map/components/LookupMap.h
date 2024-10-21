@@ -22,7 +22,7 @@ namespace MapGeneratorTool
 		void RegenerateLookUp(const LookupMapData& data, MapMask* landMask,  MapMask* oceanMask);
 		
 		//std::vector<uint8_t> GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mask, const char* name = "example.png");
-		TileMap GenerateTileMapFromMask(const LookupFeatures& data, const MapMask* mask, TileType type, const char* name = "example.png");
+		TileMap GenerateTileMapFromMask(const LookupFeatures& data, const NoiseData& borderNoise, float borderThick, const MapMask* mask, TileType type, const char* name = "example.png");
 
 		Utils::Color FindClosestTileOfSameType(const std::vector<Tile>& tileMap, int x, int y, unsigned width, unsigned height) const;
 

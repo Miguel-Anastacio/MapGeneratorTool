@@ -5,6 +5,7 @@
 #include <geometry/ComputeGeometry.h>
 #include "Color.h"
 #include "TileMap.h"
+#include "MapSpecs.h"
 namespace MapGeneratorTool
 {
 
@@ -99,7 +100,7 @@ namespace rasterizer
 	};
 
 	template <typename T>
-	static void RasterizeDiagramToTileMap(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, TileMap& tileMap, float noiseScale = 25.0f)
+	static void RasterizeDiagramToTileMap(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, TileMap& tileMap, const NoiseData& noiseData, float borderThick)
 	{
 		std::vector<Tile>& tileMapVector = tileMap.GetTilesRef();
 		std::unordered_set<LineData<T>> linesPlotted;
@@ -123,10 +124,12 @@ namespace rasterizer
 						start.y *= height;
 						end.x *= width;
 						end.y *= height;
-						FastNoiseLite noise(std::rand());
-						//auto parallelogram = createParallelogram(start, end, 3.0f);
-						//rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], tileMap, width, height, noiseScale, noise);
-						Line(start, end, tileMapVector, width, height, noise, noiseScale);
+						FastNoiseLite noise(noiseData.seed);
+						ApplyNoiseData(noiseData, noise);
+						auto parallelogram = createParallelogram(start, end, borderThick);
+						rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], 
+							tileMapVector, width, height, noiseData.scale, noise);
+						//Line(start, end, tileMapVector, width, height, noise, noiseData.scale);
 						linesPlotted.insert(LineData(origin, destination));
 					}
 				}

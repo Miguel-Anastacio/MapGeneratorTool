@@ -24,8 +24,8 @@ namespace MapGeneratorTool
 		const auto width = Width();
 		const auto height = Height();
 		m_colorsInUse.clear();
-		auto landTileMap = GenerateTileMapFromMask(data.land, landMask, TileType::LAND, "landMaskLookUp.png");
-		auto oceanTileMap = GenerateTileMapFromMask(data.ocean, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
+		auto landTileMap = GenerateTileMapFromMask(data.land, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
+		auto oceanTileMap = GenerateTileMapFromMask(data.ocean, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
 
 		landMask->Texture().clear();
 		oceanMask->Texture().clear();
@@ -92,7 +92,7 @@ namespace MapGeneratorTool
 
 	}*/
 
-	TileMap LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const MapMask* mapMask, TileType type, const char* name)
+	TileMap LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const NoiseData& noiseData, float borderThick, const MapMask* mapMask, TileType type, const char* name)
 	{
 		const auto width = Width();
 		const auto height = Height();
@@ -109,7 +109,7 @@ namespace MapGeneratorTool
 		texture.create(width, height);
 
 		TileMap maskTileMap(width, height);
-		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, 20.0f);
+		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, noiseData, borderThick);
 		auto& tileMap = maskTileMap.GetTilesRef();
 
 		for (int y = 0; y < height; y++)
@@ -149,6 +149,7 @@ namespace MapGeneratorTool
 					//break;
 					//tileMap[index].visited = true;
 				}
+
 			}
 		}
 
@@ -160,11 +161,12 @@ namespace MapGeneratorTool
 				auto index = y * width + x;
 				if (tileMap[index].isBorder)
 				{
-					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
-					if(color != Utils::Color(0, 0, 0, 0))
-						tileMap[index].color = color;
+					//auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+					auto tile = maskTileMap.GetTile(tileMap[index].centroid.x, tileMap[index].centroid.y);
+
+					if(tile.color != Utils::Color(0, 0, 0, 0))
+						tileMap[index].color = tile.color;
 						
-					//break;
 				}
 			}
 		}

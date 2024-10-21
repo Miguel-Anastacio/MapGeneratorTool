@@ -31,6 +31,15 @@ class TileMap : public Utils::Dimensions
 public:
 	TileMap(unsigned width, unsigned height);
 
+	inline Tile GetTile(unsigned x, unsigned y) const
+	{
+		if (x > Width() || y > Height())
+		{
+
+		}
+
+		return m_tiles[y * Width() + x];
+	}
 
 	std::vector<uint8_t> ConvertTileMapToBuffer() const;
 	inline std::vector<Tile>& GetTilesRef()

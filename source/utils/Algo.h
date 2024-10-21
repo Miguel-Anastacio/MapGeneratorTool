@@ -35,7 +35,7 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
         if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
         Tile& tile = tileMap[cy * width + cx];
 
-        if (tile.isBorder)
+        if (tile.isBorder && tile.type == tileType) 
             tile.centroid = mygal::Vector2<int>(x, y);
 
         if (tile.visited || tile.color == newColor) continue;

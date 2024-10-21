@@ -86,7 +86,7 @@ void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHei
 	m_oceanMask = std::make_unique<MapMask>("oceamMask.png", textureBuffer, Width(), Height(), cutOffHeight, false);
 
 	m_lookupmap = std::make_unique<LookupMap>("lookupTexture.png", Width(), Height());
-	RegenerateLookUp(LookupMapData(Width(), Height(), LookupFeatures(), LookupFeatures(), 0.001f));
+	RegenerateLookUp(LookupMapData(NoiseData(), LookupFeatures(), LookupFeatures(), Width(), Height(), 1.0f, 0.001f));
 
 	//m_lookupmap->SaveToFile();
 

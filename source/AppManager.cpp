@@ -18,7 +18,7 @@ namespace MapGeneratorTool
 	{
 		m_map = std::make_unique<Map>(width, height);
 		
-		SetLookupData(LookupMapData(width, height, LookupFeatures(), LookupFeatures(), 0.001f));
+		SetLookupData(LookupMapData(NoiseData(), LookupFeatures(), LookupFeatures(), width, height, 1.0f, 0.001f));
 		SetNoiseData(NoiseMapData(width, height));
 		SwitchState(State::DiagramEditor);
 	}
