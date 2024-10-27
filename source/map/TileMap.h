@@ -3,6 +3,7 @@
 #include "Color.h"
 #include "MyGAL/Vector2.h"
 #include <vector>
+#include <unordered_set>
 namespace MapGeneratorTool
 {
 enum class TileType : uint8_t
@@ -52,9 +53,25 @@ public:
 		return m_tiles;
 	}
 
+	inline void ComputeCentroids();
+
+	std::unordered_set<mygal::Vector2<int>> GetCentroids() const
+	{
+		return m_centroids;
+	}
+
+	size_t GetColorsInUse() const;
+
+	bool IsTileOfType(TileType type, int x, int y) const
+	{
+		return m_tiles[y * Width() + x].type == type;
+	}
+
 	static TileMap BlendTileMap(const TileMap& tileMap1, TileType type1, const TileMap& tileMap2, TileType type2);
+
 private:
 	std::vector<Tile> m_tiles;
+	std::unordered_set<mygal::Vector2<int>> m_centroids;
 
 
 };

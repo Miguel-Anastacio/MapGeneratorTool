@@ -1,5 +1,4 @@
 #include "navBar.h"
-#include <imgui.h>
 #include <FileIO.hpp>
 #include "Utils.h"
 #include "TexturePanel.h"

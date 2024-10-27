@@ -1,6 +1,5 @@
 #pragma once
 #include "terrainEditor.h"
-#include "imgui.h"
 #include "../AppManager.h"
 namespace MapGeneratorTool
 {

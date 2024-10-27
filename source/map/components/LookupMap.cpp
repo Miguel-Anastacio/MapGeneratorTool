@@ -10,6 +10,7 @@
 #include <fstream> 
 #include <queue>
 #include "Algo.h"
+#include "Color.h"
 namespace MapGeneratorTool
 {
 
@@ -35,7 +36,21 @@ namespace MapGeneratorTool
 		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
 		m_texture.clear();
 		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
+		
+		auto centroids = lookUpTileMap.GetCentroids();
+		for (const auto point : centroids)
+		{
+			sf::Color color;
+			if (lookUpTileMap.IsTileOfType(TileType::LAND, point.x, point.y))
+				color = sf::Color(255, 0, 0, 255);
+			else
+				color = sf::Color(0, 255, 0, 255);
 
+			rend::drawPoint(m_texture, point, color, width, height);
+		}
+
+		auto colors = lookUpTileMap.GetColorsInUse();
+		std::cout << "Colors in use: " << colors << "\n";
 		OutputLookupTable();
 	}
 
@@ -101,7 +116,7 @@ namespace MapGeneratorTool
 		Mask mask(width, height, buffer);
 		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask);
 		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
-		geomt::lloydRelaxation(diagram, data.lloyd);
+		geomt::lloydRelaxation(diagram, data.lloyd, mask);
 
 		// write diagram to image to get a pixel array
 		sf::RenderTexture texture;
@@ -136,6 +151,10 @@ namespace MapGeneratorTool
 		algo::floodFill(tileMap, centroids, Width(), Height());
 
 
+		auto colors = maskTileMap.GetColorsInUse();
+		std::cout << "Colors in use in " << mapMask->Name() << " before second fill: " << colors << "\n";
+		//maskTileMap.ComputeCentroids();
+
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
@@ -144,32 +163,48 @@ namespace MapGeneratorTool
 				if (!tileMap[index].visited)
 				{
 					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+					//tileMap[index].color = color;
 					if (color != Utils::Color(0, 0, 0, 0))
+					{
 						algo::fill(x, y, tileMap, color, width, height);
+						//tileMap[index].color = color;
+						//tileMap[index].visited = true;
+					}
 					//break;
 					//tileMap[index].visited = true;
 				}
 
 			}
 		}
+		colors = maskTileMap.GetColorsInUse();
+		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colors << "\n";
+		//for (int y = 0; y < height; y++)
+		//{
+		//	for (int x = 0; x < width; x++)
+		//	{
+		//		auto index = y * width + x;
+		//		if (tileMap[index].isBorder)
+		//		{
+		//			//auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
+		//			auto tile = maskTileMap.GetTile(tileMap[index].centroid.x, tileMap[index].centroid.y);
 
+		//			if(tile.color != Utils::Color(0, 0, 0, 0))
+		//				tileMap[index].color = tile.color;
+		//				
+		//		}
+		//	}
+		//}
 
-		for (int y = 0; y < height; y++)
+	/*	for (const auto point : centroids)
 		{
-			for (int x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (tileMap[index].isBorder)
-				{
-					//auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
-					auto tile = maskTileMap.GetTile(tileMap[index].centroid.x, tileMap[index].centroid.y);
+			sf::Color color;
+			if (maskTileMap.IsTileOfType(TileType::LAND, point.x, point.y))
+				color = sf::Color(255, 0, 0, 255);
+			else
+				color = sf::Color(0, 255, 0, 255);
 
-					if(tile.color != Utils::Color(0, 0, 0, 0))
-						tileMap[index].color = tile.color;
-						
-				}
-			}
-		}
+			rend::drawPoint(m_texture, point, color, width, height);
+		}*/
 
 		return maskTileMap;
 	}
@@ -180,15 +215,17 @@ namespace MapGeneratorTool
 		std::unordered_set<mygal::Vector2<int>> tilesVisited;
 		const  int startIdx = y * width + x;
 		auto targetType = tileMap[startIdx].type;
-		std::stack<std::pair<int, int>> stack;
+		std::queue<std::pair<int, int>> queue;
 
 		// Initialize BFS queue with the starting position
-		stack.push({ x, y });
+		queue.push({ x, y });
 
-		while (!stack.empty()) 
+		// Directions array for exploring neighboring tiles: right, left, down, up
+
+		while (!queue.empty())
 		{
-			auto [cx, cy] = stack.top();
-			stack.pop();
+			auto [cx, cy] = queue.front();
+			queue.pop();
 			if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
 			if (tilesVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
 
@@ -199,11 +236,10 @@ namespace MapGeneratorTool
 			else
 				tilesVisited.insert(mygal::Vector2<int>(cx, cy));
 
-			stack.push({ cx + 1, cy });
-			stack.push({ cx - 1, cy });
-			stack.push({ cx, cy + 1 });
-			stack.push({ cx, cy - 1 });
-
+			queue.push({ cx + 1, cy });
+			queue.push({ cx - 1, cy });
+			queue.push({ cx, cy + 1 });
+			queue.push({ cx, cy - 1 });
 			
 		}
 
@@ -232,6 +268,7 @@ namespace MapGeneratorTool
 		else {
 			std::cerr << "Could not open the file for writing!" << std::endl;
 		}
+
 	}
 
 }

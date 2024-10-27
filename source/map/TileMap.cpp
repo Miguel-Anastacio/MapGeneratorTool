@@ -21,6 +21,42 @@ namespace MapGeneratorTool
 		return buffer;
 	}
 
+	inline void TileMap::ComputeCentroids()
+	{
+		auto height = Height();
+		auto width = Width();
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				const int index = y * width + x;
+				m_centroids.emplace(m_tiles[index].centroid);
+			}
+		}
+	}
+
+	size_t TileMap::GetColorsInUse() const
+	{
+		std::unordered_set<Utils::Color> colors;
+		colors.reserve(m_centroids.size());
+
+	/*	for (auto& point : m_centroids)
+		{
+			colors.emplace_back(GetTile(point.x, point.y).color);
+		}*/
+		for (int y = 0; y < Height(); y++)
+		{
+			for (int x = 0; x < Width(); x++)
+			{
+				const int index = y * Width() + x;
+				colors.emplace(m_tiles[index].color);
+			}
+		}
+
+		return colors.size();
+	}
+
 	TileMap TileMap::BlendTileMap(const TileMap& tileMap1, TileType type1, const TileMap& tileMap2, TileType type2)
 	{
 		assert(tileMap1.Height() == tileMap2.Height());
@@ -51,6 +87,7 @@ namespace MapGeneratorTool
 				}
 			}
 		}
+		newTileMap.ComputeCentroids();
 
 		return newTileMap;
 	}

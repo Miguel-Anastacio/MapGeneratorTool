@@ -8,7 +8,7 @@
 #include <stack>
 #include "Color.h"
 #include "Rasterizer.h"
-constexpr double PointRadius = 1.0f;
+constexpr double PointRadius = 5.0f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {

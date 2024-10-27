@@ -14,8 +14,8 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
     const auto tileType = tileMap[index].type;
 
 
-    if (tileMap[index].isBorder)
-        tileMap[index].centroid = mygal::Vector2<int>(x, y);
+    //if (tileMap[index].isBorder)
+    //    tileMap[index].centroid = mygal::Vector2<int>(x, y);
 
     if (x >= width || x < 0 || y >= height || y < 0 || tileMap[index].color == newColor || tileMap[index].visited)
     {
@@ -35,8 +35,8 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
         if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
         Tile& tile = tileMap[cy * width + cx];
 
-        if (tile.isBorder && tile.type == tileType) 
-            tile.centroid = mygal::Vector2<int>(x, y);
+        //if (tile.isBorder && tile.type == tileType) 
+        //    tile.centroid = mygal::Vector2<int>(x, y);
 
         if (tile.visited || tile.color == newColor) continue;
 
@@ -45,7 +45,7 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
         // Mark tile as visited and set its color
         tile.color = newColor;
         tile.visited = true;
-        tile.centroid = mygal::Vector2<int>(x, y);
+        //tile.centroid = mygal::Vector2<int>(x, y);
 
         // Push neighboring tiles onto the stack
         stack.push({ cx + 1, cy });
@@ -56,6 +56,22 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
 
     return true;
 
+}
+
+static void markCentroids(int centrooidX, int centrooidY, std::vector<Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height)
+{
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            auto index = y * width + x;
+            if (tileMap[index].color == newColor )
+            {
+                tileMap[index].centroid = mygal::Vector2(centrooidX, centrooidY);
+            }
+            
+        }
+    }
 }
 
 static void floodFill(std::vector<Tile>& tileMap, std::vector<mygal::Vector2<double>>& centroids, unsigned width, unsigned height)
@@ -74,6 +90,8 @@ static void floodFill(std::vector<Tile>& tileMap, std::vector<mygal::Vector2<dou
 
         if (fill(x, y, tileMap, color, width, height))
             colorsInUse.insert(color);
+        markCentroids(x, y, tileMap, color, width, height);
+
 
     }
 }

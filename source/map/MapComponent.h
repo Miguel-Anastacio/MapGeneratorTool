@@ -28,10 +28,17 @@ public:
 
 
 
+	const char* Name() const
+	{
+		return m_name;
+	}
+
 	void Clear()
 	{
 
 	}
+
+
 
 
 protected:

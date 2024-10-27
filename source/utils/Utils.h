@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-//#include "MyGAL/Vector2.h"
+#include "MyGAL/Vector2.h"
 namespace MapGeneratorTool
 {
 	namespace Utils
@@ -67,6 +67,31 @@ namespace MapGeneratorTool
 			return str;
 		}
 
+		/*template<typename T>
+		static void ScaleByVector(mygal::Vector2<T>& og, const mygal::Vector2<T>& scale)
+		{
+			og.x *= scale.x;
+			og.x *= scale.y;
+		}*/
+
+		template<typename T, typename K>
+		static mygal::Vector2<K> ScaleByVector(const mygal::Vector2<T>& og, const mygal::Vector2<K>& scale)
+		{
+			return mygal::Vector2<K>(og.x * scale.x, og.y * scale.y);
+		}
+
+		template<typename T, typename K>
+		static mygal::Vector2<T> ScaleBothAxis(const mygal::Vector2<T>& og, K xScale, K yScale)
+		{
+			return mygal::Vector2<T>(og.x * xScale, og.y * yScale);
+		}
+
+		template<typename T, typename K>
+		static mygal::Vector2<K> DivideByVector(const mygal::Vector2<T>& og, const mygal::Vector2<K>& scale)
+		{
+			return mygal::Vector2<K>(og.x * scale.x, og.y * scale.y);
+		}
+
 		//using namespace  mygal;
 		// Function to calculate cross product of vectors (P1P2) and (P1P)
 		//template<typename T>
@@ -124,3 +149,14 @@ namespace MapGeneratorTool
 
 }
 
+
+namespace std {
+	template <>
+	struct hash<mygal::Vector2<int>>
+	{
+		std::size_t operator()(const mygal::Vector2<int>& point) const
+		{
+			return std::hash<int>()(point.x) ^ (std::hash<int>()(point.y));
+		}
+	};
+}

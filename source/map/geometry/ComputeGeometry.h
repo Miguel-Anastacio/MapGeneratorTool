@@ -12,7 +12,6 @@
 #include "fastNoiseLite/FastNoiseLite.h"
 namespace MapGeneratorTool
 {
-
 	namespace geomt
 	{
 		const float PI = 3.14159265359f;
@@ -100,6 +99,21 @@ namespace MapGeneratorTool
 		}
 
 		template<typename T>
+		static void lloydRelaxation(mygal::Diagram<T>& diagram, int iterations, const Mask& mask)
+		{
+			for (int i = 0; i < iterations; i++)
+			{
+				std::vector<mygal::Vector2<double>> centroids = diagram.computeLloydRelaxation();
+				/*for (auto& point : centroids)
+				{
+					 auto newPoint = mask.getClosestPointInMask(point);
+					 point = newPoint;
+				}*/
+				diagram = std::move(geomt::generateDiagram(centroids));
+			}
+		}
+
+		template<typename T>
 		static void lloydRelaxation(mygal::Diagram<T>& diagram, int iterations)
 		{
 			for (int i = 0; i < iterations; i++)
@@ -181,7 +195,7 @@ namespace MapGeneratorTool
 			normalizeNoise(circleNoise, cutPointIndex);
 
 			// Step 3: Map circle noise to a fault line
-			applyNoiseToLine(circleNoise, line, cutPointIndex, noiseScale);
+			//applyNoiseToLine(circleNoise, line, cutPointIndex, noiseScale);
 
 		}
 	}

@@ -43,6 +43,10 @@ namespace rasterizer
 		}
 	}
 
+	void plotLineWithWidth(const mygal::Vector2<int>& start, const mygal::Vector2<int>& end, std::vector<Tile>& tileMap, 
+		unsigned width, unsigned height,
+		FastNoiseLite& noise, float noiseScale, float wd);
+
 	template <typename T>
 	static std::array<const mygal::Vector2<T>, 4> createParallelogram(const mygal::Vector2<T> p1, const mygal::Vector2<T> p2, float width)
 	{
@@ -100,11 +104,11 @@ namespace rasterizer
 	};
 
 	template <typename T>
-	static void RasterizeDiagramToTileMap(const mygal::Diagram<T>& diagram, unsigned width, unsigned height, TileMap& tileMap, const NoiseData& noiseData, float borderThick)
+	static void RasterizeDiagramToTileMap(const mygal::Diagram<T>& diagram, int width, int height, TileMap& tileMap, const NoiseData& noiseData, float borderThick)
 	{
 		std::vector<Tile>& tileMapVector = tileMap.GetTilesRef();
 		std::unordered_set<LineData<T>> linesPlotted;
-
+		 
 		for (const auto& halfEdge : diagram.getHalfEdges())
 		{
 			auto* start = &halfEdge;
@@ -118,18 +122,16 @@ namespace rasterizer
 
 					if (!linesPlotted.contains(LineData(origin, destination)))
 					{
-						auto start = origin;
-						auto end = destination;
-						start.x *= width;
-						start.y *= height;
-						end.x *= width;
-						end.y *= height;
+						mygal::Vector2<int> start = Utils::ScaleByVector(origin, mygal::Vector2(width, height));
+						mygal::Vector2<int> end = Utils::ScaleByVector(destination, mygal::Vector2(width, height));
+						
 						FastNoiseLite noise(noiseData.seed);
 						ApplyNoiseData(noiseData, noise);
-						auto parallelogram = createParallelogram(start, end, borderThick);
-						rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], 
-							tileMapVector, width, height, noiseData.scale, noise);
+						//auto parallelogram = createParallelogram(start, end, borderThick);
+						//rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], 
+							//tileMapVector, width, height, noiseData.scale, noise);
 						//Line(start, end, tileMapVector, width, height, noise, noiseData.scale);
+						plotLineWithWidth(start, end, tileMapVector, width, height, noise, noiseData.scale, borderThick);
 						linesPlotted.insert(LineData(origin, destination));
 					}
 				}
