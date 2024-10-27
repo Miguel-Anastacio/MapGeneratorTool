@@ -10,22 +10,15 @@ namespace MapGeneratorTool
 	ApplicationManager::ApplicationManager()
 	{
 		m_currentPanel = std::make_unique<ui::LookupEditor>("lookup");
+		std::srand(time(0));
+
 	}
 
 	void ApplicationManager::Init(unsigned width, unsigned height)
 	{
-		// generate Map
-		//auto heightMapBuffer = textureHandler::decodeOneStep("heightmapearth.png", width, height);
 		m_map = std::make_unique<Map>(width, height);
-
-		//m_map->GenerateHeightMap(NoiseMapData(width, height));
-		//m_map->GenerateLookupMapFromMask(LookupMapData(width, height, 0, seedsNumber, 20), textureHandler::decodeOneStep("LandmassMask.png"));
 		
-		//m_map->GenerateMap(heightMapBuffer, 0.001f);
-		//m_map->GenerateMaskFromHeightMapTexture(heightMapBuffer, 0.001f);
-		
-
-		SetLookupData(LookupMapData(width, height, LookupFeatures(), LookupFeatures(), 0.001f));
+		SetLookupData(LookupMapData(NoiseData(), LookupFeatures(), LookupFeatures(), width, height, 1.0f, 0.001f));
 		SetNoiseData(NoiseMapData(width, height));
 		SwitchState(State::DiagramEditor);
 	}

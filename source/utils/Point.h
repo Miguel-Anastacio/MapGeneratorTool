@@ -3,7 +3,7 @@ namespace MapGeneratorTool
 {
 	namespace Utils
 	{
-		struct  Point
+		/*struct  Point
 		{
 			int X;
 			int Y;
@@ -39,7 +39,7 @@ namespace MapGeneratorTool
 		{
 			return pow(a.X - b.X, 2) + pow(a.Y - b.Y, 2);
 		}
-
+		*/
 		static float inverseLerp(float xx, float yy, float value)
 		{
 			return (value - xx) / (yy - xx);
@@ -47,19 +47,19 @@ namespace MapGeneratorTool
 	}
 }
 
-namespace std {
-	template <>
-	struct hash<MapGeneratorTool::Utils::Point> {
-		std::size_t operator()(const MapGeneratorTool::Utils::Point& point) const
-		{
-			return std::hash<int>()(point.X) ^ (std::hash<int>()(point.Y) << 1);
-		}
-	};
-	//template <>
-	//struct hash<MapGeneratorTool::Utils::Color> {
-	//	std::size_t operator()(const MapGeneratorTool::Utils::Color& color) const
-	//	{
-	//		return std::hash<int>()(color.R) ^ (std::hash<int>()(color.G) << 1) ^ (std::hash<int>()(color.B) << 1) ^ (std::hash<int>()(color.A) << 1);
-	//	}
-	//};
-}
+//namespace std {
+//	template <>
+//	struct hash<MapGeneratorTool::Utils::Point> {
+//		std::size_t operator()(const MapGeneratorTool::Utils::Point& point) const
+//		{
+//			return std::hash<int>()(point.X) ^ (std::hash<int>()(point.Y) << 1);
+//		}
+//	};
+//	//template <>
+//	//struct hash<MapGeneratorTool::Utils::Color> {
+//	//	std::size_t operator()(const MapGeneratorTool::Utils::Color& color) const
+//	//	{
+//	//		return std::hash<int>()(color.R) ^ (std::hash<int>()(color.G) << 1) ^ (std::hash<int>()(color.B) << 1) ^ (std::hash<int>()(color.A) << 1);
+//	//	}
+//	//};
+//}

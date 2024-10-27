@@ -6,7 +6,10 @@ namespace MapGeneratorTool
 class MapComponent : public Utils::Dimensions
 {
 public:
-	MapComponent(unsigned width, unsigned height, const char* name) : Dimensions(width, height), m_name(name) {};
+	MapComponent(unsigned width, unsigned height, const char* name) : Dimensions(width, height), m_name(name) 
+	{
+		//m_texture.create(width, height)
+	};
 	virtual ~MapComponent() = default;
 
 	void SaveToFile() const;
@@ -25,10 +28,17 @@ public:
 
 
 
+	const char* Name() const
+	{
+		return m_name;
+	}
+
 	void Clear()
 	{
 
 	}
+
+
 
 
 protected:

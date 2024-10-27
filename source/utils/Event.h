@@ -41,7 +41,8 @@ public:
 
 	void Execute(Map& map) const override
 	{
-		map.GenerateHeightMap(m_data);
+		//map.GenerateHeightMap(m_data);
+		map.GenerateHeightMapTectonic(m_data);
 	}
 private:
 	NoiseMapData m_data;
@@ -93,7 +94,7 @@ public:
 	}
 private:
 	std::string filepath;
-	SaveType type;
+	//SaveType type;
 };
 
 class LoadHeightMapEvent : public Event

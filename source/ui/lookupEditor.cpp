@@ -1,6 +1,5 @@
 #pragma once
 #include "lookupEditor.h"
-#include "imgui.h"
 #include "../AppManager.h"
 namespace MapGeneratorTool
 {
@@ -20,6 +19,7 @@ void LookupEditor::RenderPanel() const
         ImGui::SliderInt("Width", &width, 10, 2048, "%d");
         static int height = m_data.height;
         ImGui::SliderInt("Height", &height, 10, 2048, "%d");
+        ImGui::SliderFloat("Line thickness", &data.borderLine, 0.0f, 5.0f);
         ImGui::SliderFloat("Cutoff height", &data.cutOffHeight, 0.0f, 1.0f);
 
         data.width = width;
@@ -40,6 +40,17 @@ void LookupEditor::RenderPanel() const
         ImGui::SliderInt("Seed", &data.ocean.seed, 0, 400000, "%d");
         ImGui::SliderInt("Number of Tiles", &data.ocean.tiles, 0, 10000, "%d");
         ImGui::SliderInt("Lloyd Iterations ", &data.ocean.lloyd, 0, 20);
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNode("Border Noise Settings"))
+    {
+        ImGui::SliderInt("Seed", &data.borderNoise.seed, -3000, 3000, "%d");
+        ImGui::SliderInt("Octaves", &data.borderNoise.octaves, 1, 8, "%d");
+        ImGui::DragFloat("Frequency", &data.borderNoise.frequency, 0.001f);
+        ImGui::DragFloat("Scale", &data.borderNoise.scale, 0.5, -100, 100);
+        
+        ImGui::DragFloat("Lacunarity", &data.borderNoise.lacunarity, 0.01f, 1, 5);
         ImGui::TreePop();
     }
 

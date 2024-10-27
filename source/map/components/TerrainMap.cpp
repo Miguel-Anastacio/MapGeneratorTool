@@ -22,7 +22,8 @@ namespace MapGeneratorTool
 
 	void TerrainMap::RegenerateTerrain(const std::vector<double>& data)
 	{
-		rend::drawBuffer(CreateBuffer(data), m_texture, this->Width(), this->Height());
+		//rend::drawBuffer(CreateBuffer(data), m_texture, this->Width(), this->Height());
+
 	}
 
 	std::vector<sf::Uint8> TerrainMap::CreateBuffer(const std::vector<double>& data) const

@@ -33,14 +33,11 @@ add_subdirectory(thirdparty/fastNoiseLite)
 add_subdirectory(thirdparty/MyGAL)
 add_subdirectory(thirdparty/)
 
-# Add the path to the delaunator-cpp header files
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/delaunator/include)
-# Add the delaunator.cpp source file
-set(DELAUNATOR_SRC ${CMAKE_SOURCE_DIR}/thirdparty/delaunator/delaunator.cpp)
 
 # Add source to this project's executable.
-
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
+file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h")
+file(GLOB_RECURSE HEADERS_MYGAL CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/MyGAL/*.h")
 
 add_executable(MapGeneratorTool) 
 
@@ -58,7 +55,8 @@ else()
 
 endif()
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} ${DELAUNATOR_SRC} )
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} ${HEADERS} ${HEADERS_MYGAL})
+
 
 #target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/texture/")
@@ -67,6 +65,7 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURC
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/fileIO")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/")
 
+source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${MY_SOURCES} ${HEADERS})
 # Add the nlohmann_json dependency
 include(FetchContent)
 
@@ -81,11 +80,6 @@ FetchContent_MakeAvailable(nlohmann_json)
 target_link_libraries(MapGeneratorTool PUBLIC lodepng)
 target_link_libraries(MapGeneratorTool PUBLIC fastNoiseLite)
 target_link_libraries(MapGeneratorTool PRIVATE nlohmann_json::nlohmann_json)
-#target_link_libraries(MapGeneratorTool PRIVATE sfml-graphics)
-
-target_link_libraries(MapGeneratorTool
-  PUBLIC
-    ImGui-SFML::ImGui-SFML
-)
+target_link_libraries(MapGeneratorTool PUBLIC ImGui-SFML::ImGui-SFML)
 
 

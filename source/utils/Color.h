@@ -65,7 +65,7 @@ namespace MapGeneratorTool
 
 		};
 
-		static const Color operator *(const Color& color, float scale)
+		static const Color operator *(const Color& color, int scale)
 		{
 			return Color(color.R * scale, color.G * scale, color.B * scale, color.A);
 		}

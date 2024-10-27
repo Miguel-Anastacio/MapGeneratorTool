@@ -1,7 +1,7 @@
 #include "navBar.h"
-#include <imgui.h>
 #include <FileIO.hpp>
 #include "Utils.h"
+#include "TexturePanel.h"
 namespace MapGeneratorTool
 {
 namespace ui
@@ -26,6 +26,7 @@ namespace ui
         if (ImGui::Selectable(text, flagToUpdate, flag, size))
         {
             ApplicationManager::Get().SwitchState(state);
+            mainImage = 0;
         }
     }
     void NavBar::renderFileMenu()
@@ -42,8 +43,7 @@ namespace ui
                     auto string = Utils::WStringToString(paths[0]);
                     ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<LoadHeightMapEvent>(string));
                 }
-                
-
+                 
             }
             if (ImGui::MenuItem("Load Generated", "Ctrl+O")) 
             {

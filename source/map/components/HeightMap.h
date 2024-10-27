@@ -28,7 +28,9 @@ namespace MapGeneratorTool
 		void SetNoiseMap(std::vector<double>&& elevation);
 
 	private:
-		std::vector<double> CreateHeightMap(const NoiseMapData& data) const;
+		std::vector<double> CreateHeightMapFromNoise(const NoiseMapData& data) const;
+		void CreateHeightTectonicPlates() ;
+		void CreateHeightTectonicPlates(const NoiseMapData& data);
 		std::vector<sf::Uint8> CreateBuffer();
 
 		std::vector<double> m_elevation;

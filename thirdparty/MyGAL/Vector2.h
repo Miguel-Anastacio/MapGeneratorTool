@@ -128,6 +128,11 @@ public:
         return Vector2<T>(-y, x);
     }
 
+    bool operator==(const Vector2& other) const 
+    {
+        return x == other.x && y == other.y;
+    }
+
     /**
      * \brief Compute the euclidean norm of the vector
      *

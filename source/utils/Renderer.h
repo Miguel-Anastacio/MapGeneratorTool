@@ -5,14 +5,21 @@
 #include <MyGAL/Vector2.h>
 #include <MyGAL/Diagram.h>
 #include <unordered_set>
+#include <stack>
 #include "Color.h"
-#include <delaunator/include/delaunator.hpp>
-constexpr double PointRadius = 1.0f;
+#include "Rasterizer.h"
+constexpr double PointRadius = 5.0f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {
+class TileMap;
 namespace rend
 {
+    void saveToFile(const sf::RenderTexture& texture, const char* filename);
+    void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
+    
+    void drawTileMap(const TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
+
     using namespace  mygal;
     template<typename T>
     void drawPolygons(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height)
@@ -91,94 +98,6 @@ namespace rend
         //assert(colorsInUse.size() == polygons.size());
     }
 
-    // Function to calculate cross product of vectors (P1P2) and (P1P)
-    template<typename T>
-    float crossProduct(const Vector2<T>& P1, const Vector2<T>& P2, const Vector2<int>& P, unsigned width, unsigned height)
-    {
-        Vector2<T> p1 = P1;
-        Vector2<T> p2 = P2;
-        //const Vector2<T> p = P;
-        p1.x*=width;
-        p2.x*=width;
-        //p3.x*=width;
-
-        p1.y *= height;
-        p2.y *= height;
-        //p3.y *= height;
-
-        return (p2.x - p1.x) * (P.y - p1.y) - (p2.y - p1.y) * (P.x - p1.x);
-    }
-
-    template<typename T>
-    bool isPointInsidePolygon(const std::vector <Vector2<T>>& polygon, Vector2<int> point, unsigned width, unsigned height)
-    {
-        int n = polygon.size();
-        if (n < 3) return false;  // A polygon must have at least 3 points
-
-        bool allPositive = false;
-        bool allNegative = false;
-
-        for (int i = 0; i < n; ++i) 
-        {
-            // Get the current vertex and the next vertex (loop back at the end)
-            const auto& P1 = polygon[i];
-            const auto& P2 = polygon[(i + 1) % n];
-
-            // Calculate cross product
-            float cross = crossProduct(P1, P2, point, width, height);
-            if (i == 0) 
-            {
-                // Initialize the sign of the first cross product
-                if (cross > 0) allPositive = true;
-                else if (cross < 0) allNegative = true;
-            }
-            else {
-                // Ensure that all cross products have the same sign
-                if (allPositive && cross < 0) return false;
-                if (allNegative && cross > 0) return false;
-            }
-        }
-
-        // If all cross products are positive or all are negative, the point is inside
-        return true;
-    }
-
-
-    static void saveToFile(const sf::RenderTexture& texture, const char* filename)
-    {
-        texture.getTexture().copyToImage().saveToFile(filename);
-    }
-
-    static void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
-    {
-        //auto start = std::chrono::steady_clock::now();
-        if (renderTexture.getSize() == sf::Vector2u(0, 0))
-        {
-            if (!renderTexture.create(width, height))
-            {
-                // error...
-                std::cout << "Error creating texture to draw polygons to map" << "\n";
-                return;
-            }
-        }
-        // Create a texture
-        sf::Texture texture;
-        if (!texture.create(width, height)) {
-            return ; // Error handling
-        }
-
-        // Update the texture with the pixel buffer
-        texture.update(buffer.data());
-
-
-        renderTexture.clear();
-        sf::Sprite sprite(texture);
-        renderTexture.draw(sprite);
-        renderTexture.display();
-        //auto duration = std::chrono::steady_clock::now() - start;
-        //std::cout << "draw buffer: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
-    }
-
     template<typename T>
     void drawPolygonsByBuffer(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<Utils::Color>& colorsInUse)
     {
@@ -222,7 +141,7 @@ namespace rend
 
             }
         }
-         
+
         drawBuffer(buffer, texture, width, height);
     }
 
@@ -231,7 +150,7 @@ namespace rend
     void drawPoint(sf::RenderTexture& window, Vector2<T> point, sf::Color color, unsigned width, unsigned height)
     {
         auto shape = sf::CircleShape(PointRadius);
-        shape.setPosition(sf::Vector2f(point.x*width - PointRadius , point.y*height - PointRadius));
+        shape.setPosition(sf::Vector2f(point.x * width - PointRadius, point.y * height - PointRadius));
         shape.setFillColor(color);
         window.draw(shape);
         window.display();
@@ -242,8 +161,8 @@ namespace rend
     {
         auto line = std::array<sf::Vertex, 2>
         {
-            sf::Vertex(sf::Vector2f(origin.x * width, origin.y * height), color),
-                sf::Vertex(sf::Vector2f(destination.x * width, destination.y * height), color)
+            sf::Vertex(sf::Vector2f(origin.x* width, origin.y* height), color),
+                sf::Vertex(sf::Vector2f(destination.x* width, destination.y* height), color)
         };
         window.draw(line.data(), 2, sf::Lines);
         window.display();
@@ -287,18 +206,5 @@ namespace rend
             }
         }
     }
- 
-    static void drawPointsBuffer(sf::RenderTexture& rTex, const std::vector<delaunator::Point>& points, sf::Color color = sf::Color::Red)
-    {
-        for (auto pt : points)
-        {
-            auto shape = sf::CircleShape(PointRadius);
-            shape.setPosition(sf::Vector2f(pt.x() - PointRadius, pt.y() - PointRadius));
-            shape.setFillColor(color);
-            rTex.draw(shape);
-            rTex.display();
-        }
-    }
-
 }
 }
