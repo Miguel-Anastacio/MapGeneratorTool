@@ -25,12 +25,18 @@ struct Tile
 	Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false), type(TileType::UNDEFINED), isBorder(false), centroid(0, 0) {}
 
 };
-
+struct Mask;
 class TileMap : public Utils::Dimensions
 {
 
 public:
 	TileMap(unsigned width, unsigned height);
+
+	void MarkTilesNotInMaskAsVisited(const Mask& mask, TileType type);
+
+	void FloodFillTileMap(const std::vector<mygal::Vector2<double>>& centroids);
+
+	void FloodFillMissingTiles(int radius = 100);
 
 	inline Tile GetTile(unsigned x, unsigned y) const
 	{
@@ -55,6 +61,12 @@ public:
 
 	inline void ComputeCentroids();
 
+	void ComputeColorsInUse();
+	std::unordered_set <Utils::Color> GetColors()
+	{
+		return  m_colors;
+	}
+
 	std::unordered_set<mygal::Vector2<int>> GetCentroids() const
 	{
 		return m_centroids;
@@ -69,9 +81,14 @@ public:
 
 	static TileMap BlendTileMap(const TileMap& tileMap1, TileType type1, const TileMap& tileMap2, TileType type2);
 
+	void InsertCentroid(const mygal::Vector2<int>& point, const Utils::Color& color);
+
+	bool FindColorOfClosestTileOfSameType(int x, int y, int radius, Utils::Color& out_color) const;
+
 private:
 	std::vector<Tile> m_tiles;
 	std::unordered_set<mygal::Vector2<int>> m_centroids;
+	std::unordered_set<Utils::Color> m_colors;
 
 
 };

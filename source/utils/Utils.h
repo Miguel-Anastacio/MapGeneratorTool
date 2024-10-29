@@ -3,6 +3,15 @@
 #include <vector>
 #include <string>
 #include "MyGAL/Vector2.h"
+namespace mygal
+{
+	template<typename T>
+	mygal::Vector2<T> operator/(const mygal::Vector2<T>& vector, T div)
+	{
+		return mygal::Vector2<T>(vector.x / div, vector.y / div);
+	}
+}
+
 namespace MapGeneratorTool
 {
 	namespace Utils
@@ -89,8 +98,10 @@ namespace MapGeneratorTool
 		template<typename T, typename K>
 		static mygal::Vector2<K> DivideByVector(const mygal::Vector2<T>& og, const mygal::Vector2<K>& scale)
 		{
-			return mygal::Vector2<K>(og.x * scale.x, og.y * scale.y);
+			return mygal::Vector2<K>(og.x / scale.x, og.y / scale.y);
 		}
+
+
 
 		//using namespace  mygal;
 		// Function to calculate cross product of vectors (P1P2) and (P1P)
