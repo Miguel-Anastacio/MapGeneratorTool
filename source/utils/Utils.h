@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include "MyGAL/Vector2.h"
 
 namespace MapGeneratorTool
 {

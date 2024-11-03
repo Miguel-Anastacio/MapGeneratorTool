@@ -4,6 +4,7 @@
 #include "MyGAL/Vector2.h"
 #include <vector>
 #include <unordered_set>
+#include "VectorWrapper.h"
 namespace MapGeneratorTool
 {
 enum class TileType : uint8_t
@@ -25,7 +26,7 @@ struct Tile
 	Tile() : color(Utils::Color(0, 0, 0, 0)), visited(false), type(TileType::UNDEFINED), isBorder(false), centroid(0, 0) {}
 
 };
-struct Mask;
+class Mask;
 class TileMap : public Utils::Dimensions
 {
 
@@ -76,6 +77,11 @@ public:
 
 	bool IsTileOfType(TileType type, int x, int y) const
 	{
+		if (x > Width() || y > Height())
+		{
+			return false;
+		}
+
 		return m_tiles[y * Width() + x].type == type;
 	}
 
