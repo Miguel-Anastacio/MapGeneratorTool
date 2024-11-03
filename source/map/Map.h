@@ -23,47 +23,47 @@ namespace MapGeneratorTool
 		Map(unsigned width, unsigned height);
 		~Map();
 
-		inline const sf::RenderTexture& LookupTexture() const
+		inline const sf::RenderTexture* LookupTexture() const
 		{
 			if(m_lookupmap)
-				return m_lookupmap->Texture();
+				return &m_lookupmap->Texture();
 
-			return sf::RenderTexture();
+			return nullptr;
 		}
-		inline const sf::RenderTexture& HeightMapTexture() const
+		inline const sf::RenderTexture* HeightMapTexture() const
 		{
 			if (m_heightmap)
-				return m_heightmap->Texture();
+				return &m_heightmap->Texture();
 
-			return sf::RenderTexture();
+			return nullptr;
 		}
-		inline const sf::RenderTexture& TerrainMapTexture() const
+		inline const sf::RenderTexture* TerrainMapTexture() const
 		{
 			if (m_terrainmap)
-				return m_terrainmap->Texture();
+				return &m_terrainmap->Texture();
 
-			return sf::RenderTexture();
+			return nullptr;
 		}
-		inline const sf::RenderTexture& MapMaskTexture () const
+		inline const sf::RenderTexture* MapMaskTexture () const
 		{
 			if (m_maskmap)
-				return m_maskmap->Texture();
+				return &m_maskmap->Texture();
 
-			return sf::RenderTexture();
+			return nullptr;
 		}
-		inline const sf::RenderTexture& OceanMapMaskTexture() const
+		inline const sf::RenderTexture* OceanMapMaskTexture() const
 		{
 			if (m_oceanMask)
-				return m_oceanMask->Texture();
+				return &m_oceanMask->Texture();
 
-			return sf::RenderTexture();
+			return nullptr;
 		}
-		inline const sf::RenderTexture& LandMapMaskTexture() const
+		inline const sf::RenderTexture* LandMapMaskTexture() const
 		{
 			if (m_landMask)
-				return m_landMask->Texture();
+				return &m_landMask->Texture();
 
-			return sf::RenderTexture();
+			return nullptr;
 		}
 
 
@@ -96,10 +96,11 @@ namespace MapGeneratorTool
 
 
 		void RegenerateLookUp(const LookupMapData& data);
+		void RegenerateLookupBorders(const LookupMapData& data);
 
 		void GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height); 
 
-		void GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
+		void GenerateMapFromHeigthMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 		
 		//void SaveMap(const char* filePath);
 		void SaveMap(const std::string& filePath) const;

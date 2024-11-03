@@ -4,6 +4,7 @@
 #include <string>
 #include "MapComponent.h"
 #include "MapSpecs.h"
+#include "Mask.h"
 namespace MapGeneratorTool
 {
 	using namespace Utils;
@@ -28,6 +29,12 @@ namespace MapGeneratorTool
 		}
 
 		void RegenerateMask(float cutOffHeight, bool mode = true);
+
+		const Mask& GetMask() const
+		{
+			return mask;
+		}
+
 	
 	private:
 		//std::vector<double> CreateHeightMap(const NoiseMapData& data) const;
@@ -37,6 +44,7 @@ namespace MapGeneratorTool
 		
 		std::vector<double> m_elevation;
 		std::vector<uint8_t> m_maskBuffer;
+		Mask mask;
 	};
 
 

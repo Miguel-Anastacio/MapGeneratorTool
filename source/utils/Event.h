@@ -17,14 +17,13 @@ public:
 	~Event() = default;
 
 	virtual void Execute(Map& map) const = 0;
-private:
 
 };
 
 class GenerateLookupMapEvent : public Event
 {
 public:
-	GenerateLookupMapEvent(LookupMapData data) : m_data(data){}
+	GenerateLookupMapEvent(const LookupMapData& data) : m_data(data){}
 
 	void Execute(Map& map) const override 
 	{
@@ -41,7 +40,6 @@ public:
 
 	void Execute(Map& map) const override
 	{
-		//map.GenerateHeightMap(m_data);
 		map.GenerateHeightMapTectonic(m_data);
 	}
 private:
@@ -77,25 +75,11 @@ public:
 	void Execute(Map& map) const override
 	{
 		map.SaveMap(filepath);
-		/*switch (type)
-		{
-		case MapGeneratorTool::SaveType::Lookup:
-			rend::saveToFile(map.lookupTexture(), filename);
-			break;
-		case MapGeneratorTool::SaveType::Terrain:
-			rend::saveToFile(map.TerrainMapTexture(), filename);
-			break;
-		case MapGeneratorTool::SaveType::Noise:
-			rend::saveToFile(map.HeightMapTexture(), filename);
-			break;
-		default:
-			break;
-		}*/
 	}
 private:
 	std::string filepath;
-	//SaveType type;
 };
+
 
 class LoadHeightMapEvent : public Event
 {
@@ -113,7 +97,16 @@ private:
 	std::string filename;
 };
 
-
-
+class BorderNoiseEvent : public Event
+{
+public:
+	BorderNoiseEvent(const LookupMapData& data) : m_data(data) {}
+	void Execute(Map& map) const override
+	{
+		map.RegenerateLookupBorders(m_data);
+	}
+private:
+	LookupMapData m_data;
+};
 
 }

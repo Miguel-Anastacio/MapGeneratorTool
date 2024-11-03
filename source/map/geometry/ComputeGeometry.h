@@ -96,7 +96,7 @@ namespace MapGeneratorTool
 			duration = std::chrono::steady_clock::now() - start;
 			std::cout << "intersection: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
 
-			return diagram;
+			return std::move(diagram);
 		}
 
 		template<typename T>

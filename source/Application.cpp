@@ -112,20 +112,20 @@ namespace MapGeneratorTool
 		ImGui::PopStyleVar();
 	}
 
-	static const sf::RenderTexture& UpdateTexture(const Map& map)
-	{
-		switch (ApplicationManager::Get().CurrentState())
-		{
-		case State::DiagramEditor:
-			return map.LookupTexture();
-			break;
-		case State::TerrainEditor:
-			return map.HeightMapTexture();
-			break;
-		default:
-			break;
-		}
-	}
+	//static const sf::RenderTexture& UpdateTexture(const Map& map)
+	//{
+	//	switch (ApplicationManager::Get().CurrentState())
+	//	{
+	//	case State::DiagramEditor:
+	//		return map.LookupTexture();
+	//		break;
+	//	case State::TerrainEditor:
+	//		return map.HeightMapTexture();
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//}
 
 	static ui::TexturePanel UpdateTexturePanel( const Map& map)
 	{
@@ -133,14 +133,14 @@ namespace MapGeneratorTool
 		switch (ApplicationManager::Get().CurrentState())
 		{
 		case State::DiagramEditor:
-			panel.texturesStack.emplace_back(&map.LookupTexture());
-			panel.texturesStack.emplace_back(&map.MapMaskTexture());
-			panel.texturesStack.emplace_back(&map.LandMapMaskTexture());
-			panel.texturesStack.emplace_back(&map.OceanMapMaskTexture());
+			panel.texturesStack.emplace_back(map.LookupTexture());
+			panel.texturesStack.emplace_back(map.MapMaskTexture());
+			panel.texturesStack.emplace_back(map.LandMapMaskTexture());
+			panel.texturesStack.emplace_back(map.OceanMapMaskTexture());
 			break;
 		case State::TerrainEditor:
-			panel.texturesStack.push_back(&map.HeightMapTexture());
-			panel.texturesStack.push_back(&map.TerrainMapTexture());
+			panel.texturesStack.emplace_back(map.HeightMapTexture());
+			panel.texturesStack.emplace_back(map.TerrainMapTexture());
 			break;
 		default:
 			break;

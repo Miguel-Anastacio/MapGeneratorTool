@@ -2,16 +2,16 @@
 #include <algorithm>
 #include "../../thirdparty/MyGAL/Vector2.h"
 #include "Renderer.h"
-#include "components/MapMask.h"
 #include "MapMask.h"
 
 namespace MapGeneratorTool
 {
 	MapMask::MapMask(const char* name, const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height, float cutOffHeight, bool mode)
-		: MapComponent(width, height, name)
+		: MapComponent(width, height, name), mask(width, height)
 	{
 		m_elevation = ExtractHeightMapFromTexture(textureBuffer, width, height);
 		m_maskBuffer = CreateBuffer(m_elevation, cutOffHeight, mode);
+		mask.SetMaskData(m_maskBuffer, Utils::Color(255, 255, 255, 255));
 		rend::drawBuffer(m_maskBuffer, m_texture, width, height);
 		//rend::saveToFile(m_texture, name);
 	}

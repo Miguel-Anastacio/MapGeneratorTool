@@ -16,6 +16,12 @@ public:
 		SetMaskData(textureBuffer, maskColor);
 	}
 
+	Mask(unsigned wid, unsigned ht, const Utils::Color& maskColor = Utils::Color(255, 255, 255, 255))
+		: Dimensions(wid, ht), data(wid* ht)
+	{
+		
+	}
+
     bool isInMask(int x, int y) const 
 	{
         auto width = Width();
@@ -49,48 +55,6 @@ public:
 		}
 	}
 
-	//template<typename T>
-	//mygal::Vector2<T> getClosestPointInMask(const mygal::Vector2<T>& point) const
-	//{
- //       auto width = Width();
- //       auto height = Height();
-	//	auto x = static_cast<int>(point.x * width);
-	//	auto y = static_cast<int>(point.y * height);
-
-	//	if (isInMask(x, y))
-	//	{
-	//		return point;
-	//	}
-
-	//	std::unordered_set<mygal::Vector2<int>> pointsVisited;
-	//	const  int startIdx = y * width + x;
-	//	std::queue<mygal::Vector2<int>> queue;
-
-	//	// Initialize BFS queue with the starting position
-	//	queue.push({ x, y });
-
-	//	while (!queue.empty())
-	//	{
-	//		auto [cx, cy] = queue.front();
-	//		queue.pop();
-	//		if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
-	//		if (pointsVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
-
-
-	//		if (data[cy * width + cx])
-	//			return mygal::ScaleBothAxis(mygal::Vector2<T>(cx, cy), 1.0f / width, 1.0f / height);
-	//		else
-	//			pointsVisited.insert(mygal::Vector2<int>(cx, cy));
-
-	//		queue.push({ cx + 1, cy });
-	//		queue.push({ cx - 1, cy });
-	//		queue.push({ cx, cy + 1 });
-	//		queue.push({ cx, cy - 1 });
-
-	//	}
-	//	
-	//	return point;
-	//}
 private:
     std::vector<bool> data; 
 };

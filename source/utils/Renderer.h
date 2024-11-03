@@ -170,14 +170,14 @@ namespace rend
     }
 
     template<typename T>
-    void drawPoints(sf::RenderTexture& window, const Diagram<T>& diagram, unsigned width, unsigned height)
+    void drawPoints(sf::RenderTexture& window, const mygal::Diagram<T>& diagram, unsigned width, unsigned height)
     {
         for (const auto& site : diagram.getSites())
             drawPoint(window, site.point, sf::Color(255, 0, 0), width, height);
     }
 
     template<typename T>
-    void drawDiagram(sf::RenderTexture& window, const Diagram<T>& diagram, unsigned width, unsigned height)
+    void drawDiagram(sf::RenderTexture& window, const mygal::Diagram<T>& diagram, unsigned width, unsigned height)
     {
         for (const auto& site : diagram.getSites())
         {

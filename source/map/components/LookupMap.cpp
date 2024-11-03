@@ -26,8 +26,12 @@ namespace MapGeneratorTool
 		const auto width = Width();
 		const auto height = Height();
 		m_colorsInUse.clear();
-		auto landTileMap = GenerateTileMapFromMask(data.land, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
-		auto oceanTileMap = GenerateTileMapFromMask(data.ocean, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
+
+		computeDiagramFromMask(data.land, landMask, m_landDiagram);
+		computeDiagramFromMask(data.ocean, oceanMask, m_oceanDiagram);
+
+		auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
+		auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
 
 		landMask->Texture().clear();
 		oceanMask->Texture().clear();
@@ -37,45 +41,47 @@ namespace MapGeneratorTool
 		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
 		m_texture.clear();
 		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
-		/*
-		auto centroids = lookUpTileMap.GetCentroids();
-		for (const auto point : centroids)
-		{
-			sf::Color color;
-			if (lookUpTileMap.IsTileOfType(TileType::LAND, point.x, point.y))
-				color = sf::Color(255, 0, 0, 255);
-			else
-				color = sf::Color(0, 255, 0, 255);
-
-			rend::drawPoint(m_texture, point, color, width, height);
-		}*/
 
 		auto colors = lookUpTileMap.GetColorsInUse();
 		std::cout << "Colors in use: " << colors << "\n";
 		//OutputLookupTable();
 	}
 
-	TileMap LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const NoiseData& noiseData, float borderThick, const MapMask* mapMask, TileType type, const char* name)
+	void LookupMap::RegenerateBorders(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
 	{
 		const auto width = Width();
 		const auto height = Height();
-		const auto buffer = mapMask->GetMaskBuffer();
+		m_colorsInUse.clear();
+		auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
+		auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
 
-		Mask mask(width, height, buffer);
-		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask);
-		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
-		geomt::lloydRelaxation(diagram, data.lloyd, mask);
-		
+		landMask->Texture().clear();
+		oceanMask->Texture().clear();
+		rend::drawTileMap(landTileMap, landMask->Texture(), width, height);
+		rend::drawTileMap(oceanTileMap, oceanMask->Texture(), width, height);
+
+		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
+		m_texture.clear();
+		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
+
+	}
+	TileMap LookupMap::GenerateTileMapFromMask(const std::shared_ptr<Diagram>& diagram, const NoiseData& noiseData, float borderThick, const MapMask* mapMask, TileType type, const char* name)
+	{
+		const auto width = Width();
+		const auto height = Height();
+
+	
+		assert(diagram != nullptr);
 
 		TileMap maskTileMap(width, height);
-		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, noiseData, (double)borderThick);
+		rasterizer::RasterizeDiagramToTileMap(*diagram, width, height, maskTileMap, noiseData, (double)borderThick);
 		auto& tileMap = maskTileMap.GetTilesRef();
 
-		maskTileMap.MarkTilesNotInMaskAsVisited(mask, type);
+		maskTileMap.MarkTilesNotInMaskAsVisited(mapMask->GetMask(), type);
 
 		std::vector<mygal::Vector2<double>> centroids;
-		centroids.reserve(diagram.getSites().size());
-		for (auto& site : diagram.getSites())
+		centroids.reserve(diagram->getSites().size());
+		for (auto& site : diagram->getSites())
 		{
 			centroids.emplace_back(site.point);
 		}
@@ -95,7 +101,7 @@ namespace MapGeneratorTool
 			for (int x = 0; x < width; x++)
 			{
 				auto index = y * width + x;
-				if (tileMap[index].isBorder && mask.isInMask(x, y))
+				if (tileMap[index].isBorder && mapMask->GetMask().isInMask(x, y))
 				{
 					Utils::Color color;
 					if (maskTileMap.FindColorOfClosestTileOfSameType(x, y, width, color))
@@ -105,7 +111,6 @@ namespace MapGeneratorTool
 				}
 			}
 		}
-
 
 		return maskTileMap;
 	}
@@ -169,6 +174,17 @@ namespace MapGeneratorTool
 		else {
 			std::cerr << "Could not open the file for writing!" << std::endl;
 		}
+
+	}
+
+	void LookupMap::computeDiagramFromMask(const LookupFeatures& data, MapMask* mask, std::shared_ptr<Diagram>& diagram) const
+	{
+		const auto width = Width();
+		const auto height = Height();
+
+		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask->GetMask());
+		diagram = std::make_shared<Diagram>(geomt::generateDiagram(pointsContr));
+		geomt::lloydRelaxation(*diagram.get(), data.lloyd, mask->GetMask());
 
 	}
 

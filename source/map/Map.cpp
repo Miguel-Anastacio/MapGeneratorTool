@@ -64,21 +64,25 @@ void Map::RegenerateLookUp(const LookupMapData& data)
 		m_maskmap->RegenerateMask(data.cutOffHeight, true);
 		m_landMask->RegenerateMask(data.cutOffHeight, true);
 		m_oceanMask->RegenerateMask(data.cutOffHeight, false);
+		m_maskmap->Texture().clear();
+		rend::drawBuffer(m_maskmap->GetMaskBuffer(), m_maskmap->Texture(), Width(), Height());
 	}
 
 	m_lookupmap->RegenerateLookUp(data, m_landMask.get(), m_oceanMask.get());
-	//m_heightmap-
-	m_maskmap->Texture().clear();
-	rend::drawBuffer(m_maskmap->GetMaskBuffer(), m_maskmap->Texture(), Width(), Height());
+}
+
+void Map::RegenerateLookupBorders(const LookupMapData& data)
+{
+
 }
 
 void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height)
 {
 	setDimensions(width, height);
-	GenerateMap(textureBuffer, m_cutOffHeight);
+	GenerateMapFromHeigthMap(textureBuffer, m_cutOffHeight);
 }
 
-void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
+void Map::GenerateMapFromHeigthMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
 {
 	m_cutOffHeight = cutOffHeight;
 	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, Width(), Height(), cutOffHeight);
@@ -94,16 +98,6 @@ void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, float cutOffHei
 	//m_heightmap->
 	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), Width(), Height(), m_terrainTypes);
 }
-
-//void Map::SaveMap(const char* filePath)
-//{
-//	SaveMapComponent(m_lookupmap.get());
-//	SaveMapComponent(m_heightmap.get());
-//	SaveMapComponent(m_terrainmap.get());
-//	SaveMapComponent(m_landMask.get());
-//	SaveMapComponent(m_maskmap.get());
-//	SaveMapComponent(m_oceanMask.get());
-//}
 
 void Map::SaveMap(const std::string& filePath) const
 {

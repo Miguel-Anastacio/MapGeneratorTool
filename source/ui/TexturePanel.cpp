@@ -14,44 +14,51 @@ namespace ui
 		if (ImGui::Begin("Viewport")) 
 		{
 			auto images = texturesStack;
-			// Set up a horizontal layout for large and small images
-			ImGui::BeginChild("Large Image", ImVec2(850, 0), true); // Left side for the large image
-
-			ImVec2 imageSize(800, 600);
-			static float zoom = 1;
-			static ImVec2 panOffset(0, 0);
-			HandleMouseInput(zoom, panOffset, imageSize);
-
-			// Define UV coordinates for zooming and panning
-			ImVec2 uv0 = ImVec2(0.5f, 0.5f) - ImVec2(0.5f, 0.5f) / zoom + panOffset;
-			ImVec2 uv1 = ImVec2(0.5f, 0.5f) + ImVec2(0.5f, 0.5f) / zoom + panOffset;
-
-			// Clamp UV coordinates to ensure they remain within [0, 1]
-			uv0 = clamp(uv0, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
-			uv1 = clamp(uv1, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
-
-			// flip UVs Y due to sf::RenderTexture storage
-			std::swap(uv0.y, uv1.y);
 
 
-			// Display the large image
-			auto image = (ImTextureID)(intptr_t) (*images[mainImage]).getTexture().getNativeHandle();
-			ImVec2(0, 1),
-			ImVec2(1, 0), // flipped vertically, because textures in sf::RenderTexture are
-				// stored this way
-			ImGui::Image(image, imageSize, uv0, uv1); 
-			ImGui::EndChild();
+			if (images.size() > 0 && images[mainImage])
+			{
+				// Set up a horizontal layout for large and small images
+				ImGui::BeginChild("Large Image", ImVec2(850, 0), true); // Left side for the large image
 
+				ImVec2 imageSize(800, 600);
+				static float zoom = 1;
+				static ImVec2 panOffset(0, 0);
+				HandleMouseInput(zoom, panOffset, imageSize);
+
+				// Define UV coordinates for zooming and panning
+				ImVec2 uv0 = ImVec2(0.5f, 0.5f) - ImVec2(0.5f, 0.5f) / zoom + panOffset;
+				ImVec2 uv1 = ImVec2(0.5f, 0.5f) + ImVec2(0.5f, 0.5f) / zoom + panOffset;
+
+				// Clamp UV coordinates to ensure they remain within [0, 1]
+				uv0 = clamp(uv0, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
+				uv1 = clamp(uv1, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
+
+				// flip UVs Y due to sf::RenderTexture storage
+				std::swap(uv0.y, uv1.y);
+
+
+				// Display the large image
+				auto image = (ImTextureID)(intptr_t) (*images[mainImage]).getTexture().getNativeHandle();
+				ImVec2(0, 1),
+				ImVec2(1, 0), // flipped vertically, because textures in sf::RenderTexture are
+					// stored this way
+				ImGui::Image(image, imageSize, uv0, uv1); 
+				ImGui::EndChild();
+			}
+
+			// Display the small images as buttons
 			// Place the small images next to the large image
 			ImGui::SameLine(); 
 			ImGui::BeginChild("Small Images", ImVec2(0, 0), true);
-
-			// Display the small images as buttons
 			for (int i = 0; i < images.size(); i++)
 			{
-				if (ImGui::ImageButton(("ban" + std::to_string(i)).c_str(), *images[i], ImVec2(100, 100)))
+				if (images[i])
 				{
-					mainImage = i;
+					if (ImGui::ImageButton(("ban" + std::to_string(i)).c_str(), *images[i], ImVec2(100, 100)))
+					{
+						mainImage = i;
+					}
 				}
 			}
 
@@ -91,10 +98,6 @@ namespace ui
 					zoom_adjustment.y *= -1;
 					panOffset += zoom_adjustment;
 				}
-				
-
-
-
 			}
 
 			// Handle panning when dragging with left mouse button
@@ -115,6 +118,5 @@ namespace ui
 		// Apply clamping to ensure the pan offset doesn't exceed the image boundaries
 		panOffset = clamp(panOffset, min_offset, max_offset);
 	}
-
 }
 }
