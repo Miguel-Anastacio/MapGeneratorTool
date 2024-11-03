@@ -26,8 +26,6 @@ public:
 		return m_texture;
 	}
 
-
-
 	const char* Name() const
 	{
 		return m_name;
@@ -37,9 +35,6 @@ public:
 	{
 
 	}
-
-
-
 
 protected:
 	sf::RenderTexture m_texture;

@@ -40,7 +40,6 @@ namespace MapGeneratorTool
 		std::shared_ptr<Diagram> m_oceanDiagram;
 
 
-
 	};
 
 

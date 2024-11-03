@@ -14,13 +14,13 @@
 #include "VectorWrapper.h"
 #include "Timer.h"
 #include "Logger.h"
+#include "ThreadPool.h"
 namespace MapGeneratorTool
 {
 
 	LookupMap::LookupMap(const char* name, unsigned width, unsigned height)
 	: MapComponent(width, height, name)
 	{
-
 	}
 
 	void LookupMap::RegenerateLookUp(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
@@ -35,18 +35,18 @@ namespace MapGeneratorTool
 		auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
 		auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
 
-		landMask->Texture().clear();
-		oceanMask->Texture().clear();
-		rend::drawTileMap(landTileMap, landMask->Texture(), width, height);
-		rend::drawTileMap(oceanTileMap, oceanMask->Texture(), width, height);
+
+		thread::ThreadPool threadPool(1);
+		threadPool.submit(rend::drawTileMap, landTileMap, std::ref(landMask->Texture()), width, height);
+		threadPool.submit(rend::drawTileMap, oceanTileMap, std::ref(oceanMask->Texture()), width, height);
 
 		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
-		m_texture.clear();
-		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
+		threadPool.submit(rend::drawTileMap, lookUpTileMap, std::ref(m_texture), width, height);
 
 		auto colors = lookUpTileMap.GetColorsInUse();
 		std::cout << "Colors in use: " << colors << "\n";
 		//OutputLookupTable();
+
 	}
 
 	void LookupMap::RegenerateBorders(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
