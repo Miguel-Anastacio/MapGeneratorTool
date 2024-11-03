@@ -22,38 +22,9 @@ public:
 		
 	}
 
-    bool isInMask(int x, int y) const 
-	{
-        auto width = Width();
-        auto height = Height();
-		if (x < 0 || x >= width || y < 0 || y >= height)
-			return false;
+	bool isInMask(int x, int y) const;
 
-        return data[y * width + x];
-    }
-
-	void SetMaskData(const std::vector<uint8_t>& buffer, const Utils::Color& maskColor)
-	{	
-        auto width = Width();
-        auto height = Height();
-		for (unsigned y = 0; y < height; y++)
-		{
-			for (unsigned x = 0; x < width; x++)
-			{
-				int index = 4 * width * y + 4 * x;
-				Utils::Color maskPixelColor(buffer[index], buffer[index + 1], buffer[index + 2], 255);
-				if (maskPixelColor == maskColor)
-				{
-					data[y * width + x] = true;
-				}
-				else
-				{
-					data[y * width + x] = false;
-				}
-
-			}
-		}
-	}
+	void SetMaskData(const std::vector<uint8_t>& buffer, const Utils::Color& maskColor);
 
 private:
     std::vector<bool> data; 

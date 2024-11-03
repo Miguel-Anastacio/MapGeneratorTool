@@ -12,8 +12,10 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
 {
     const int index = y * width + x;
     const auto tileType = tileMap[index].type;
+    auto wid = static_cast<int>(width);
+    auto hgt = static_cast<int>(height);
 
-    if (x >= width || x < 0 || y >= height || y < 0 || tileMap[index].color == newColor || tileMap[index].visited)
+    if (x >= wid || x < 0 || y >= hgt || y < 0 || tileMap[index].color == newColor || tileMap[index].visited)
     {
         return false;
     }
@@ -28,8 +30,8 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
         stack.pop();
 
         // Check boundary conditions again and ensure tile hasn't been visited
-        if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
-        Tile& tile = tileMap[cy * width + cx];
+        if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt) continue;
+        Tile& tile = tileMap[cy * wid + cx];
 
         //if (tile.isBorder && tile.type == tileType) 
         //    tile.centroid = mygal::Vector2<int>(x, y);
@@ -56,6 +58,9 @@ static bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& n
 
 static mygal::Vector2<int> fillGetCentroidOfPoints(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height)
 {
+    auto wid = static_cast<int>(width);
+    auto hgt = static_cast<int>(height);
+
     const int index = y * width + x;
     const auto tileType = tileMap[index].type;
     mygal::Vector2<int> pointsSum;
@@ -63,7 +68,7 @@ static mygal::Vector2<int> fillGetCentroidOfPoints(int x, int y, std::vector<Til
     int count = 0;
 
 
-    if (x >= width || x < 0 || y >= height || y < 0 || tileMap[index].color == newColor || tileMap[index].visited)
+    if (x >= wid || x < 0 || y >= hgt || y < 0 || tileMap[index].color == newColor || tileMap[index].visited)
     {
         return mygal::Vector2<int>(-1, -1);
     }
@@ -77,8 +82,8 @@ static mygal::Vector2<int> fillGetCentroidOfPoints(int x, int y, std::vector<Til
         stack.pop();
 
         // Check boundary conditions again and ensure tile hasn't been visited
-        if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
-        Tile& tile = tileMap[cy * width + cx];
+        if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt) continue;
+        Tile& tile = tileMap[cy * wid + cx];
 
         //if (tile.isBorder && tile.type == tileType) 
         //    tile.centroid = mygal::Vector2<int>(x, y);

@@ -70,7 +70,6 @@ namespace MapGeneratorTool
 		const auto width = Width();
 		const auto height = Height();
 
-	
 		assert(diagram != nullptr);
 
 		TileMap maskTileMap(width, height);
@@ -96,9 +95,9 @@ namespace MapGeneratorTool
 		colorsNum = maskTileMap.GetColorsInUse();
 		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colorsNum << "\n";
 
-		for (int y = 0; y < height; y++)
+		for (unsigned y = 0; y < height; y++)
 		{
-			for (int x = 0; x < width; x++)
+			for (unsigned x = 0; x < width; x++)
 			{
 				auto index = y * width + x;
 				if (tileMap[index].isBorder && mapMask->GetMask().isInMask(x, y))
@@ -118,6 +117,8 @@ namespace MapGeneratorTool
 
 	Utils::Color LookupMap::FindClosestTileOfSameType(const std::vector<Tile>& tileMap, int x, int y, unsigned width, unsigned height) const
 	{
+		auto wid = static_cast<int>(width);
+		auto hgt = static_cast<int>(height);
 		std::unordered_set<mygal::Vector2<int>> tilesVisited;
 		const  int startIdx = y * width + x;
 		auto targetType = tileMap[startIdx].type;
@@ -132,10 +133,10 @@ namespace MapGeneratorTool
 		{
 			auto [cx, cy] = queue.front();
 			queue.pop();
-			if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
+			if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt) continue;
 			if (tilesVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
 
-			const Tile& tile = tileMap[cy * width + cx];
+			const Tile& tile = tileMap[cy * wid + cx];
 
 			if (tile.type == targetType && (tile.visited) && (!tile.isBorder))
 				return tile.color;

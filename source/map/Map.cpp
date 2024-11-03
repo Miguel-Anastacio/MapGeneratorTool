@@ -73,18 +73,22 @@ void Map::RegenerateLookUp(const LookupMapData& data)
 
 void Map::RegenerateLookupBorders(const LookupMapData& data)
 {
+	assert(m_lookupmap != nullptr);
+	assert(m_landMask != nullptr);
+	assert(m_oceanMask != nullptr);
 
+	m_lookupmap->RegenerateBorders(data, m_landMask.get(), m_oceanMask.get());
 }
 
 void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height)
 {
-	setDimensions(width, height);
+	//setDimensions(width, height);
 	GenerateMapFromHeigthMap(textureBuffer, m_cutOffHeight);
 }
 
 void Map::GenerateMapFromHeigthMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
 {
-	m_cutOffHeight = cutOffHeight;
+	cutOffHeight = 0.001f;
 	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, Width(), Height(), cutOffHeight);
 	m_landMask = std::make_unique<MapMask>("landMask.png", textureBuffer, Width(), Height(), cutOffHeight);
 	m_oceanMask = std::make_unique<MapMask>("oceamMask.png", textureBuffer, Width(), Height(), cutOffHeight, false);

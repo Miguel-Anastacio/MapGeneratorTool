@@ -45,6 +45,7 @@ namespace MapGeneratorTool
 	{
 		Texture().clear();
 		m_maskBuffer = CreateBuffer(m_elevation, cutOffHeight, mode);
+		mask.SetMaskData(m_maskBuffer, Utils::Color(255, 255, 255, 255));
 	}
 
 	std::vector<double> MapGeneratorTool::MapMask::ExtractHeightMapFromTexture(const std::vector<uint8_t>& buffer, unsigned width, unsigned height) const

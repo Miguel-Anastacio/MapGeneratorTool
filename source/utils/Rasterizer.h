@@ -22,7 +22,7 @@ namespace MapGeneratorTool
 			T dy = (end.y - start.y);
 			T length = std::sqrt(dx * dx + dy * dy);  // Line length
 			T stepSize = std::sqrt(2.0f) / 2.0f;      // Step size
-			int numSteps = std::ceil(length / stepSize);  // Number of steps
+			int numSteps = static_cast<int>(std::ceil(length / stepSize));  // Number of steps
 
 			std::vector<mygal::Vector2<T>> line(numSteps + 1);
 
@@ -58,7 +58,7 @@ namespace MapGeneratorTool
 					T dTx = (offsetDown.x - offsetUp.x);
 					T dTy = (offsetDown.y - offsetUp.y);
 
-					int steps = std::ceil(offsetUp.getDistance(offsetDown) / stepSize);
+					int steps = static_cast<int>(std::ceil(offsetUp.getDistance(offsetDown) / stepSize));
 					for (int s = 0; s <= steps; ++s)
 					{
 						T t = s / static_cast<T>(steps);

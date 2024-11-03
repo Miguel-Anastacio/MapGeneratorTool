@@ -190,12 +190,12 @@ namespace MapGeneratorTool
 
 			// Parameters
 			float radius = 1.0f;      // Circle radius
-			int numSamples = line.size();     // Number of samples (points on the circle)
+			size_t numSamples = line.size();     // Number of samples (points on the circle)
 			const int maxvalue = INT32_MAX;
 			int cutPointIndex = 0;    // Cut point (can be any index on the circle)
 
 			// Step 1: Sample noise on the circle
-			std::vector<double> circleNoise = sampleNoiseInACircle<double>(noise, radius, numSamples);
+			std::vector<double> circleNoise = sampleNoiseInACircle<double>(noise, radius, (int)numSamples);
 
 			// Step 2: Normalize noise so that the value at the cut point is zero
 			normalizeNoise(circleNoise, cutPointIndex);
