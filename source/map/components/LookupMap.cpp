@@ -1,6 +1,6 @@
 #pragma once
 #include <algorithm>
-#include "../../thirdparty/MyGAL/Vector2.h"
+#include "MyGAL/Vector2.h"
 #include "Renderer.h"
 #include "components/LookupMap.h"
 #include "components/MapMask.h"
@@ -11,6 +11,7 @@
 #include <queue>
 #include "Algo.h"
 #include "Color.h"
+#include "VectorWrapper.h"
 namespace MapGeneratorTool
 {
 
@@ -36,7 +37,7 @@ namespace MapGeneratorTool
 		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
 		m_texture.clear();
 		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
-		
+		/*
 		auto centroids = lookUpTileMap.GetCentroids();
 		for (const auto point : centroids)
 		{
@@ -47,65 +48,12 @@ namespace MapGeneratorTool
 				color = sf::Color(0, 255, 0, 255);
 
 			rend::drawPoint(m_texture, point, color, width, height);
-		}
+		}*/
 
 		auto colors = lookUpTileMap.GetColorsInUse();
 		std::cout << "Colors in use: " << colors << "\n";
-		OutputLookupTable();
+		//OutputLookupTable();
 	}
-
-	/*std::vector<uint8_t> LookupMap::GenerateLookupMapFromMask(const LookupFeatures& data, const MapMask* mapMask, const char* name)
-	{
-		const auto width = Width();
-		const auto height = Height();
-		const auto buffer = mapMask->GetMaskBuffer();
-
-		Mask mask(width, height, buffer);
-		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask);
-		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
-		geomt::lloydRelaxation(diagram, data.lloyd);
-
-		TileMap maskTileMap(width, height);
-
-		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, 40.0f);
-		auto tileMap = maskTileMap.GetTilesRef();
-
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				tileMap[y * width + x].land = mask.isInMask(x, y);
-
-				if (!mask.isInMask(x, y))
-					tileMap[y * width + x].visited = true;
-			}
-		}
-
-		std::vector<mygal::Vector2<double>> centroids;
-		centroids.reserve(diagram.getSites().size());
-		for (auto& site : diagram.getSites())
-		{
-			centroids.emplace_back(site.point);
-		}
-		algo::floodFill(tileMap, centroids, Width(), Height());
-
-
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (!tileMap[index].visited)
-				{
-					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
-					if (color != Utils::Color(0, 0, 0, 0))
-						algo::fill(x, y, tileMap, color, width, height);
-				}
-			}
-		}
-		return maskTileMap.ConvertTileMapToBuffer();
-
-	}*/
 
 	TileMap LookupMap::GenerateTileMapFromMask(const LookupFeatures& data, const NoiseData& noiseData, float borderThick, const MapMask* mapMask, TileType type, const char* name)
 	{
@@ -117,30 +65,13 @@ namespace MapGeneratorTool
 		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask);
 		mygal::Diagram<double>  diagram = std::move(geomt::generateDiagram(pointsContr));
 		geomt::lloydRelaxation(diagram, data.lloyd, mask);
-
-		// write diagram to image to get a pixel array
-		sf::RenderTexture texture;
-		texture.clear();
-		texture.create(width, height);
+		
 
 		TileMap maskTileMap(width, height);
-		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, noiseData, borderThick);
+		rasterizer::RasterizeDiagramToTileMap(diagram, width, height, maskTileMap, noiseData, (double)borderThick);
 		auto& tileMap = maskTileMap.GetTilesRef();
 
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				if (!mask.isInMask(x, y))
-				{
-					tileMap[y * width + x].visited = true;
-				}
-				else
-				{
-					tileMap[y * width + x].type = type;
-				}
-			}
-		}
+		maskTileMap.MarkTilesNotInMaskAsVisited(mask, type);
 
 		std::vector<mygal::Vector2<double>> centroids;
 		centroids.reserve(diagram.getSites().size());
@@ -148,63 +79,33 @@ namespace MapGeneratorTool
 		{
 			centroids.emplace_back(site.point);
 		}
-		algo::floodFill(tileMap, centroids, Width(), Height());
+		maskTileMap.FloodFillTileMap(centroids);
 
+		auto colorsNum = maskTileMap.GetColorsInUse();
+		std::cout << "Colors in use in " << mapMask->Name() << " before second fill: " << colorsNum << "\n";
+		std::unordered_set<Utils::Color> colors = maskTileMap.GetColors();
 
-		auto colors = maskTileMap.GetColorsInUse();
-		std::cout << "Colors in use in " << mapMask->Name() << " before second fill: " << colors << "\n";
-		//maskTileMap.ComputeCentroids();
+		maskTileMap.FloodFillMissingTiles(100);
+
+		colorsNum = maskTileMap.GetColorsInUse();
+		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colorsNum << "\n";
 
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
 				auto index = y * width + x;
-				if (!tileMap[index].visited)
+				if (tileMap[index].isBorder && mask.isInMask(x, y))
 				{
-					auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
-					//tileMap[index].color = color;
-					if (color != Utils::Color(0, 0, 0, 0))
+					Utils::Color color;
+					if (maskTileMap.FindColorOfClosestTileOfSameType(x, y, width, color))
 					{
-						algo::fill(x, y, tileMap, color, width, height);
-						//tileMap[index].color = color;
-						//tileMap[index].visited = true;
+						tileMap[index].color = color;
 					}
-					//break;
-					//tileMap[index].visited = true;
 				}
-
 			}
 		}
-		colors = maskTileMap.GetColorsInUse();
-		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colors << "\n";
-		//for (int y = 0; y < height; y++)
-		//{
-		//	for (int x = 0; x < width; x++)
-		//	{
-		//		auto index = y * width + x;
-		//		if (tileMap[index].isBorder)
-		//		{
-		//			//auto color = FindClosestTileOfSameType(tileMap, x, y, width, height);
-		//			auto tile = maskTileMap.GetTile(tileMap[index].centroid.x, tileMap[index].centroid.y);
 
-		//			if(tile.color != Utils::Color(0, 0, 0, 0))
-		//				tileMap[index].color = tile.color;
-		//				
-		//		}
-		//	}
-		//}
-
-	/*	for (const auto point : centroids)
-		{
-			sf::Color color;
-			if (maskTileMap.IsTileOfType(TileType::LAND, point.x, point.y))
-				color = sf::Color(255, 0, 0, 255);
-			else
-				color = sf::Color(0, 255, 0, 255);
-
-			rend::drawPoint(m_texture, point, color, width, height);
-		}*/
 
 		return maskTileMap;
 	}

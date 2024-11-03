@@ -8,6 +8,8 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <memory>
+#include "Color.h"
+
 #include "ui/navBar.h"
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"

@@ -10,6 +10,7 @@
 #include <cmath>
 //#include "delaunator/include/delaunator.hpp"
 #include "fastNoiseLite/FastNoiseLite.h"
+#include "VectorWrapper.h"
 namespace MapGeneratorTool
 {
 	namespace geomt
@@ -60,8 +61,8 @@ namespace MapGeneratorTool
 			{
 				T x = distribution(generator);
 				T y = distribution(generator);
-				int maskX = static_cast<int>(x * mask.width);
-				int maskY = static_cast<int>(y * mask.height);
+				int maskX = static_cast<int>(x * mask.Width());
+				int maskY = static_cast<int>(y * mask.Height());
 
 				if (mask.isInMask(maskX, maskY)) 
 				{
@@ -154,7 +155,7 @@ namespace MapGeneratorTool
 
 		// Function to map circle noise to a 1D fault line
 		template<typename T>
-		static void applyNoiseToLine(const std::vector<T>& circleNoise, std::vector<mygal::Vector2<T>>& line, int cutPointIndex, float noiseScale)
+		static void applyNoiseToLine(const std::vector<T>& circleNoise, std::vector<mygal::Vector2<T>>& line, int cutPointIndex, float noiseScale, int thickness)
 		{
 			auto numSamples = circleNoise.size();
 			std::vector<T> faultLine(numSamples);
@@ -168,16 +169,20 @@ namespace MapGeneratorTool
 				faultLine[i] = circleNoise[i];
 			}
 
+			int index = 0;
 			for (int i = 0; i < numSamples; ++i)
 			{
-				line[i].y += faultLine[i] * noiseScale;
-				line[i].x += faultLine[i] * noiseScale;
+				mygal::Vector2<T> tangent = line.size() > 1 ? line[numSamples-1] - line[0] : mygal::Vector2<T>(1, 0); // Approximate tangent
+				auto perpendicular = mygal::normed(tangent.getOrthogonal());
+
+				line[i].x += faultLine[i] * noiseScale * perpendicular.x;
+				line[i].y += faultLine[i] * noiseScale * perpendicular.y;
 			}
 
 		}
 
 		template<typename T>
-		static void DeformLine(std::vector<mygal::Vector2<T>>& line, FastNoiseLite& noise, float noiseScale = 25.0f)
+		static void DeformLine(std::vector<mygal::Vector2<T>>& line, FastNoiseLite& noise, float noiseScale = 25.0f, int thickness = 2)
 		{
 			// Initialize the noise generator
 			//int seed = std::rand();
@@ -186,6 +191,7 @@ namespace MapGeneratorTool
 			// Parameters
 			float radius = 1.0f;      // Circle radius
 			int numSamples = line.size();     // Number of samples (points on the circle)
+			const int maxvalue = INT32_MAX;
 			int cutPointIndex = 0;    // Cut point (can be any index on the circle)
 
 			// Step 1: Sample noise on the circle
@@ -195,7 +201,7 @@ namespace MapGeneratorTool
 			normalizeNoise(circleNoise, cutPointIndex);
 
 			// Step 3: Map circle noise to a fault line
-			//applyNoiseToLine(circleNoise, line, cutPointIndex, noiseScale);
+			applyNoiseToLine(circleNoise, line, cutPointIndex, noiseScale, thickness);
 
 		}
 	}

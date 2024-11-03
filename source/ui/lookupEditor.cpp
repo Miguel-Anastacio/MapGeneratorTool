@@ -30,7 +30,7 @@ void LookupEditor::RenderPanel() const
     if (ImGui::TreeNode("Land Settings"))
     {
         ImGui::SliderInt("Seed", &data.land.seed, 0, 400000, "%d");
-        ImGui::SliderInt("Number of Tiles", &data.land.tiles, 0, 500, "%d");
+        ImGui::SliderInt("Number of Tiles", &data.land.tiles, 0, 2000, "%d");
         ImGui::SliderInt("Lloyd Iterations ", &data.land.lloyd, 0, 20);
         ImGui::TreePop();
     }
