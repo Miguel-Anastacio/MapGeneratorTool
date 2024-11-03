@@ -12,6 +12,8 @@
 #include "Algo.h"
 #include "Color.h"
 #include "VectorWrapper.h"
+#include "Timer.h"
+#include "Logger.h"
 namespace MapGeneratorTool
 {
 
@@ -95,6 +97,7 @@ namespace MapGeneratorTool
 		colorsNum = maskTileMap.GetColorsInUse();
 		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colorsNum << "\n";
 
+		Timer timer;
 		for (unsigned y = 0; y < height; y++)
 		{
 			for (unsigned x = 0; x < width; x++)
@@ -110,47 +113,8 @@ namespace MapGeneratorTool
 				}
 			}
 		}
-
+		Logger::TimeMsec("Time set border colors", timer.elapsedMilliseconds());
 		return maskTileMap;
-	}
-
-
-	Utils::Color LookupMap::FindClosestTileOfSameType(const std::vector<Tile>& tileMap, int x, int y, unsigned width, unsigned height) const
-	{
-		auto wid = static_cast<int>(width);
-		auto hgt = static_cast<int>(height);
-		std::unordered_set<mygal::Vector2<int>> tilesVisited;
-		const  int startIdx = y * width + x;
-		auto targetType = tileMap[startIdx].type;
-		std::queue<std::pair<int, int>> queue;
-
-		// Initialize BFS queue with the starting position
-		queue.push({ x, y });
-
-		// Directions array for exploring neighboring tiles: right, left, down, up
-
-		while (!queue.empty())
-		{
-			auto [cx, cy] = queue.front();
-			queue.pop();
-			if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt) continue;
-			if (tilesVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
-
-			const Tile& tile = tileMap[cy * wid + cx];
-
-			if (tile.type == targetType && (tile.visited) && (!tile.isBorder))
-				return tile.color;
-			else
-				tilesVisited.insert(mygal::Vector2<int>(cx, cy));
-
-			queue.push({ cx + 1, cy });
-			queue.push({ cx - 1, cy });
-			queue.push({ cx, cy + 1 });
-			queue.push({ cx, cy - 1 });
-			
-		}
-
-		return Utils::Color();
 	}
 
 	void LookupMap::OutputLookupTable() const
@@ -183,10 +147,12 @@ namespace MapGeneratorTool
 		const auto width = Width();
 		const auto height = Height();
 
+		Timer timer;
 		auto pointsContr = geomt::generatePointsConstrained<double>(data.tiles, data.seed, true, mask->GetMask());
 		diagram = std::make_shared<Diagram>(geomt::generateDiagram(pointsContr));
 		geomt::lloydRelaxation(*diagram.get(), data.lloyd, mask->GetMask());
 
+		Logger::TimeMsec("Generate Diagram:", timer.elapsedMilliseconds());
 	}
 
 }

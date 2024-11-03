@@ -2,8 +2,7 @@
 #include <algorithm>
 #include "components/HeightMap.h"
 #include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "Point.h"
-#include "../../thirdparty/MyGAL/Vector2.h"
+#include "MyGAL/Vector2.h"
 #include "Renderer.h"
 #include "Rasterizer.h"
 #include <execution>
@@ -116,13 +115,13 @@ namespace MapGeneratorTool
 		}
 
 		// could also use threads for this
-		for (int y = 0; y < data.height; y++)
+		/*for (int y = 0; y < data.height; y++)
 		{
 			for (int x = 0; x < data.width; x++)
 			{
 				heightMap[y * data.width + x] = inverseLerp(minNoise, maxNoise, heightMap[y * data.width + x]);
 			}
-		}
+		}*/
 
 		return heightMap;
     }

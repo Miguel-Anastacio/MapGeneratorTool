@@ -1,16 +1,14 @@
 #pragma once
 #include <vector>
 #include <random>
-#include <chrono>
-#include <iostream>
-#include "Color.h"
 #include "MyGAL/Diagram.h"
 #include "MyGAL/FortuneAlgorithm.h"
 #include "Mask.h"
 #include <cmath>
-//#include "delaunator/include/delaunator.hpp"
 #include "fastNoiseLite/FastNoiseLite.h"
 #include "VectorWrapper.h"
+#include "Logger.h"
+#include "Timer.h"
 namespace MapGeneratorTool
 {
 	namespace geomt
@@ -49,7 +47,7 @@ namespace MapGeneratorTool
 		template<typename T>
 		static std::vector<mygal::Vector2<T>> generatePointsConstrained(int nbPoints, int seedValue, bool state, const Mask& mask)
 		{
-						
+			//Timer 			
 			std::cout << "seed: " << seedValue << '\n';
 			std::default_random_engine generator(seedValue);
 			std::uniform_real_distribution<T> distribution(0.0, 1.0);
@@ -78,23 +76,14 @@ namespace MapGeneratorTool
 		{
 			// Construct diagram
 			auto algorithm = mygal::FortuneAlgorithm<T>(points);
-			auto start = std::chrono::steady_clock::now();
 			algorithm.construct();
-			auto duration = std::chrono::steady_clock::now() - start;
-			std::cout << "construction: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
 
 			// Bound the diagram
-			start = std::chrono::steady_clock::now();
 			algorithm.bound(mygal::Box<T>{-0.05, -0.05, 1.05, 1.05}); // Take the bounding box slightly bigger than the intersection box
-			duration = std::chrono::steady_clock::now() - start;
-			std::cout << "bounding: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
 			auto diagram = algorithm.getDiagram();
 
 			// Intersect the diagram with a box
-			start = std::chrono::steady_clock::now();
 			diagram.intersect(mygal::Box<T>{-0.01, -0.01, 1.01, 1.01});
-			duration = std::chrono::steady_clock::now() - start;
-			std::cout << "intersection: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
 
 			return std::move(diagram);
 		}

@@ -82,7 +82,7 @@ void Map::RegenerateLookupBorders(const LookupMapData& data)
 
 void Map::GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height)
 {
-	//setDimensions(width, height);
+	setDimensions(width, height);
 	GenerateMapFromHeigthMap(textureBuffer, m_cutOffHeight);
 }
 

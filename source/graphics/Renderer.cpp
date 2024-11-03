@@ -1,5 +1,7 @@
 #include <Renderer.h>
 #include <TileMap.h>
+#include "Timer.h"
+#include "Logger.h"
 namespace MapGeneratorTool
 {
 namespace rend
@@ -40,7 +42,9 @@ namespace rend
 
     void drawTileMap(const TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
     {
+        Timer timer;
         drawBuffer(tileMap.ConvertTileMapToBuffer(), renderTexture, width, height);
+        Logger::TimeMsec("Draw tileMap took:", timer.elapsedMilliseconds());
     }
 
 } // namespace rend

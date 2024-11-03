@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "Utils.h"
-#include "Point.h"
 #include "Color.h"
 #include <algorithm>
 #include <cmath>

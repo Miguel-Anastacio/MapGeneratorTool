@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Algo.h"
 #include "Mask.h"
+#include "Timer.h"
 namespace MapGeneratorTool
 {
 	TileMap::TileMap(unsigned width, unsigned height) : Dimensions(width, height), m_tiles(width*height, Tile())
@@ -11,8 +12,10 @@ namespace MapGeneratorTool
 	}
 	void TileMap::MarkTilesNotInMaskAsVisited(const Mask& mask, TileType type)
 	{
+
 		auto width = Width();
 		auto height = Height();
+		Timer timer;
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
@@ -27,12 +30,15 @@ namespace MapGeneratorTool
 				}
 			}
 		}
+		std::cout << "Time for MarkTilesNotInMaskAsVisited (msec): " << timer.elapsedMilliseconds() << "\n";
 	}
 	void TileMap::FloodFillTileMap(const std::vector<mygal::Vector2<double>>& centroids)
 	{
 		auto width = Width();
 		auto height = Height();
+		Timer timer;
 		algo::floodFill(m_tiles, centroids, width, height);
+		std::cout << "Time for FloodFillTileMap (msec): " << timer.elapsedMilliseconds() << "\n";
 
 		ComputeCentroids();
 		ComputeColorsInUse();
@@ -42,6 +48,7 @@ namespace MapGeneratorTool
 	{
 		auto width = Width();
 		auto height = Height();
+		Timer timer;
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
@@ -68,6 +75,7 @@ namespace MapGeneratorTool
 				}
 			}
 		}
+		std::cout << "Time for FloodFillMissingTiles (msec): " << timer.elapsedMilliseconds() << "\n";
 	}
 	std::vector<uint8_t> TileMap::ConvertTileMapToBuffer() const
 	{
@@ -102,14 +110,16 @@ namespace MapGeneratorTool
 
 	void TileMap::ComputeColorsInUse()
 	{
+		auto height = Height();
+		auto width = Width();
 		m_colors.clear();
 		m_colors.reserve(m_centroids.size());
 
-		for (int y = 0; y < Height(); y++)
+		for (unsigned y = 0; y < height; y++)
 		{
-			for (int x = 0; x < Width(); x++)
+			for (unsigned x = 0; x < width; x++)
 			{
-				const int index = y * Width() + x;
+				const unsigned index = y * width + x;
 				m_colors.emplace(m_tiles[index].color);
 			}
 		}
@@ -127,6 +137,7 @@ namespace MapGeneratorTool
 
 		auto height = tileMap1.Height();
 		auto width = tileMap1.Width();
+		Timer timer;
 
 		TileMap newTileMap(width, height);
 		auto& newTiles = newTileMap.GetTilesRef();
@@ -134,11 +145,11 @@ namespace MapGeneratorTool
 		auto tiles1 = tileMap1.GetTiles();
 		auto tiles2 = tileMap2.GetTiles();
 
-		for (int y = 0; y < height; y++)
+		for (unsigned y = 0; y < height; y++)
 		{
-			for (int x = 0; x < width; x++)
+			for (unsigned x = 0; x < width; x++)
 			{
-				const int index = y * width + x;
+				const unsigned index = y * width + x;
 				if (tiles1[index].type == type1)
 				{
 					newTiles[index] = tiles1[index];
@@ -150,15 +161,18 @@ namespace MapGeneratorTool
 				}
 			}
 		}
+		std::cout << "Time for BlendTileMap (msec): " << timer.elapsedMilliseconds() << "\n";
 		newTileMap.ComputeCentroids();
 
 		return newTileMap;
 	}
+
 	void TileMap::InsertCentroid(const mygal::Vector2<int>& point, const Utils::Color& color)
 	{
 		m_colors.insert(color);
 		m_centroids.insert(point);
 	}
+
 	bool TileMap::FindColorOfClosestTileOfSameType(int x, int y, int radius, Utils::Color& out_color) const
 	{
 		auto width = Width();
