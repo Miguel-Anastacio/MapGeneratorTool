@@ -21,7 +21,23 @@ namespace ui
 				// Set up a horizontal layout for large and small images
 				ImGui::BeginChild("Large Image", ImVec2(850, 0), true); // Left side for the large image
 
-				ImVec2 imageSize(800, 600);
+				const float maxWidth = 900;
+				const float maxHeight = 700;
+
+				auto size = images[mainImage]->getSize();
+				float ratio = size.x / size.y;
+
+				float new_width = maxWidth;
+				float new_height = maxWidth / ratio;
+
+				// If new height exceeds max height, scale down based on height instead
+				if (new_height > maxHeight) 
+				{
+					new_height = maxHeight;
+					new_width = maxHeight * ratio;
+				}
+
+				ImVec2 imageSize(new_width, new_height);
 				static float zoom = 1;
 				static ImVec2 panOffset(0, 0);
 				HandleMouseInput(zoom, panOffset, imageSize);

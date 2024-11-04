@@ -55,6 +55,9 @@ namespace MapGeneratorTool
 			std::vector<mygal::Vector2<T>> points;
 			points.reserve(nbPoints);
 
+			const int maxAttempts = 500;
+			int attempts = 0;
+
 			while (points.size() < nbPoints) 
 			{
 				T x = distribution(generator);
@@ -65,6 +68,13 @@ namespace MapGeneratorTool
 				if (mask.isInMask(maskX, maskY)) 
 				{
 					points.emplace_back(x, y);
+					attempts = 0;
+				}
+				else
+				{
+					attempts++;
+					if (attempts > maxAttempts)
+						return points;
 				}
 			}
 

@@ -28,7 +28,7 @@ void LookupEditor::RenderPanel() const
     if (ImGui::TreeNode("Land Settings"))
     {
         ImGui::SliderInt("Seed", &data.land.seed, 0, 400000, "%d");
-        ImGui::SliderInt("Number of Tiles", &data.land.tiles, 0, 2000, "%d");
+        ImGui::SliderInt("Number of Tiles", &data.land.tiles, 0, 5000, "%d");
         ImGui::SliderInt("Lloyd Iterations ", &data.land.lloyd, 0, 20);
         ImGui::TreePop();
     }
@@ -36,15 +36,15 @@ void LookupEditor::RenderPanel() const
     if (ImGui::TreeNode("Ocean Settings"))
     {
         ImGui::SliderInt("Seed", &data.ocean.seed, 0, 400000, "%d");
-        ImGui::SliderInt("Number of Tiles", &data.ocean.tiles, 0, 10000, "%d");
-        ImGui::SliderInt("Lloyd Iterations ", &data.ocean.lloyd, 0, 20);
+        ImGui::SliderInt("Number of Tiles", &data.ocean.tiles, 0, 2000, "%d");
+        ImGui::SliderInt("Lloyd Iterations ", &data.ocean.lloyd, 0, 10);
         ImGui::TreePop();
     }
 
     bool generate = false;
     if (ImGui::TreeNode("Border Noise Settings"))
     {
-        generate = generate || ImGui::SliderInt("Seed", &data.borderNoise.seed, -3000, 3000, "%d");
+        generate = generate || ImGui::SliderInt("Seed", &data.borderNoise.seed, 0, 5900000, "%d");
         generate = generate || ImGui::SliderInt("Octaves", &data.borderNoise.octaves, 1, 8, "%d");
         generate = generate || ImGui::DragFloat("Frequency", &data.borderNoise.frequency, 0.001f);
         generate = generate || ImGui::DragFloat("Scale", &data.borderNoise.scale, 0.5, -100, 100);        
@@ -59,7 +59,7 @@ void LookupEditor::RenderPanel() const
     }
     else if (generate)
     {
-        ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<BorderNoiseEvent>(data));
+        //ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<BorderNoiseEvent>(data));
     }
 
     static char text[256] = "test.png";
