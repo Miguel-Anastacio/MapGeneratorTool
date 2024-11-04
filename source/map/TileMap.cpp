@@ -15,9 +15,9 @@ void TileMap::MarkTilesNotInMaskAsVisited(const Mask& mask, TileType type)
 	auto width = Width();
 	auto height = Height();
 	Timer timer;
-	for (int y = 0; y < height; y++)
+	for (unsigned y = 0; y < height; y++)
 	{
-		for (int x = 0; x < width; x++)
+		for (unsigned x = 0; x < width; x++)
 		{
 			if (!mask.isInMask(x, y))
 			{
@@ -191,7 +191,7 @@ bool TileMap::FindColorOfClosestTileOfSameType(int x, int y, int radius, Utils::
 	{
 		auto [cx, cy] = queue.front();
 		queue.pop();
-		if (cx < 0 || cx >= width || cy < 0 || cy >= height) continue;
+		if (cx < 0 || cx >=(int)width || cy < 0 || cy >= (int)height) continue;
 		if (tilesVisited.contains(mygal::Vector2<int>(cx, cy))) continue;
 
 		const Tile& tile = m_tiles[cy * width + cx];

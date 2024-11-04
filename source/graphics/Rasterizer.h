@@ -11,11 +11,11 @@ namespace MapGeneratorTool
 	namespace rasterizer
 	{
 
-		void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap, const mygal::Vector2<int>& centroid);
+		void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& tileMap);
 
 		template <typename T>
 		static void Line(const mygal::Vector2<T>& start, const mygal::Vector2<T>& end, std::vector<Tile>& tileMap, unsigned width, unsigned height,
-			FastNoiseLite& noise, float noiseScale, T thick, const mygal::Vector2<int>& centroid)
+			FastNoiseLite& noise, float noiseScale, T thick)
 		{
 			// Create line
 			T dx = (end.x - start.x);
@@ -48,7 +48,7 @@ namespace MapGeneratorTool
 				auto perpendicular = mygal::normed(tangent.getOrthogonal());
 				if (std::abs(thick - 1) < 0.01)
 				{
-					plotTile(static_cast<int>(point.x), static_cast<int>(point.y), width, height, tileMap, centroid);
+					plotTile(static_cast<int>(point.x), static_cast<int>(point.y), width, height, tileMap);
 				}
 				else
 				{
@@ -64,55 +64,13 @@ namespace MapGeneratorTool
 						T t = s / static_cast<T>(steps);
 						T x = offsetUp.x + t * dTx;
 						T y = offsetUp.y + t * dTy;
-						plotTile(static_cast<int>(x), static_cast<int>(y), width, height, tileMap, centroid);
+						plotTile(static_cast<int>(x), static_cast<int>(y), width, height, tileMap);
 					}
 					
 				}
 
 			}
 		}
-
-		//template <typename T>
-		//static std::array<const mygal::Vector2<T>, 4> createParallelogram(const mygal::Vector2<T> p1, const mygal::Vector2<T> p2, float width)
-		//{
-		//	// Compute the direction vector of the line
-		//	float dx = p2.x - p1.x;
-		//	float dy = p2.y - p1.y;
-
-		//	// Compute the normal vector to the line
-		//	float length = std::sqrt(dx * dx + dy * dy);
-		//	float nx = -(dy / length) * (width / 2);
-		//	float ny = (dx / length) * (width / 2);
-
-		//	// Define the four corners of the parallelogram
-		//	const mygal::Vector2<T> p1Prime = { p1.x + nx, p1.y + ny }; // Top-left corner
-		//	const mygal::Vector2<T> p1DoublePrime = { p1.x - nx, p1.y - ny }; // Bottom-left corner
-		//	const mygal::Vector2<T> p2Prime = { p2.x + nx, p2.y + ny }; // Top-right corner
-		//	const mygal::Vector2<T> p2DoublePrime = { p2.x - nx, p2.y - ny }; // Bottom-right corner
-
-		//	return { p1Prime, p1DoublePrime, p2Prime, p2DoublePrime };
-		//}
-
-		//template <typename T>
-		//static void rasterizeParallelogram(const mygal::Vector2<T> p1Prime, const mygal::Vector2<T> p1DoublePrime, const mygal::Vector2<T> p2Prime, const mygal::Vector2<T> p2DoublePrime,
-		//	std::vector<Tile>& tileMap, unsigned width, unsigned height, float noiseScale, FastNoiseLite& noise)
-		//{
-		//	// Rasterize two triangles
-		//	Line(p1Prime, p2Prime, tileMap, width, height, noise, noiseScale); // Top line
-		//	Line(p1DoublePrime, p2DoublePrime, tileMap, width, height, noise, noiseScale); // Bottom line
-
-		//	// Fill in the interior of the parallelogram (simple naive horizontal stepping)
-		//	float stepSize = std::sqrt(2.0f) / 2.0f;
-		//	for (float t = 0; t <= 1.0f; t += stepSize)
-		//	{
-		//		mygal::Vector2<T> top(p1Prime.x + t * (p2Prime.x - p1Prime.x), p1Prime.y + t * (p2Prime.y - p1Prime.y));
-		//		mygal::Vector2<T> bottom(p1DoublePrime.x + t * (p2DoublePrime.x - p1DoublePrime.x), p1DoublePrime.y + t * (p2DoublePrime.y - p1DoublePrime.y));
-
-
-		//		Line(top, bottom, tileMap, width, height, noise, noiseScale);
-		//	}
-		//}
-
 
 		template <typename T>
 		struct LineData
@@ -157,10 +115,6 @@ namespace rasterizer
 		 
 		for (const auto& halfEdge : diagram.getHalfEdges())
 		{
-			mygal::Vector2<T> centroidRaw = halfEdge.incidentFace->site->point;
-			centroidRaw = mygal::ScaleBothAxis(centroidRaw, width, height);
-			mygal::Vector2<int> centroid = mygal::Vector2<int>(centroidRaw.x, centroidRaw.y);
-
 			auto* start = &halfEdge;
 			auto* it = &halfEdge;
 			while (it != nullptr)
@@ -178,12 +132,7 @@ namespace rasterizer
 						
 						FastNoiseLite noise(noiseData.seed);
 						ApplyNoiseData(noiseData, noise);
-						//auto parallelogram = createParallelogram(start, end, borderThick);
-						//rasterizeParallelogram(parallelogram[0], parallelogram[1], parallelogram[2], parallelogram[3], 
-							//tileMapVector, width, height, noiseData.scale, noise);
-						Line(start, end, tileMapVector, width, height, noise, noiseData.scale, borderThick, centroid);
-						//plotLineWithWidth(start, end, tileMapVector, width, height, noise, noiseData.scale, borderThick);
-
+						Line(start, end, tileMapVector, width, height, noise, noiseData.scale, borderThick);
 
 						linesPlotted.insert(LineData(origin,destination));
 					}

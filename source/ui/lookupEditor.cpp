@@ -11,7 +11,6 @@ void LookupEditor::RenderPanel() const
 
     ImGui::Begin(m_name, nullptr, window_flags);
 
-    ImGuiSliderFlags_ flags;
     static LookupMapData data = m_data;
     if (ImGui::TreeNode("General Settings"))
     {

@@ -22,7 +22,7 @@ namespace ui
     {
         ImGuiSelectableFlags_ flag = ImGuiSelectableFlags_AllowDoubleClick;
         ImVec2 size = ImGui::CalcTextSize(text);
-        size.y = size.y * 1.5;
+        size.y = size.y * 1.5f;
         if (ImGui::Selectable(text, flagToUpdate, flag, size))
         {
             ApplicationManager::Get().SwitchState(state);
