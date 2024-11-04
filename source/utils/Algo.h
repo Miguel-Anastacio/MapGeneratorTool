@@ -16,7 +16,9 @@ mygal::Vector2<int> fillGetCentroidOfPoints(int x, int y, std::vector<Tile>& til
 
 void markCentroids(int centrooidX, int centrooidY, std::vector<Tile>& tileMap, const Utils::Color& newColor, unsigned width, unsigned height);
 
-void floodFill(std::vector<Tile>& tileMap, const std::vector<mygal::Vector2<double>>& centroids, int width, int height);
+void floodFill(std::vector<Tile>& tileMap, const std::vector<mygal::Vector2<double>>& centroids, 
+               std::unordered_set<Utils::Color>& colorsInUse,
+               int width, int height);
 
 } // namespace algo
 }// namespace MapGeneratorTool

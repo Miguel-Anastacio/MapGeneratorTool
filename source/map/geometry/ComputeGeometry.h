@@ -112,6 +112,20 @@ namespace MapGeneratorTool
 				diagram = std::move(geomt::generateDiagram(centroids));
 			}
 		}
+
+		template<typename T>
+		static std::vector<mygal::Vector2<T>> GetCentroidsOfDiagram(mygal::Diagram<T>& diagram)
+		{
+			std::vector<mygal::Vector2<T>> centroids;
+			centroids.reserve(diagram.getSites().size());
+			for (auto& site : diagram.getSites())
+			{
+				centroids.emplace_back(site.point);
+			}
+			return centroids;
+		}
+
+
 		// ------------------------ MYGAL
 
 

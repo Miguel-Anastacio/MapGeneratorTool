@@ -22,15 +22,16 @@ namespace MapGeneratorTool
 		void RegenerateLookUp(const LookupMapData& data, MapMask* landMask,  MapMask* oceanMask);
 		void RegenerateBorders(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask);
 		
-		TileMap GenerateTileMapFromMask(const std::shared_ptr<Diagram>& diagram, const NoiseData& borderNoise, float borderThick, const MapMask* mask, TileType type, const char* name = "example.png");
+		TileMap GenerateTileMapFromMask(const std::shared_ptr<Diagram>& diagram, const NoiseData& borderNoise, float borderThick, 
+										const MapMask* mask, TileType type, 
+										std::unordered_set <Utils::Color>& colorsInUse,
+										const char* name = "example.png");
 
 		void OutputLookupTable() const ; 
 
 	private:
 		void computeDiagramFromMask(const LookupFeatures& data, MapMask* mask, std::shared_ptr<Diagram>& diagram) const;
 
-
-		std::unordered_set<Utils::Color> m_colorsInUse;
 		LookupFeatures m_lastLookup;
 		std::vector<mygal::Vector2<double>> m_centroids;
 

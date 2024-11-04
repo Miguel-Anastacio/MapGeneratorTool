@@ -33,15 +33,6 @@ namespace MapGeneratorTool
 				return R == other.R && G == other.G && B == other.B && A == other.A;
 			}
 
-			/*	Color& operator*=(float scale)
-				{
-
-					this->R *= scale;
-					this->G *= scale;
-					this->B *= scale;
-					return *this;
-				}*/
-
 			void RandColor()
 			{
 				R = static_cast<uint8_t>(rand() % 255);
@@ -65,10 +56,9 @@ namespace MapGeneratorTool
 
 		};
 
-		static const Color operator *(const Color& color, int scale)
-		{
-			return Color(color.R * scale, color.G * scale, color.B * scale, color.A);
-		}
+		static const Color operator *(const Color& color, int scale);
+
+		std::ostream& operator<<(std::ostream& os, const Color& color);
 	}
 }
 

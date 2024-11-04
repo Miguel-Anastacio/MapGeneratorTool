@@ -29,9 +29,6 @@ bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& newColor
         if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt) continue;
         Tile& tile = tileMap[cy * wid + cx];
 
-        //if (tile.isBorder && tile.type == tileType) 
-        //    tile.centroid = mygal::Vector2<int>(x, y);
-
         if (tile.visited || tile.color == newColor) continue;
 
         if (tile.type != tileType) continue;
@@ -39,7 +36,6 @@ bool fill(int x, int y, std::vector<Tile>& tileMap, const Utils::Color& newColor
         // Mark tile as visited and set its color
         tile.color = newColor;
         tile.visited = true;
-        //tile.centroid = mygal::Vector2<int>(x, y);
 
         // Push neighboring tiles onto the stack
         stack.push({ cx + 1, cy });
@@ -81,9 +77,6 @@ mygal::Vector2<int> fillGetCentroidOfPoints(int x, int y, std::vector<Tile>& til
         if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt) continue;
         Tile& tile = tileMap[cy * wid + cx];
 
-        //if (tile.isBorder && tile.type == tileType) 
-        //    tile.centroid = mygal::Vector2<int>(x, y);
-
         if (tile.visited || tile.color == newColor) continue;
 
         if (tile.type != tileType) continue;
@@ -91,7 +84,6 @@ mygal::Vector2<int> fillGetCentroidOfPoints(int x, int y, std::vector<Tile>& til
         // Mark tile as visited and set its color
         tile.color = newColor;
         tile.visited = true;
-        //tile.centroid = mygal::Vector2<int>(x, y);
         pointsSum += mygal::Vector2(cx, cy);
         count++;
 
@@ -129,27 +121,25 @@ void markCentroids(int centrooidX, int centrooidY, std::vector<Tile>& tileMap, c
     }
 }
 
-void floodFill(std::vector<Tile>& tileMap, const std::vector<mygal::Vector2<double>>& centroids, int width, int height)
+void floodFill(std::vector<Tile>& tileMap, const std::vector<mygal::Vector2<double>>& centroids, 
+               std::unordered_set<Utils::Color>& colorsInUse,
+               int width, int height)
 {
     std::vector<uint8_t> buffer(tileMap.size() * 4);
-    std::unordered_set<Utils::Color> colorsInUse;
-
     for (auto center : centroids)
     {
         auto x = static_cast<int>(center.x * width);
         auto y = static_cast<int>(center.y * height);
-        Utils::Color color;
-        do {
-            color.RandColor();
-        } while (colorsInUse.contains(color));
-
+        Utils::Color color = Utils::GetRandomColorNotInSet(colorsInUse);
 
         x = std::clamp(x, 0, width - 1);
         y = std::clamp(y, 0, height - 1);
 
         if (fill(x, y, tileMap, color, width, height))
+        {
             colorsInUse.insert(color);
-        markCentroids(x, y, tileMap, color, width, height);
+            markCentroids(x, y, tileMap, color, width, height);
+        }
     }
 
 }

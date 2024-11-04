@@ -3,7 +3,8 @@
 #include <vector>
 #include <string>
 #include "MyGAL/Vector2.h"
-
+#include "Color.h"
+#include <unordered_set>
 namespace MapGeneratorTool
 {
 namespace Utils
@@ -40,7 +41,7 @@ std::vector<T> mapValuesToVector(const std::unordered_map<K, T>& map)
     values.reserve(map.size());
     for (const auto val : map)
     {
-        values.push_back(val.second);
+        values.emplace_back(val.second);
     }
 
     return values;
@@ -53,10 +54,24 @@ std::vector<T> mapKeysToVector(const std::unordered_map<K, T>& map)
     keys.reserve(map.size());
     for (const auto val : map)
     {
-        keys.push_back(val.first);
+        keys.emplace_back(val.first);
     }
 
     return keys;
+}
+
+template<typename K, typename V>
+bool getKeyFromValue(const std::unordered_map<K, V>& map, const V& value, K& key)
+{
+    for (const auto val : map)
+    {
+        if (val.second == value)
+        {
+            key = val.first;
+            return true;
+        }
+    }
+    return  false;
 }
 
 static std::string WStringToString(const std::wstring& wstr)
@@ -67,6 +82,8 @@ static std::string WStringToString(const std::wstring& wstr)
     wcstombs_s(&size, &str[0], str.size() + 1, wstr.c_str(), wstr.size());
     return str;
 }
+
+Color GetRandomColorNotInSet(const std::unordered_set<Color>& set);
 //using namespace  mygal;
 // Function to calculate cross product of vectors (P1P2) and (P1P)
 //template<typename T>

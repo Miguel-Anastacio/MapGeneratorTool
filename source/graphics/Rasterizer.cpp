@@ -11,7 +11,6 @@ void plotTile(int x, int y, unsigned width, unsigned height, std::vector<Tile>& 
 		int index = y * width + x;
 		tileMap[index].visited = true; // Mark the tile as visited
 		tileMap[index].isBorder = true; // Mark the tile as visited
-		tileMap[index].centroid = centroid;
 	}
 }
 

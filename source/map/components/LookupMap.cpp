@@ -27,25 +27,26 @@ namespace MapGeneratorTool
 	{
 		const auto width = Width();
 		const auto height = Height();
-		m_colorsInUse.clear();
 
 		computeDiagramFromMask(data.land, landMask, m_landDiagram);
 		computeDiagramFromMask(data.ocean, oceanMask, m_oceanDiagram);
 
-		auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
-		auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
+		RegenerateBorders(data, landMask, oceanMask);
+
+		//std::unordered_set <Utils::Color> colorsInUse;
+		//auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, colorsInUse, "landMaskLookUp.png");
+		//auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, colorsInUse,"oceanMaskLookUp.png");
+
+		//thread::ThreadPool threadPool(1);
+		//threadPool.submit(rend::drawTileMap, landTileMap, std::ref(landMask->Texture()), width, height);
+		//threadPool.submit(rend::drawTileMap, oceanTileMap, std::ref(oceanMask->Texture()), width, height);
+		//TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
+		//threadPool.submit(rend::drawTileMap, lookUpTileMap, std::ref(m_texture), width, height);
 
 
-		thread::ThreadPool threadPool(1);
-		threadPool.submit(rend::drawTileMap, landTileMap, std::ref(landMask->Texture()), width, height);
-		threadPool.submit(rend::drawTileMap, oceanTileMap, std::ref(oceanMask->Texture()), width, height);
-
-		TileMap lookUpTileMap = TileMap::BlendTileMap(landTileMap, TileType::LAND, oceanTileMap, TileType::WATER);
-		threadPool.submit(rend::drawTileMap, lookUpTileMap, std::ref(m_texture), width, height);
-
-		auto colors = lookUpTileMap.GetColorsInUse();
-		std::cout << "Colors in use: " << colors << "\n";
-		//OutputLookupTable();
+		////Logger::LogObject(Logger::Type::INFO, "Colors in set ", colorsInUse.size());
+		////Logger::LogObject(Logger::Type::INFO, "Colors in tileMap ", lookUpTileMap.GetColorsInUse());
+		//Logger::LogObject(Logger::Type::INFO, "", lookUpTileMap);
 
 	}
 
@@ -53,9 +54,9 @@ namespace MapGeneratorTool
 	{
 		const auto width = Width();
 		const auto height = Height();
-		m_colorsInUse.clear();
-		auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, "landMaskLookUp.png");
-		auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, "oceanMaskLookUp.png");
+		std::unordered_set <Utils::Color> colorsInUse;
+		auto landTileMap = GenerateTileMapFromMask(m_landDiagram, data.borderNoise, data.borderLine, landMask, TileType::LAND, colorsInUse, "landMaskLookUp.png");
+		auto oceanTileMap = GenerateTileMapFromMask(m_oceanDiagram, data.borderNoise, data.borderLine, oceanMask, TileType::WATER, colorsInUse, "oceanMaskLookUp.png");
 
 		landMask->Texture().clear();
 		oceanMask->Texture().clear();
@@ -66,8 +67,13 @@ namespace MapGeneratorTool
 		m_texture.clear();
 		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
 
+		Logger::LogObject(Logger::Type::INFO, "", lookUpTileMap);
 	}
-	TileMap LookupMap::GenerateTileMapFromMask(const std::shared_ptr<Diagram>& diagram, const NoiseData& noiseData, float borderThick, const MapMask* mapMask, TileType type, const char* name)
+
+	TileMap LookupMap::GenerateTileMapFromMask(const std::shared_ptr<Diagram>& diagram, const NoiseData& noiseData, float borderThick, 
+											   const MapMask* mapMask, TileType type, 
+											   std::unordered_set <Utils::Color>& colors,
+											   const char* name)
 	{
 		const auto width = Width();
 		const auto height = Height();
@@ -75,45 +81,22 @@ namespace MapGeneratorTool
 		assert(diagram != nullptr);
 
 		TileMap maskTileMap(width, height);
+
 		rasterizer::RasterizeDiagramToTileMap(*diagram, width, height, maskTileMap, noiseData, (double)borderThick);
-		auto& tileMap = maskTileMap.GetTilesRef();
 
 		maskTileMap.MarkTilesNotInMaskAsVisited(mapMask->GetMask(), type);
 
-		std::vector<mygal::Vector2<double>> centroids;
-		centroids.reserve(diagram->getSites().size());
-		for (auto& site : diagram->getSites())
-		{
-			centroids.emplace_back(site.point);
-		}
-		maskTileMap.FloodFillTileMap(centroids);
-
+		std::vector<mygal::Vector2<double>> centroids = geomt::GetCentroidsOfDiagram(*diagram);
+		maskTileMap.FloodFillTileMap(centroids, colors);
 		auto colorsNum = maskTileMap.GetColorsInUse();
 		std::cout << "Colors in use in " << mapMask->Name() << " before second fill: " << colorsNum << "\n";
-		std::unordered_set<Utils::Color> colors = maskTileMap.GetColors();
 
 		maskTileMap.FloodFillMissingTiles(100);
-
 		colorsNum = maskTileMap.GetColorsInUse();
 		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colorsNum << "\n";
 
-		Timer timer;
-		for (unsigned y = 0; y < height; y++)
-		{
-			for (unsigned x = 0; x < width; x++)
-			{
-				auto index = y * width + x;
-				if (tileMap[index].isBorder && mapMask->GetMask().isInMask(x, y))
-				{
-					Utils::Color color;
-					if (maskTileMap.FindColorOfClosestTileOfSameType(x, y, width, color))
-					{
-						tileMap[index].color = color;
-					}
-				}
-			}
-		}
-		Logger::TimeMsec("Time set border colors", timer.elapsedMilliseconds());
+		maskTileMap.ColorInBorders(mapMask->GetMask());
+
 		return maskTileMap;
 	}
 
@@ -123,11 +106,11 @@ namespace MapGeneratorTool
 		nlohmann::ordered_json jsonArray = nlohmann::ordered_json::array();
 
 		int i = 0;
-		for (auto color : m_colorsInUse)
+		/*for (auto color : m_colorsInUse)
 		{
 			jsonArray.push_back({ {"Name", i}, {"Color", color.ConvertToHex()}});
 			i++;
-		}
+		}*/
 		//std::cout << jsonArray.dump(4) << std::endl;
 
 		// Write the JSON array to a file
