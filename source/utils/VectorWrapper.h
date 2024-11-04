@@ -1,7 +1,9 @@
 #pragma once
 #include "MyGAL/Vector2.h"
-#include <functional> // Include this for std::hash
+#include <functional>
 #include <iostream>
+#include "json.hpp"
+
 namespace mygal
 {
 template<typename T>
@@ -41,6 +43,21 @@ static mygal::Vector2<T> ScaleBothAxis(const mygal::Vector2<T>& og, K xScale, K 
 {
     return mygal::Vector2<T>(og.x * xScale, og.y * yScale);
 }
+
+using json = nlohmann::json;
+//template<typename T>
+inline void to_json(json& j, const mygal::Vector2<int>& vector) 
+{
+	j = json{ {"X", vector.x}, {"Y", vector.y}};
+}
+
+//template<typename T>
+inline void from_json(const json& j,mygal::Vector2<int>& vector)
+{
+	j.at("X").get_to(vector.x);
+	j.at("Y").get_to(vector.y);
+}
+
 }
 
 // namespace MapGeneraotTool

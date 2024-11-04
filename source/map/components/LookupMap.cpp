@@ -6,8 +6,7 @@
 #include "components/MapMask.h"
 #include "geometry/ComputeGeometry.h"
 #include "Mask.h"
-#include "json.hpp"
-#include <fstream> 
+#include "FileHandler.h"
 #include <queue>
 #include "Algo.h"
 #include "Color.h"
@@ -15,6 +14,7 @@
 #include "Timer.h"
 #include "Logger.h"
 #include "ThreadPool.h"
+#include "FileHandler.h"
 namespace MapGeneratorTool
 {
 
@@ -48,6 +48,8 @@ namespace MapGeneratorTool
 		////Logger::LogObject(Logger::Type::INFO, "Colors in tileMap ", lookUpTileMap.GetColorsInUse());
 		//Logger::LogObject(Logger::Type::INFO, "", lookUpTileMap);
 
+		OutputLookupTable();
+
 	}
 
 	void LookupMap::RegenerateBorders(const LookupMapData& data, MapMask* landMask, MapMask* oceanMask)
@@ -67,7 +69,9 @@ namespace MapGeneratorTool
 		m_texture.clear();
 		rend::drawTileMap(lookUpTileMap, m_texture, width, height);
 
-		Logger::LogObject(Logger::Type::INFO, "", lookUpTileMap);
+		m_lookUpTileMap = std::make_unique<TileMap>(std::move(lookUpTileMap));
+
+		Logger::LogObject(Logger::Type::INFO, "", *m_lookUpTileMap);
 	}
 
 	TileMap LookupMap::GenerateTileMapFromMask(const std::shared_ptr<Diagram>& diagram, const NoiseData& noiseData, float borderThick, 
@@ -88,12 +92,12 @@ namespace MapGeneratorTool
 
 		std::vector<mygal::Vector2<double>> centroids = geomt::GetCentroidsOfDiagram(*diagram);
 		maskTileMap.FloodFillTileMap(centroids, colors);
-		auto colorsNum = maskTileMap.GetColorsInUse();
-		std::cout << "Colors in use in " << mapMask->Name() << " before second fill: " << colorsNum << "\n";
+		//auto colorsNum = maskTileMap.GetColorsInUse();
+		//std::cout << "Colors in use in " << mapMask->Name() << " before second fill: " << colorsNum << "\n";
 
 		maskTileMap.FloodFillMissingTiles(100);
-		colorsNum = maskTileMap.GetColorsInUse();
-		std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colorsNum << "\n";
+		//colorsNum = maskTileMap.GetColorsInUse();
+		//std::cout << "Colors in use in " << mapMask->Name() << " after second fill: " << colorsNum << "\n";
 
 		maskTileMap.ColorInBorders(mapMask->GetMask());
 
@@ -103,25 +107,21 @@ namespace MapGeneratorTool
 	void LookupMap::OutputLookupTable() const
 	{
 		/// print a json file whit an id associated with a colour
-		nlohmann::ordered_json jsonArray = nlohmann::ordered_json::array();
+		nlohmann::ordered_json lookUpArray = nlohmann::ordered_json::array();
+		nlohmann::ordered_json centroidArray = nlohmann::ordered_json::array();
 
 		int i = 0;
-		/*for (auto color : m_colorsInUse)
+		for (auto cell : m_lookUpTileMap->GetCellMap())
 		{
-			jsonArray.push_back({ {"Name", i}, {"Color", color.ConvertToHex()}});
+			lookUpArray.push_back({ {"Name", i}, {"Color", cell.second.ConvertToHex()}});
+			nlohmann::json j = cell.first;
+			centroidArray.push_back({ {"Centroid", i}, {"Position", j} });	
 			i++;
-		}*/
-		//std::cout << jsonArray.dump(4) << std::endl;
 
-		// Write the JSON array to a file
-		std::ofstream outFile("output.json"); // Open file in write mode
-		if (outFile.is_open()) {
-			outFile << jsonArray.dump(4);  // Write to file with indentation
-			outFile.close();  // Close the file after writing
 		}
-		else {
-			std::cerr << "Could not open the file for writing!" << std::endl;
-		}
+		tools::FileHandler::OutputJsonArrayToFIle("lookup.json", lookUpArray);
+		tools::FileHandler::OutputJsonArrayToFIle("centroid.json", centroidArray);
+
 
 	}
 

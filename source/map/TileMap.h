@@ -7,6 +7,7 @@
 #include "VectorWrapper.h"
 #include <unordered_map>
 
+
 namespace MapGeneratorTool
 {
 enum class TileType : uint8_t
@@ -35,6 +36,19 @@ class TileMap : public Utils::Dimensions
 
 public:
 	TileMap(unsigned width, unsigned height);
+	TileMap(const TileMap&) = delete;
+	TileMap& operator=(const TileMap&) = delete;
+
+	/**
+	 * \brief Default move constructor
+	 */
+	TileMap(TileMap&&) = default;
+
+	/**
+	 * \brief Default move assignment operator
+	 */
+	TileMap& operator=(TileMap&&) = default;
+
 
 	void MarkTilesNotInMaskAsVisited(const Mask& mask, TileType type);
 
