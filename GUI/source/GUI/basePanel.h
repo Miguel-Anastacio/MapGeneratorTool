@@ -2,8 +2,6 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 #include "windowSettings.h"
-namespace Core
-{
 namespace GUI
 {
 	class BasePanel
@@ -28,5 +26,4 @@ namespace GUI
 		}
 	};
 
-}
 }

@@ -47,10 +47,10 @@ add_subdirectory(thirdparty/)
 target_include_directories(GUI PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/")
 
 # link to core
-target_link_libraries(MapGenerator PRIVATE Core)
+target_link_libraries(GUI PRIVATE Core)
 # Add Libraries
 #  GUI
-target_link_libraries(GUI PRIVATE ImGui-SFML::ImGui-SFML)
+target_link_libraries(GUI PUBLIC ImGui-SFML::ImGui-SFML)
 
 # Configuration-specific settings
 # Debug configuration

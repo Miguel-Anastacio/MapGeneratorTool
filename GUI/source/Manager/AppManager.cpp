@@ -1,6 +1,6 @@
 #pragma once
 #include "AppManager.h"
-namespace Core
+namespace GUI
 {
 	ApplicationManager::ApplicationManager()
 	{

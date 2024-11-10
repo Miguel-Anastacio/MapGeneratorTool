@@ -17,7 +17,7 @@ namespace MapGeneratorTool
 
 	using namespace Utils;
 	//class Texture;
-	class TerrainMap : public MapComponent
+	class TerrainMap : public MapComponentSFML
 	{
 	public:
 		TerrainMap(const char* name, const std::vector<double>& noiseValues, unsigned width, unsigned height);

@@ -1,26 +1,28 @@
 #pragma once
 #include <memory>
-#include "Utils.h"
-#include "Color.h"
+#include "data/Utils.h"
+#include "data/Color.h"
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
 #include <MyGAL/Diagram.h>
 #include <SFML/Graphics/RenderTexture.hpp>
-#include "MapSpecs.h"
+#include "map/MapSpecs.h"
 #include "components/HeightMap.h"
 #include "components/TerrainMap.h"
 #include "components/MapMask.h"
 #include "components/LookupMap.h"
+#include "map/Map.h"
 namespace MapGeneratorTool
 {
 	class Texture;
-	using namespace Utils;
-	class Map : public Dimensions
+	using namespace MapGenerator::data;
+	using namespace MapGenerator;
+	class MapSFML : public Dimensions
 	{
 	public:
-		Map(unsigned width, unsigned height);
-		~Map();
+		MapSFML(unsigned width, unsigned height);
+		~MapSFML();
 
 		inline const sf::RenderTexture* LookupTexture() const
 		{
@@ -107,13 +109,13 @@ namespace MapGeneratorTool
 
 	private:
 		//void SaveMapComponent(MapComponent* component, const char* filePath, const char* message = "map component");
-		void SaveMapComponent(MapComponent* component, const std::string& filePath, const char* message = "map component") const;
-		void ClearMapComponent(MapComponent* component, const char* message = "map component");
+		void SaveMapComponent(MapComponentSFML* component, const std::string& filePath, const char* message = "map component") const;
+		void ClearMapComponent(MapComponentSFML* component, const char* message = "map component");
 		
 		std::vector<TerrainType> m_terrainTypes; 
 
 		std::unique_ptr<LookupMap> m_lookupmap;
-		std::unique_ptr<HeightMap> m_heightmap;
+		std::unique_ptr<HeightMapWrapper> m_heightmap;
 		std::unique_ptr<TerrainMap> m_terrainmap;
 		std::unique_ptr<MapMask> m_maskmap;
 		std::unique_ptr<MapMask> m_landMask;

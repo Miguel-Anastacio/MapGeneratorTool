@@ -13,7 +13,7 @@ namespace MapGeneratorTool
 	using namespace Utils;
 	//class Texture;
 	class MapMask;
-	class LookupMap : public MapComponent
+	class LookupMap : public MapComponentSFML
 	{
 		using Diagram = mygal::Diagram<double>;
 	public:

@@ -1,16 +1,18 @@
 #pragma once
-#include "Utils.h"
+#include "data/Utils.h"
 #include <SFML/Graphics/RenderTexture.hpp>
+#include "map/MapComponent.h"
 namespace MapGeneratorTool
 {
-class MapComponent : public Utils::Dimensions
+class MapComponentSFML
 {
 public:
-	MapComponent(unsigned width, unsigned height, const char* name) : Dimensions(width, height), m_name(name) 
+	MapComponentSFML(unsigned width, unsigned height, const char* name)  : m_mapData(width, height, name)
 	{
 		//m_texture.create(width, height)
+		m_mapData = std::make_
 	};
-	virtual ~MapComponent() = default;
+	virtual ~MapComponentSFML() = default;
 
 	void SaveToFile() const;
 	void SaveToFile(const char* filename) const;
@@ -28,7 +30,7 @@ public:
 
 	const char* Name() const
 	{
-		return m_name;
+		return m_mapData->Name();
 	}
 
 	void Clear()
@@ -38,7 +40,8 @@ public:
 
 protected:
 	sf::RenderTexture m_texture;
-	const char* m_name;
+	std::unique_ptr<MapGenerator::MapComponent> m_mapData;
+
 };
 
 

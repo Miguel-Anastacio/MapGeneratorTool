@@ -8,7 +8,7 @@
 *	Connects the UI with the map creation logic 
 *	Handles user events 
 */
-namespace Core
+namespace GUI
 {
 	enum class State
 	{
@@ -42,9 +42,11 @@ namespace Core
 
 		//std::vector<std::unique_ptr<Event>> EventQueue;
 
-	private:
+	protected:
+		virtual ~ApplicationManager() = default;
 		ApplicationManager();
-		~ApplicationManager() = default;
+
+	private:
 		ApplicationManager(ApplicationManager& other) = delete;
 		void operator = (const ApplicationManager&) = delete;
 		ApplicationManager(ApplicationManager&&) = delete;
