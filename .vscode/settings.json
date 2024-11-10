@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.usf": "hlsl",
+        "vector": "cpp"
+    }
+}

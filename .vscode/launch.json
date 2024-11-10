@@ -1,7 +1,35 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": []
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "(gdb) Launch", // or (lldb) Launch for macOS
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/build/your_executable_name", // Path to the built executable
+      "args": [], // Command-line arguments if needed
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}", // Set the current working directory
+      "environment": [],
+      "externalConsole": true, // Whether to use an external terminal
+      "MIMode": "gdb", // or "lldb" for macOS
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "build", // Task to execute before launching (optional)
+      "miDebuggerPath": "/usr/bin/gdb", // Path to the debugger (gdb or lldb)
+      "logging": {
+        "moduleLoad": false,
+        "programOutput": true,
+        "trace": true,
+        "engineLogging": false
+      },
+      "targetArchitecture": "x86_64",
+      "launchCompleteCommand": "exec-run", 
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
 }
