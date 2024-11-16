@@ -21,30 +21,32 @@ set_target_properties(Core PROPERTIES
 
 # Include directories for the Core project
 target_include_directories(Core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+target_include_directories(Core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty")
 
 # Specify the source files
 file(GLOB_RECURSE CORE_SOURCES "Source/*.cpp" "Source/*.h" "Source/*.hpp")
+# file(GLOB_RECURSE JSON_SOURCES "thirdParty/*.hpp")
 target_sources(Core PRIVATE ${CORE_SOURCES})
+# target_sources(Core PRIVATE ${JSON_SOURCES})
 
 # Organize files by their folder structure in the Visual Studio solution
-source_group(TREE ${CMAKE_SOURCE_DIR}/Core/source PREFIX "Source Files" FILES ${CORE_SOURCES})
+source_group(TREE ${CMAKE_SOURCE_DIR}/Core/source PREFIX "Source Files" FILES ${CORE_SOURCES}) 
+# source_group(TREE ${CMAKE_SOURCE_DIR}/Core/thirdParty PREFIX "Thirdparty" FILES ${JSON_SOURCES}) 
 
 # Disable static runtime linking (equivalent to `staticruntime "off"`)
 # This can be done with specific flags for MSVC
 if(MSVC)
-    target_compile_options(Core PUBLIC "/MD$<$<CONFIG:Debug>:d>")
+target_compile_options(Core PUBLIC "/MD$<$<CONFIG:Debug>:d>")
 endif()
 
 # Platform-specific settings for Windows
 if(WIN32)
-    target_compile_definitions(Core PRIVATE "_WINDOWS")
-    set_target_properties(Core PROPERTIES
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"  # Matches /MD for Release, /MDd for Debug
+target_compile_definitions(Core PRIVATE "_WINDOWS")
+set_target_properties(Core PROPERTIES
+MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"  # Matches /MD for Release, /MDd for Debug
     )
 endif()
-
-add_subdirectory(thirdparty/)
-target_include_directories(Core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/")
+    
 
 # Configuration-specific settings
 # Debug configuration

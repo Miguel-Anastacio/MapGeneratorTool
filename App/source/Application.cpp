@@ -1,7 +1,6 @@
 #pragma once
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "Application.h"
-#include "map/Map.h" 
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include <SFML/Graphics.hpp>

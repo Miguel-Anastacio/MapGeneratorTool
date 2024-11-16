@@ -1,7 +1,8 @@
 #include "navBar.h"
-#include <FileIO.hpp>
-#include "Utils.h"
+#include "AppManager.h"
+#include "FileIO/FileIO.hpp"
 #include "TexturePanel.h"
+#include "Utilities/Utils.h"
 namespace MapGeneratorTool
 {
 namespace ui
@@ -40,7 +41,7 @@ namespace ui
                 FileIO::OpenFile(paths);
                 if (!paths.empty())
                 {
-                    auto string = Utils::WStringToString(paths[0]);
+                    auto string = Core::Utils::WStringToString(paths[0]);
                     ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<LoadHeightMapEvent>(string));
                 }
                  
@@ -53,7 +54,7 @@ namespace ui
             {
                 std::wstring path;
                 FileIO::SelectDirectory(path);
-                auto string = Utils::WStringToString(path);
+                auto string = Core::Utils::WStringToString(path);
                 ApplicationManager::Get().EventQueue.emplace_back(std::make_unique<SaveEvent>(string));
                
             } 

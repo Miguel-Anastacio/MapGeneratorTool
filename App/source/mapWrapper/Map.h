@@ -50,11 +50,11 @@ namespace MapGeneratorTool
 			return m_map;
 		}
 
-		inline const std::vector<double> NoiseMap() const
-		{
-			/*assert(m_heightmap != nullptr);
-			return m_heightmap->NoiseMap();*/
-		}
+		//inline const std::vector<double> NoiseMap() const
+		//{
+		//	/*assert(m_heightmap != nullptr);
+		//	return m_heightmap->NoiseMap();*/
+		//}
 
 		inline void AddTerrainType(const TerrainType& type)
 		{
@@ -81,8 +81,8 @@ namespace MapGeneratorTool
 
 		void GenerateMapFromHeigthMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 		
-		//void SaveMap(const std::string& filePath) const;
-		//void Reset();
+		void SaveMap(const std::string& filePath) const;
+		void Reset();
 
 	private:
 		//void SaveMapComponent(MapComponent* component, const char* filePath, const char* message = "map component");

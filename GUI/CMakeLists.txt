@@ -52,6 +52,10 @@ target_link_libraries(GUI PRIVATE Core)
 #  GUI
 target_link_libraries(GUI PUBLIC ImGui-SFML::ImGui-SFML)
 
+
+set(SFML_DLL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/SFML/bin")
+target_compile_definitions(GUI PUBLIC SFML_DLL_DIR="${SFML_DLL_DIR}")
+
 # Configuration-specific settings
 # Debug configuration
 target_compile_definitions(GUI PRIVATE

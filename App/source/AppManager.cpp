@@ -3,7 +3,6 @@
 #include "ui/lookupEditor.h"
 #include "ui/terrainEditor.h"
 #include "map/Map.h"
-#include "AppManager.h"
 #include "../thirdparty/lodepng/textureHandler.h"
 namespace MapGeneratorTool
 {
@@ -43,7 +42,7 @@ namespace MapGeneratorTool
 	{
 		for (auto& event : EventQueue)
 		{
-			event->Execute(*(m_map->GetMap()));
+			event->Execute(*m_map.get());
 		}
 		EventQueue.clear();
 	}

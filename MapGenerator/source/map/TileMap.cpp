@@ -133,8 +133,8 @@ namespace MapGenerator
 
 	TileMap TileMap::BlendTileMap(const TileMap &tileMap1, TileType type1, const TileMap &tileMap2, TileType type2)
 	{
-		assert(tileMap1.Height() == tileMap2.Height());
-		assert(tileMap1.Width() == tileMap2.Width());
+		/*assert(tileMap1.Height() == tileMap2.Height());
+		assert(tileMap1.Width() == tileMap2.Width());*/
 
 		auto height = tileMap1.Height();
 		auto width = tileMap1.Width();

@@ -95,12 +95,7 @@ namespace MapGenerator
 
 	void Map::SaveMap(const std::string &filePath) const
 	{
-		SaveMapComponent(m_lookupmap.get(), filePath);
-		SaveMapComponent(m_heightmap.get(), filePath);
-		SaveMapComponent(m_terrainmap.get(), filePath);
-		SaveMapComponent(m_landMask.get(), filePath);
-		SaveMapComponent(m_maskmap.get(), filePath);
-		SaveMapComponent(m_oceanMask.get(), filePath);
+
 	}
 
 	void Map::Reset()

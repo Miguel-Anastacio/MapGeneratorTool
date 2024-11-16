@@ -1,6 +1,6 @@
 #pragma once
 #include "lookupEditor.h"
-#include "../AppManager.h"
+#include "AppManager.h"
 namespace MapGeneratorTool
 {
 namespace ui

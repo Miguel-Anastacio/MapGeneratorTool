@@ -19,12 +19,14 @@ namespace ui
 			if (images.size() > 0 && images[mainImage])
 			{
 				// Set up a horizontal layout for large and small images
-				ImGui::BeginChild("Large Image", ImVec2(850, 0), true); // Left side for the large image
+				ImGui::BeginChild("Large Image", ImVec2(1000, 0), true); // Left side for the large image
 
-				const float maxWidth = 900;
+				const float maxWidth = 950;
 				const float maxHeight = 700;
 
 				auto size = images[mainImage]->getSize();
+				if (size.y == 0)
+					size.y = 1;
 				float ratio = size.x / size.y;
 
 				float new_width = maxWidth;

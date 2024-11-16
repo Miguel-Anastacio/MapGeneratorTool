@@ -8,6 +8,8 @@ namespace ui
 {
 	class TerrainEditor : public GUI::BasePanel
 	{
+		using NoiseMapData = MapGenerator::NoiseMapData;
+		using TerrainType = MapGenerator::TerrainType;
 	public:
 		TerrainEditor(const char* name) : BasePanel(name) {};
 		TerrainEditor(const char* name, const NoiseMapData& data) : BasePanel(name), m_data(data) {};

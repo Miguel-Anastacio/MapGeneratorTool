@@ -1,10 +1,10 @@
-﻿#include "Core.h"
-#include "Utilities/Timer.h"
-#include "Utilities/Logger.h"
+﻿// MapGeneratorTool.cpp : Defines the entry point for the application.
+//
+#include "Application.h"
 using namespace std;
+
 int main()
 {
-	Core::Timer timer;
-	Core::Logger::TimeMsec("Hey", timer.elapsedMilliseconds());
+	MapGeneratorTool::Run();
 	return 0;
 }

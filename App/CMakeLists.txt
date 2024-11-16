@@ -20,10 +20,14 @@ set_target_properties(App PROPERTIES
 )
 
 # Source files for App
+# add_subdirectory(thirdparty/)
 file(GLOB_RECURSE APP_SOURCES "Source/*.cpp" "Source/*.h")
+file(GLOB_RECURSE LODEPNG_SOURCES "thirdparty/*.cpp" "thirdparty/*.h")
 target_sources(App PRIVATE ${APP_SOURCES})
+target_sources(App PRIVATE ${LODEPNG_SOURCES})
 
 source_group(TREE ${CMAKE_SOURCE_DIR}/App/source PREFIX "Source Files" FILES ${APP_SOURCES})
+source_group(TREE ${CMAKE_SOURCE_DIR}/App/thirdparty PREFIX "Thirdparty" FILES ${LODEPNG_SOURCES})
 
 # Include directories for App and Core and MapGenerator
 target_include_directories(App PUBLIC 
@@ -34,6 +38,7 @@ target_include_directories(App PUBLIC
 )
 
 # Link with Core library
+target_link_libraries(App PRIVATE Core)
 target_link_libraries(App PRIVATE MapGenerator)
 target_link_libraries(App PRIVATE GUI)
 

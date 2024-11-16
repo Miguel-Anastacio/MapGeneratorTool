@@ -71,7 +71,7 @@ void TerrainEditor::renderTerrainEdit() const
 
     if (ImGui::SmallButton("+"))
     {
-        types.emplace_back(TerrainType(0.5, sf::Color::Red, "Red" + types.size()));
+        //types.emplace_back(TerrainType(0.5, sf::Color::Red, "Red" + types.size()));
         generate = true;
     }
 
@@ -106,25 +106,25 @@ bool TerrainEditor::renderTerrainType(bool& generate, TerrainType& t) const
 {
     if (ImGui::TreeNode(t.name.c_str()))
     {
-        //float minHeight2 = t.minHeight;
-        generate = generate || ImGui::DragFloat("minHeight", &t.minHeight, 0.005f);
-        float col1[3] = { t.color.r / 255.f, t.color.g / 255.f, t.color.b / 255.f };
-        generate = generate || ImGui::ColorEdit3("color 1", col1);
-        //ImGui::SameLine(); HelpMarker(
-        //    "Click on the color square to open a color picker.\n"
-        //    "Click and hold to use drag and drop.\n"
-        //    "Right-click on the color square to show options.\n"
-        //    "CTRL+click on individual component to input value.\n");
-        t.color = sf::Color(255 * col1[0], 255 * col1[1], 255 * col1[2]);
+        ////float minHeight2 = t.minHeight;
+        //generate = generate || ImGui::DragFloat("minHeight", &t.minHeight, 0.005f);
+        //float col1[3] = { t.color.r / 255.f, t.color.g / 255.f, t.color.b / 255.f };
+        //generate = generate || ImGui::ColorEdit3("color 1", col1);
+        ////ImGui::SameLine(); HelpMarker(
+        ////    "Click on the color square to open a color picker.\n"
+        ////    "Click and hold to use drag and drop.\n"
+        ////    "Right-click on the color square to show options.\n"
+        ////    "CTRL+click on individual component to input value.\n");
+        //t.color = sf::Color(255 * col1[0], 255 * col1[1], 255 * col1[2]);
 
-        // Create a buffer that ImGui can use
-        char buffer[256];
-        std::strncpy(buffer, t.name.c_str(), sizeof(buffer));
-        buffer[sizeof(buffer) - 1] = '\0'; // Ensure null-termination
-        if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
-        {
-            t.name = std::string(buffer);
-        }
+        //// Create a buffer that ImGui can use
+        //char buffer[256];
+        //std::strncpy(buffer, t.name.c_str(), sizeof(buffer));
+        //buffer[sizeof(buffer) - 1] = '\0'; // Ensure null-termination
+        //if (ImGui::InputText("Name", buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+        //{
+        //    t.name = std::string(buffer);
+        //}
      
         bool alive = true;
         if (ImGui::SmallButton("-"))
