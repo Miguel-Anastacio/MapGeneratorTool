@@ -109,7 +109,7 @@ namespace MapGenerator
 	void LookupMap::OutputLookupTable() const
 	{
 		/// print a json file whit an id associated with a colour
-		/*nlohmann::ordered_json lookUpArray = nlohmann::ordered_json::array();
+		nlohmann::ordered_json lookUpArray = nlohmann::ordered_json::array();
 		nlohmann::ordered_json centroidArray = nlohmann::ordered_json::array();
 
 		int i = 0;
@@ -121,7 +121,7 @@ namespace MapGenerator
 			i++;
 		}
 		Core::FileHandler::OutputJsonArrayToFIle("lookup.json", lookUpArray);
-		Core::FileHandler::OutputJsonArrayToFIle("centroid.json", centroidArray);*/
+		Core::FileHandler::OutputJsonArrayToFIle("centroid.json", centroidArray);
 	}
 
 	void LookupMap::computeDiagramFromMask(const LookupFeatures &data, MapMask *mask, std::shared_ptr<Diagram> &diagram) const
