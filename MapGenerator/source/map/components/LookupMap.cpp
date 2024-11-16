@@ -101,6 +101,11 @@ namespace MapGenerator
 		return maskTileMap;
 	}
 
+	const TileMap& LookupMap::GetTileMap() const
+	{
+		return *m_lookUpTileMap;
+	}
+
 	void LookupMap::OutputLookupTable() const
 	{
 		/// print a json file whit an id associated with a colour

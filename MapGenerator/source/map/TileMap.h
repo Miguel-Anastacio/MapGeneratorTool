@@ -7,7 +7,6 @@
 #include "utils/VectorWrapper.h"
 #include <unordered_map>
 
-//using namespace Core;
 namespace MapGenerator
 {
 	enum class TileType : uint8_t

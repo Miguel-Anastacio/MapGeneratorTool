@@ -1,7 +1,7 @@
-#include <Renderer.h>
-#include <TileMap.h>
-#include "Timer.h"
-#include "Logger.h"
+#include "Renderer.h"
+#include "map/TileMap.h"
+#include "Utilities/Logger.h"
+#include "Utilities/Timer.h"
 namespace MapGeneratorTool
 {
 namespace rend
@@ -40,11 +40,11 @@ namespace rend
         //std::cout << "draw buffer: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count() << "ms" << '\n';
     }
 
-    void drawTileMap(const TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
+    void drawTileMap(const MapGenerator::TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height)
     {
-        Timer timer;
+        Core::Timer timer;
         drawBuffer(tileMap.ConvertTileMapToBuffer(), renderTexture, width, height);
-        Logger::TimeMsec("Draw tileMap took:", timer.elapsedMilliseconds());
+        Core::Logger::TimeMsec("Draw tileMap took:", timer.elapsedMilliseconds());
     }
 
 } // namespace rend

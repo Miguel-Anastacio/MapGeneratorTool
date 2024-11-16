@@ -7,19 +7,18 @@
 #include <MyGAL/Diagram.h>
 #include <unordered_set>
 #include <stack>
-#include "Color.h"
-#include "Rasterizer.h"
+#include "data/Color.h"
+#include "map/TileMap.h"
 constexpr double PointRadius = 5.0f;
 constexpr double Offset = 1.0f;
 namespace MapGeneratorTool
 {
-class TileMap;
 namespace rend
 {
     void saveToFile(const sf::RenderTexture& texture, const char* filename);
     void drawBuffer(const std::vector<sf::Uint8>& buffer, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
     
-    void drawTileMap(const TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
+    void drawTileMap(const MapGenerator::TileMap& tileMap, sf::RenderTexture& renderTexture, unsigned width, unsigned height);
 
     using namespace  mygal;
     template<typename T>
@@ -35,7 +34,7 @@ namespace rend
             }
         }
 
-        std::unordered_set<Utils::Color> colorsInUse;
+        std::unordered_set<MapGenerator::data::Color> colorsInUse;
         // drawing uses the same functions
         texture.clear();
         for (const std::vector<Vector2<T>>& pol : polygons)
@@ -47,7 +46,7 @@ namespace rend
                 sf::Vector2f point(pol[i].x * width, pol[i].y * height);
                 convex.setPoint(i, point);
             }
-            Utils::Color color;
+            MapGenerator::data::Color color;
             do {
                 color.RandColor();
             } while (colorsInUse.contains(color));
@@ -62,7 +61,7 @@ namespace rend
     }
 
     template<typename T>
-    void drawPolygons(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<Utils::Color>& colorsInUse)
+    void drawPolygons(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<MapGenerator::data::Color>& colorsInUse)
     {
         if (texture.getSize() == sf::Vector2u(0, 0))
         {
@@ -85,7 +84,7 @@ namespace rend
                 sf::Vector2f point(pol[i].x * width, pol[i].y * height);
                 convex.setPoint(i, point);
             }
-            Utils::Color color;
+            MapGenerator::data::Color color;
             do {
                 color.RandColor();
             } while (colorsInUse.contains(color));
@@ -100,7 +99,7 @@ namespace rend
     }
 
     template<typename T>
-    void drawPolygonsByBuffer(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<Utils::Color>& colorsInUse)
+    void drawPolygonsByBuffer(const std::vector<std::vector<Vector2<T>>>& polygons, sf::RenderTexture& texture, unsigned width, unsigned height, std::unordered_set<MapGenerator::data::Color>& colorsInUse)
     {
         std::vector<uint8_t> buffer(width * height * 4);
 
@@ -118,7 +117,7 @@ namespace rend
         texture.clear();
         for (const std::vector<Vector2<T>>& pol : polygons)
         {
-            Utils::Color color;
+            MapGenerator::data::Color color;
             do {
                 color.RandColor();
             } while (colorsInUse.contains(color));

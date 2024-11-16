@@ -8,10 +8,6 @@
 #include <MyGAL/Diagram.h>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include "map/MapSpecs.h"
-#include "components/HeightMap.h"
-#include "components/TerrainMap.h"
-#include "components/MapMask.h"
-#include "components/LookupMap.h"
 #include "map/Map.h"
 namespace MapGeneratorTool
 {
@@ -26,52 +22,38 @@ namespace MapGeneratorTool
 
 		inline const sf::RenderTexture* LookupTexture() const
 		{
-			if(m_lookupmap)
-				return &m_lookupmap->Texture();
-
-			return nullptr;
+			return &m_lookupTexture;
 		}
 		inline const sf::RenderTexture* HeightMapTexture() const
 		{
-			if (m_heightmap)
-				return &m_heightmap->Texture();
-
-			return nullptr;
+			return &m_heighMapTexture;
 		}
 		inline const sf::RenderTexture* TerrainMapTexture() const
 		{
-			if (m_terrainmap)
-				return &m_terrainmap->Texture();
-
-			return nullptr;
+			return &m_terrainTexture;
 		}
 		inline const sf::RenderTexture* MapMaskTexture () const
 		{
-			if (m_maskmap)
-				return &m_maskmap->Texture();
-
-			return nullptr;
+			return &m_maskTexture;
 		}
 		inline const sf::RenderTexture* OceanMapMaskTexture() const
 		{
-			if (m_oceanMask)
-				return &m_oceanMask->Texture();
-
-			return nullptr;
+			return &m_lookupTextureOcean;
 		}
 		inline const sf::RenderTexture* LandMapMaskTexture() const
 		{
-			if (m_landMask)
-				return &m_landMask->Texture();
-
-			return nullptr;
+			return &m_lookupTextureLand;
 		}
 
+		inline MapGenerator::Map& GetMap() 
+		{
+			return m_map;
+		}
 
 		inline const std::vector<double> NoiseMap() const
 		{
-			assert(m_heightmap != nullptr);
-			return m_heightmap->NoiseMap();
+			/*assert(m_heightmap != nullptr);
+			return m_heightmap->NoiseMap();*/
 		}
 
 		inline void AddTerrainType(const TerrainType& type)
@@ -91,10 +73,6 @@ namespace MapGeneratorTool
 		void GenerateTerrainMap(const std::vector<double>& noiseMap);
 		void GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types);
 
-		//void SaveLookupMapToFile() const;
-		//void SaveLookupMapToFile(const char* filename) const;
-		//void SaveHeightMapToFile(const char* filename) const;
-
 
 		void RegenerateLookUp(const LookupMapData& data);
 		void RegenerateLookupBorders(const LookupMapData& data);
@@ -103,26 +81,24 @@ namespace MapGeneratorTool
 
 		void GenerateMapFromHeigthMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight);
 		
-		//void SaveMap(const char* filePath);
-		void SaveMap(const std::string& filePath) const;
-		void Reset();
+		//void SaveMap(const std::string& filePath) const;
+		//void Reset();
 
 	private:
 		//void SaveMapComponent(MapComponent* component, const char* filePath, const char* message = "map component");
-		void SaveMapComponent(MapComponentSFML* component, const std::string& filePath, const char* message = "map component") const;
-		void ClearMapComponent(MapComponentSFML* component, const char* message = "map component");
+		//void SaveMapComponent(MapComponentSFML* component, const std::string& filePath, const char* message = "map component") const;
+		//void ClearMapComponent(MapComponentSFML* component, const char* message = "map component");
 		
 		std::vector<TerrainType> m_terrainTypes; 
 
-		std::unique_ptr<LookupMap> m_lookupmap;
-		std::unique_ptr<HeightMapWrapper> m_heightmap;
-		std::unique_ptr<TerrainMap> m_terrainmap;
-		std::unique_ptr<MapMask> m_maskmap;
-		std::unique_ptr<MapMask> m_landMask;
-		std::unique_ptr<MapMask> m_oceanMask;
+		MapGenerator::Map m_map;
 
-		float m_cutOffHeight = 0.001f;
-		//std::unique_ptr<Texture> m_lookUpTexture;
+		sf::RenderTexture m_lookupTexture;
+		sf::RenderTexture m_lookupTextureLand;
+		sf::RenderTexture m_lookupTextureOcean;
+		sf::RenderTexture m_maskTexture;
+		sf::RenderTexture m_heighMapTexture;
+		sf::RenderTexture m_terrainTexture;
 	};
 
 }

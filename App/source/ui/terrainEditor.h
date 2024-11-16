@@ -1,12 +1,12 @@
 #pragma once
-#include "basePanel.h"
+#include "GUI/basePanel.h"
 //#include "map/MapSpecs.h"
-#include "Event.h"
+#include "utils/Event.h"
 namespace MapGeneratorTool
 {
 namespace ui
 {
-	class TerrainEditor : public BasePanel
+	class TerrainEditor : public GUI::BasePanel
 	{
 	public:
 		TerrainEditor(const char* name) : BasePanel(name) {};

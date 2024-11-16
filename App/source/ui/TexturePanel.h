@@ -1,5 +1,5 @@
 #pragma once
-#include "basePanel.h"
+#include "GUI/basePanel.h"
 #include <vector>
 #include <SFML/Graphics/RenderTexture.hpp>
 namespace MapGeneratorTool
@@ -7,7 +7,7 @@ namespace MapGeneratorTool
 namespace ui
 {
 	static int mainImage = 0;
-class TexturePanel : public BasePanel
+class TexturePanel : public GUI::BasePanel
 {
 public:
 	TexturePanel(const char* name) : BasePanel(name) {};

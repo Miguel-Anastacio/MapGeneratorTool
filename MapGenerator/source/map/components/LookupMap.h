@@ -28,6 +28,8 @@ namespace MapGenerator
 										std::unordered_set<data::Color> &colorsInUse,
 										const char *name = "example.png");
 
+		const TileMap& GetTileMap() const;
+
 		void OutputLookupTable() const;
 
 	private:

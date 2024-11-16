@@ -1,15 +1,15 @@
 #pragma once
-#include "basePanel.h"
-#include "MapSpecs.h"
+#include "GUI/basePanel.h"
+#include "map/MapSpecs.h"
 #include <functional>
 namespace MapGeneratorTool
 {
 namespace ui
 {
-	class LookupEditor : public BasePanel
+	class LookupEditor : public GUI::BasePanel
 	{
 		//using CallBack = std::function<void()>;
-
+		using LookupMapData = MapGenerator::LookupMapData;
 	public:
 		LookupEditor(const char* name) : BasePanel(name) {};
 		LookupEditor(const char* name, const LookupMapData& data) : BasePanel(name), m_data(data) {};

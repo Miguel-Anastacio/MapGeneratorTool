@@ -21,13 +21,10 @@ namespace MapGenerator
 		Map(unsigned width, unsigned height);
 		~Map();
 
-		// inline const sf::RenderTexture* LookupTexture() const
-		//{
-		//	if(m_lookupmap)
-		//		return &m_lookupmap->Texture();
-
-		//	return nullptr;
-		//}
+		const TileMap& GetLookupTileMap() const
+		{
+			return m_lookupmap->GetTileMap();
+		}
 		// inline const sf::RenderTexture* HeightMapTexture() const
 		//{
 		//	if (m_heightmap)

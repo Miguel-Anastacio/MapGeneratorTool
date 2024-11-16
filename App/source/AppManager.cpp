@@ -16,7 +16,7 @@ namespace MapGeneratorTool
 
 	void ApplicationManager::Init(unsigned width, unsigned height)
 	{
-		m_map = std::make_unique<Map>(width, height);
+		m_map = std::make_unique<MapSFML>(width, height);
 		
 		SetLookupData(LookupMapData(NoiseData(), LookupFeatures(), LookupFeatures(), width, height, 1.0f, 0.001f));
 		SetNoiseData(NoiseMapData(width, height));
@@ -43,7 +43,7 @@ namespace MapGeneratorTool
 	{
 		for (auto& event : EventQueue)
 		{
-			event->Execute(*m_map);
+			event->Execute(*(m_map->GetMap()));
 		}
 		EventQueue.clear();
 	}

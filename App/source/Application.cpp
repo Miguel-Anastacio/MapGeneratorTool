@@ -8,7 +8,7 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 #include <memory>
-#include "Color.h"
+#include "data/Color.h"
 
 #include "ui/navBar.h"
 #include "ui/lookupEditor.h"
@@ -18,7 +18,6 @@
 #include "AppManager.h"
 namespace MapGeneratorTool
 {
-	using namespace Utils;
 
 	// Taken from https://github.com/ocornut/imgui/issues/707
 	void setFancyImguiStyle() {
@@ -89,7 +88,7 @@ namespace MapGeneratorTool
 		ImGui::SFML::Update(window, deltaClock.restart());
 	}
 
-	static void RenderState(const sf::RenderTexture& texture, const ui::BasePanel& panel)
+	static void RenderState(const sf::RenderTexture& texture, const GUI::BasePanel& panel)
 	{
 		panel.RenderPanel();
 		static ImVec2 viewportSize{ 500, 500 };
@@ -127,7 +126,7 @@ namespace MapGeneratorTool
 	//	}
 	//}
 
-	static ui::TexturePanel UpdateTexturePanel( const Map& map)
+	static ui::TexturePanel UpdateTexturePanel( const MapSFML& map)
 	{
 		ui::TexturePanel panel("Viewport");
 		switch (ApplicationManager::Get().CurrentState())
@@ -149,18 +148,6 @@ namespace MapGeneratorTool
 		return panel;
 	}
 
-	/*void TestPoints()
-	{
-		sf::RenderTexture texture;
-		unsigned width = 250;
-		unsigned height = 250;
-		texture.create(width, height);
-		texture.clear(sf::Color::Black);
-		rend::drawPointsBuffer(texture, rb::GeneratePoints(width, height, 0.5));
-		rend::saveToFile(texture, "points.png");
-	}*/
-
-
 	void Run()
 	{
 		// INIT
@@ -172,7 +159,6 @@ namespace MapGeneratorTool
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		setFancyImguiStyle();
 
-		//TestPoints();
 		ui::NavBar nav;
 
 		ApplicationManager::Get().Init();

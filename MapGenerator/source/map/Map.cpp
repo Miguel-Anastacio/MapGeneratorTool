@@ -1,7 +1,5 @@
 #include "Map.h"
 #include "utils/ComputeGeometry.h"
-//#include "../../thirdparty/lodepng/textureHandler.h"
-//#include "Renderer.h"
 #include "fastNoiseLite/FastNoiseLite.h"
 #include "components/HeightMap.h"
 namespace MapGenerator
@@ -91,10 +89,7 @@ namespace MapGenerator
 		m_lookupmap = std::make_unique<LookupMap>("lookupTexture.png", Width(), Height());
 		RegenerateLookUp(LookupMapData(NoiseData(), LookupFeatures(), LookupFeatures(), Width(), Height(), 1.0f, 0.001f));
 
-		// m_lookupmap->SaveToFile();
-
 		m_heightmap = std::make_unique<HeightMap>("heightMap1.png", Width(), Height(), m_landMask->GetElevation());
-		// m_heightmap->
 		m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), Width(), Height(), m_terrainTypes);
 	}
 

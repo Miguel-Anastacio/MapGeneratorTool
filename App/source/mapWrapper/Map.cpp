@@ -1,15 +1,13 @@
 #include "Map.h"
-#include "geometry/ComputeGeometry.h"
-#include "../../thirdparty/lodepng/textureHandler.h"
-#include "Renderer.h"
-#include "../../thirdparty/fastNoiseLite/FastNoiseLite.h"
-#include "components/HeightMap.h"
+#include "graphics/Renderer.h"
+#include "map/Map.h"
+#include "map/TileMap.h"
 namespace MapGeneratorTool
 {
 
 
 MapSFML::MapSFML(unsigned width, unsigned height)
-	: Dimensions(width, height)
+	: Dimensions(width, height), m_map(width, height)
 {
 
 }
@@ -24,127 +22,46 @@ MapSFML::~MapSFML()
 
 void MapSFML::GenerateHeightMap(const NoiseMapData& data)
 {
-	m_heightmap = std::make_unique<HeightMapWrapper>("heightMap1.png", data);
-	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), data.width, data.height, m_terrainTypes);
-	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, data.width, data.height);
+	m_map.GenerateHeightMap(data);
 }
 
 void MapSFML::GenerateHeightMapTectonic()
 {
-	m_heightmap = std::make_unique<HeightMapWrapper>("heightMap1.png", NoiseMapData());
+	m_map.GenerateHeightMapTectonic();
 }
 
 void MapSFML::GenerateHeightMapTectonic(const NoiseMapData& data)
 {
-	m_heightmap = std::make_unique<HeightMapWrapper>("heightMap1.png", data);
 }
 
 void MapSFML::GenerateTerrainMap(const std::vector<double>& noiseMap)
 {
-	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), m_heightmap->Width(), m_heightmap->Height(), m_terrainTypes);
-	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, Width(), Height());
+	m_map.GenerateTerrainMap(noiseMap);
 }
 
 void MapSFML::GenerateTerrainMap(const std::vector<double>& noiseMap, const std::vector<TerrainType>& types)
 {
-	m_terrainTypes = types;
-	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), m_heightmap->Width(), m_heightmap->Height(), types);
-	//rend::drawDiagram(m_terrainmap->Texture(), m_diagram, Width(), Height());
 }
 
 void MapSFML::RegenerateLookUp(const LookupMapData& data)
 {
-	assert(m_lookupmap != nullptr);
-	assert(m_landMask != nullptr);
-	assert(m_oceanMask != nullptr);
-	assert(m_maskmap != nullptr);
-
-	if (std::abs(data.cutOffHeight - m_cutOffHeight) > 0.00001)
-	{
-		m_maskmap->RegenerateMask(data.cutOffHeight, true);
-		m_landMask->RegenerateMask(data.cutOffHeight, true);
-		m_oceanMask->RegenerateMask(data.cutOffHeight, false);
-		m_maskmap->Texture().clear();
-		rend::drawBuffer(m_maskmap->GetMaskBuffer(), m_maskmap->Texture(), Width(), Height());
-	}
-
-	m_lookupmap->RegenerateLookUp(data, m_landMask.get(), m_oceanMask.get());
+	m_map.RegenerateLookUp(data);
+	rend::drawTileMap(m_map.GetLookupTileMap(), m_lookupTexture, Width(), Height());
 }
 
 void MapSFML::RegenerateLookupBorders(const LookupMapData& data)
 {
-	assert(m_lookupmap != nullptr);
-	assert(m_landMask != nullptr);
-	assert(m_oceanMask != nullptr);
-
-	m_lookupmap->RegenerateBorders(data, m_landMask.get(), m_oceanMask.get());
+	m_map.RegenerateLookupBorders(data);
+	rend::drawTileMap(m_map.GetLookupTileMap(), m_lookupTexture, Width(), Height()); 
 }
 
 void MapSFML::GenerateMap(const std::vector<uint8_t>& textureBuffer, unsigned width, unsigned height)
 {
-	setDimensions(width, height);
-	GenerateMapFromHeigthMap(textureBuffer, m_cutOffHeight);
+	m_map.GenerateMap(textureBuffer, width, height);
 }
 
 void MapSFML::GenerateMapFromHeigthMap(const std::vector<uint8_t>& textureBuffer, float cutOffHeight)
 {
-	cutOffHeight = 0.001f;
-	m_maskmap = std::make_unique<MapMask>("LandmassMaskTest.png", textureBuffer, Width(), Height(), cutOffHeight);
-	m_landMask = std::make_unique<MapMask>("landMask.png", textureBuffer, Width(), Height(), cutOffHeight);
-	m_oceanMask = std::make_unique<MapMask>("oceamMask.png", textureBuffer, Width(), Height(), cutOffHeight, false);
-
-	m_lookupmap = std::make_unique<LookupMap>("lookupTexture.png", Width(), Height());
-	RegenerateLookUp(LookupMapData(NoiseData(), LookupFeatures(), LookupFeatures(), Width(), Height(), 1.0f, 0.001f));
-
-	//m_lookupmap->SaveToFile();
-
-	m_heightmap = std::make_unique<HeightMapWrapper>("heightMap1.png", Width(), Height(), m_landMask->GetElevation());
-	//m_heightmap->
-	m_terrainmap = std::make_unique<TerrainMap>("terrainMap.png", m_heightmap->NoiseMap(), Width(), Height(), m_terrainTypes);
-}
-
-void MapSFML::SaveMap(const std::string& filePath) const
-{
-	SaveMapComponent(m_lookupmap.get(), filePath);
-	SaveMapComponent(m_heightmap.get(), filePath);
-	SaveMapComponent(m_terrainmap.get(), filePath);
-	SaveMapComponent(m_landMask.get(), filePath);
-	SaveMapComponent(m_maskmap.get(), filePath);
-	SaveMapComponent(m_oceanMask.get(), filePath);
-}
-
-void MapSFML::Reset() 
-{
-	ClearMapComponent(m_lookupmap.get());
-	ClearMapComponent(m_heightmap.get());
-	ClearMapComponent(m_terrainmap.get());
-	ClearMapComponent(m_landMask.get());
-	ClearMapComponent(m_maskmap.get());
-	ClearMapComponent(m_oceanMask.get());
-
-	//m_terrainTypes.
-	m_cutOffHeight = 0.01f;
-}
-//void Map::SaveMapComponent(MapComponent* component, const char* filePath, const char* message)
-//{
-//	if (component)
-//		component->SaveToFile();
-//	else
-//		std::cout << "ERROR - save " << message << std::endl;
-//}
-void MapSFML::SaveMapComponent(MapComponentSFML* component, const std::string& filePath, const char* message) const
-{
-	if (component)
-		component->SaveToFile(filePath);
-	else
-		std::cout << "ERROR - save " << message << std::endl;
-}
-
-void MapSFML::ClearMapComponent(MapComponentSFML* component, const char* message)
-{
-	if (component)
-		component->Clear();
-	else
-		std::cout << "ERROR - clear " << message << std::endl;
+	m_map.GenerateMapFromHeigthMap(textureBuffer, cutOffHeight);
 }
 }
