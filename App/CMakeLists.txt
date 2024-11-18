@@ -71,3 +71,7 @@ target_compile_definitions(App PRIVATE $<$<CONFIG:Dist>:DIST>)
 target_compile_options(App PRIVATE $<$<CONFIG:Dist>:-O3 -DNDEBUG>)
 set_target_properties(App PROPERTIES DIST_POSTFIX "dist")
 
+add_custom_command(TARGET App POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:App> $<TARGET_RUNTIME_DLLS:App>
+  COMMAND_EXPAND_LISTS
+)

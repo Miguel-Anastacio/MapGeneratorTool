@@ -1,5 +1,4 @@
 #include "TileMap.h"
-//#include "Renderer.h"
 #include <cmath>
 #include "utils/Algo.h"
 #include "data/Mask.h"

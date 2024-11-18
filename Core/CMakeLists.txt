@@ -80,4 +80,3 @@ set_target_properties(Core PROPERTIES
     DIST_POSTFIX "dist"
 )
 
-
