@@ -1,20 +1,17 @@
 #pragma once
 #include <vector>
 #include <random>
-#include "MyGAL/Diagram.h"
-#include "MyGAL/FortuneAlgorithm.h"
-#include "data/Mask.h"
+#include "../../ThirdParty/MyGAL/Diagram.h"
+#include "../../ThirdParty/MyGAL//FortuneAlgorithm.h"
+#include "../data/Mask.h"
 #include <cmath>
-#include "fastNoiseLite/FastNoiseLite.h"
+#include "../../ThirdParty/fastNoiseLite/FastNoiseLite.h"
 #include "VectorWrapper.h"
-// #include "Utilitis/Logger.h"
-// #include "Timer.h"
+#include <chrono>
 namespace MapGenerator
 {
 	namespace geomt
 	{
-		const float PI = 3.14159265359f;
-
 		// ------------------------ MYGAL
 		template <typename T>
 		static std::vector<mygal::Vector2<T>> generatePoints(int nbPoints)
@@ -139,7 +136,7 @@ namespace MapGenerator
 			for (int i = 0; i < numSamples; ++i)
 			{
 				// Sample at different angles around the circle
-				T theta = (2 * PI * i) / numSamples;
+				T theta = (2 * 3.14159265359f * i) / numSamples;
 				T x = radius * cos(theta) + offsetX;
 				T y = radius * sin(theta) + offsetY;
 

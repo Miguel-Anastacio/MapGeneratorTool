@@ -1,5 +1,5 @@
 #pragma once
-#include "fastNoiseLite/FastNoiseLite.h"
+#include "../../ThirdParty/fastNoiseLite/FastNoiseLite.h"
 namespace MapGenerator
 {
 	struct LookupFeatures

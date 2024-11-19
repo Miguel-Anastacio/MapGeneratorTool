@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
-#include <MyGAL/Diagram.h>
-#include "utils/ComputeGeometry.h"
-#include "data/Color.h"
-#include "map/TileMap.h"
-#include "map/MapSpecs.h"
-#include "utils/VectorWrapper.h"
+#include "../../ThirdParty/MyGAL/Diagram.h"
+#include "../utils/ComputeGeometry.h"
+#include "../data/Color.h"
+#include "../map/TileMap.h"
+#include "../map/MapSpecs.h"
+#include "../utils/VectorWrapper.h"
 namespace MapGenerator
 {
 	namespace rasterizer
@@ -42,7 +42,7 @@ namespace MapGenerator
 				const auto &point = line[i];
 				if (i + 1 < line.size())
 				{
-					mygal::Vector2<T> tangent = line[i + 1] - point;
+					tangent = line[i + 1] - point;
 				}
 
 				auto perpendicular = mygal::normed(tangent.getOrthogonal());
@@ -124,12 +124,12 @@ namespace MapGenerator
 
 						if (!linesPlotted.contains(LineData(origin, destination)))
 						{
-							const mygal::Vector2<double> start = mygal::ScaleBothAxis(origin, static_cast<double>(width), static_cast<double>(height));
-							const mygal::Vector2<double> end = mygal::ScaleBothAxis(destination, static_cast<double>(width), static_cast<double>(height));
+							const mygal::Vector2<double> s = mygal::ScaleBothAxis(origin, static_cast<double>(width), static_cast<double>(height));
+							const mygal::Vector2<double> e = mygal::ScaleBothAxis(destination, static_cast<double>(width), static_cast<double>(height));
 
 							FastNoiseLite noise(noiseData.seed);
 							ApplyNoiseData(noiseData, noise);
-							Line(start, end, tileMapVector, width, height, noise, noiseData.scale, borderThick);
+							Line(s, e, tileMapVector, width, height, noise, noiseData.scale, borderThick);
 
 							linesPlotted.insert(LineData(origin, destination));
 						}

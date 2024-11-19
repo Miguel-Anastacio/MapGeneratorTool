@@ -1,5 +1,5 @@
 #pragma once
-#include "data/Utils.h"
+#include "../data/Utils.h"
 namespace MapGenerator
 {
 	class MapComponent : public data::Dimensions

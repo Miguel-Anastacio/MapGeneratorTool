@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "map/TileMap.h"
-#include "data/Color.h"
+#include "../map/TileMap.h"
+#include "../data/Color.h"
 #include "VectorWrapper.h"
 #include <stack>
 namespace MapGenerator

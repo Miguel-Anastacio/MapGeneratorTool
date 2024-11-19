@@ -2,10 +2,10 @@
 #include <vector>
 #include <cassert>
 #include <string>
-#include "map/MapComponent.h"
-#include "map/MapSpecs.h"
-#include "graphics/Rasterizer.h"
-#include "map/TileMap.h"
+#include "../MapComponent.h"
+#include "../MapSpecs.h"
+#include "../../graphics/Rasterizer.h"
+#include "../TileMap.h"
 
 namespace MapGenerator
 {
@@ -29,8 +29,6 @@ namespace MapGenerator
 										const char *name = "example.png");
 
 		const TileMap& GetTileMap() const;
-
-		void OutputLookupTable() const;
 
 	private:
 		void computeDiagramFromMask(const LookupFeatures &data, MapMask *mask, std::shared_ptr<Diagram> &diagram) const;

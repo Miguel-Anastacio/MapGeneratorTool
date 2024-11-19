@@ -1,6 +1,6 @@
 #include "Map.h"
-#include "utils/ComputeGeometry.h"
-#include "fastNoiseLite/FastNoiseLite.h"
+#include "../utils/ComputeGeometry.h"
+#include "../../thirdParty/fastNoiseLite/FastNoiseLite.h"
 #include "components/HeightMap.h"
 namespace MapGenerator
 {

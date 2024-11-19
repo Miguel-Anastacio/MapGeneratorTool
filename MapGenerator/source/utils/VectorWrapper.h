@@ -1,8 +1,7 @@
 #pragma once
-#include "MyGAL/Vector2.h"
+#include "../../ThirdParty/MyGAL/Vector2.h"
 #include <functional>
 #include <iostream>
-#include "FileIO/FileHandler.h"
 
 namespace mygal
 {
@@ -43,21 +42,6 @@ namespace mygal
 	{
 		return mygal::Vector2<T>(og.x * xScale, og.y * yScale);
 	}
-
-	using json = nlohmann::json;
-	// template<typename T>
-	inline void to_json(json &j, const mygal::Vector2<int> &vector)
-	{
-		j = json{{"X", vector.x}, {"Y", vector.y}};
-	}
-
-	// template<typename T>
-	inline void from_json(const json &j, mygal::Vector2<int> &vector)
-	{
-		j.at("X").get_to(vector.x);
-		j.at("Y").get_to(vector.y);
-	}
-
 }
 
 namespace std

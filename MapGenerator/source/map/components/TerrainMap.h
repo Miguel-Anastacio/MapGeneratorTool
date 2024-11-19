@@ -2,8 +2,8 @@
 #include <vector>
 #include <cassert>
 #include <string>
-#include "map/MapComponent.h"
-#include "map/MapSpecs.h"
+#include "../MapComponent.h"
+#include "../MapSpecs.h"
 namespace MapGenerator
 {
 	struct TerrainType

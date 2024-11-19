@@ -1,10 +1,10 @@
 #include "TileMap.h"
 #include <cmath>
-#include "utils/Algo.h"
-#include "data/Mask.h"
-#include "data/Utils.h"
-#include "Utilities/Timer.h"
-#include "Utilities/Logger.h"
+#include "../utils/Algo.h"
+#include "../data/Mask.h"
+#include "../data/Utils.h"
+//#include "Utilities/Timer.h"
+//#include "Utilities/Logger.h"
 namespace MapGenerator
 {
 	TileMap::TileMap(unsigned width, unsigned height) : Dimensions(width, height), m_tiles(width * height, Tile())
@@ -14,7 +14,6 @@ namespace MapGenerator
 	{
 		auto width = Width();
 		auto height = Height();
-		Core::Timer timer;
 		for (unsigned y = 0; y < height; y++)
 		{
 			for (unsigned x = 0; x < width; x++)
@@ -29,17 +28,13 @@ namespace MapGenerator
 				}
 			}
 		}
-		std::cout << "Time for MarkTilesNotInMaskAsVisited (msec): " << timer.elapsedMilliseconds() << "\n";
 	}
 
 	void TileMap::FloodFillTileMap(const std::vector<mygal::Vector2<double>> &centroids, std::unordered_set<data::Color> &colorsUnavailable)
 	{
 		auto width = Width();
 		auto height = Height();
-		Core::Timer timer;
 		algo::floodFill(m_tiles, centroids, colorsUnavailable, width, height);
-		std::cout << "Time for FloodFillTileMap (msec): " << timer.elapsedMilliseconds() << "\n";
-
 		m_colors = colorsUnavailable;
 	}
 
@@ -47,7 +42,6 @@ namespace MapGenerator
 	{
 		auto width = Width();
 		auto height = Height();
-		Core::Timer timer;
 		for (unsigned y = 0; y < height; y++)
 		{
 			for (unsigned x = 0; x < width; x++)
@@ -69,7 +63,6 @@ namespace MapGenerator
 				}
 			}
 		}
-		std::cout << "Time for FloodFillMissingTiles (msec): " << timer.elapsedMilliseconds() << "\n";
 	}
 	std::vector<uint8_t> TileMap::ConvertTileMapToBuffer() const
 	{
@@ -132,12 +125,9 @@ namespace MapGenerator
 
 	TileMap TileMap::BlendTileMap(const TileMap &tileMap1, TileType type1, const TileMap &tileMap2, TileType type2)
 	{
-		/*assert(tileMap1.Height() == tileMap2.Height());
-		assert(tileMap1.Width() == tileMap2.Width());*/
 
 		auto height = tileMap1.Height();
 		auto width = tileMap1.Width();
-		Core::Timer timer;
 
 		TileMap newTileMap(width, height);
 		auto &newTiles = newTileMap.GetTilesRef();
@@ -160,7 +150,6 @@ namespace MapGenerator
 				}
 			}
 		}
-		std::cout << "Time for BlendTileMap (msec): " << timer.elapsedMilliseconds() << "\n";
 
 		newTileMap.ComputeCells();
 		newTileMap.ComputeColorsInUse();
@@ -220,7 +209,6 @@ namespace MapGenerator
 	{
 		auto width = Width();
 		auto height = Height();
-		Core::Timer timer;
 		for (unsigned y = 0; y < height; y++)
 		{
 			for (unsigned x = 0; x < width; x++)
@@ -236,7 +224,6 @@ namespace MapGenerator
 				}
 			}
 		}
-		Core::Logger::TimeMsec("Time set border colors", timer.elapsedMilliseconds());
 	}
 
 	void TileMap::PrintTileMapColors()

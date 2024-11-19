@@ -1,7 +1,7 @@
 #pragma once
-#include <algorithm>
-#include "MyGAL/Vector2.h"
 #include "MapMask.h"
+#include <algorithm>
+#include "../../../thirdParty/MyGAL/Vector2.h"
 
 namespace MapGenerator
 {

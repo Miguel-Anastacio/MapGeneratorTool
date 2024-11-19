@@ -1,8 +1,8 @@
 #pragma once
-#include <algorithm>
-#include "MyGAL/Vector2.h"
-// #include "Renderer.h"
 #include "TerrainMap.h"
+#include <algorithm>
+#include "../../../thirdParty/MyGAL/Vector2.h"
+// #include "Renderer.h"
 namespace MapGenerator
 {
 	TerrainMap::TerrainMap(const char *name, const std::vector<double> &data, unsigned width, unsigned height)

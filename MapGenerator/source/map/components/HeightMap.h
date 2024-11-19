@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
-#include "map/MapComponent.h"
+#include "../MapComponent.h"
 #include <cassert>
 #include <algorithm>
 #include <memory>
-#include "map/MapSpecs.h"
+#include "../MapSpecs.h"
 class FastNoiseLite;
 namespace MapGenerator
 {

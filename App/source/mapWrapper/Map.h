@@ -84,10 +84,14 @@ namespace MapGeneratorTool
 		void SaveMap(const std::string& filePath) const;
 		void Reset();
 
+
+
 	private:
 		//void SaveMapComponent(MapComponent* component, const char* filePath, const char* message = "map component");
 		//void SaveMapComponent(MapComponentSFML* component, const std::string& filePath, const char* message = "map component") const;
-		//void ClearMapComponent(MapComponentSFML* component, const char* message = "map component");
+		//void ClearMapComponent(MapComponentSFML* component, const char* message = "map component");x
+
+		void OutputLookupTable() const;
 		
 		std::vector<TerrainType> m_terrainTypes; 
 

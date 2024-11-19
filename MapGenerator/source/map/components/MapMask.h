@@ -2,9 +2,9 @@
 #include <vector>
 #include <cassert>
 #include <string>
-#include "map/MapComponent.h"
-#include "map/MapSpecs.h"
-#include "data/Mask.h"
+#include "../MapComponent.h"
+#include "../MapSpecs.h"
+#include "../../data/Mask.h"
 namespace MapGenerator
 {
 	using namespace data;

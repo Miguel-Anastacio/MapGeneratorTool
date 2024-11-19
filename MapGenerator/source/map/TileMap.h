@@ -1,10 +1,10 @@
 #pragma once
-#include "data/Utils.h"
-#include "data/Color.h"
-#include "MyGAL/Vector2.h"
+#include "../data/Utils.h"
+#include "../data/Color.h"
+#include "../../ThirdParty/MyGAL/Vector2.h"
 #include <vector>
 #include <unordered_set>
-#include "utils/VectorWrapper.h"
+#include "../utils/VectorWrapper.h"
 #include <unordered_map>
 
 namespace MapGenerator

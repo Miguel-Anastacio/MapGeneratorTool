@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
-#include "data/Utils.h"
-#include "data/Color.h"
+#include "../data/Utils.h"
+#include "../data/Color.h"
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
-#include <MyGAL/Diagram.h>
+#include "../../thirdParty/MyGAL/Diagram.h"
 #include "MapSpecs.h"
 #include "components/HeightMap.h"
 #include "components/TerrainMap.h"
