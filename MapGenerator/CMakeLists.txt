@@ -1,5 +1,5 @@
 ﻿# App/CMakeLists.txt
-
+cmake_minimum_required(VERSION 3.28)
 # Define the MapGenerator as a library as a console application
 add_library(MapGenerator STATIC)
 
@@ -11,7 +11,12 @@ set_target_properties(MapGenerator PROPERTIES
 )
 
 # Specify the output directories for the compiled library and object files
-set(OutputDir "${CMAKE_SYSTEM_NAME}-${CMAKE_GENERATOR_PLATFORM}/$<CONFIG>")
+if(CMAKE_GENERATOR_PLATFORM)
+    set(OutputDir "${CMAKE_SYSTEM_NAME}-${CMAKE_GENERATOR_PLATFORM}/$<CONFIG>")
+else()
+    set(OutputDir "${CMAKE_SYSTEM_NAME}/$<CONFIG>")
+endif()
+
 set_target_properties(MapGenerator PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Binaries/${OutputDir}/MapGenerator"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Binaries/${OutputDir}/MapGenerator"
@@ -19,22 +24,12 @@ set_target_properties(MapGenerator PROPERTIES
     OBJECT_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Binaries/Intermediates/${OutputDir}/MapGenerator"
 )
 
-target_include_directories(MapGenerator PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+target_include_directories(MapGenerator PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 # Specify the source files
-file(GLOB_RECURSE GENERATOR_SOURCES "Source/*.cpp" "Source/*.h" "Source/*.hpp")
+file(GLOB_RECURSE GENERATOR_SOURCES "source/*.cpp" "source/*.h" "source/*.hpp")
 target_sources(MapGenerator PRIVATE ${GENERATOR_SOURCES})
-# Organize files by their folder structure in the Visual Studio solution
-source_group(TREE ${CMAKE_SOURCE_DIR}/MapGenerator/source PREFIX "Source Files" FILES ${GENERATOR_SOURCES})
 
-# link to core
-target_link_libraries(MapGenerator PRIVATE Core)
-
-# Disable static runtime linking (equivalent to `staticruntime "off"`)
-# This can be done with specific flags for MSVC
-if(MSVC)
-    target_compile_options(MapGenerator PUBLIC "/MD$<$<CONFIG:Debug>:d>")
-endif()
 
 # Platform-specific settings for Windows
 if(WIN32)

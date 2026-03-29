@@ -1,23 +1,29 @@
 #pragma once
 #include <vector>
 #include <random>
+#include <chrono>
 #include "../../ThirdParty/MyGAL/Diagram.h"
 #include "../../ThirdParty/MyGAL//FortuneAlgorithm.h"
 #include "../data/Mask.h"
 #include <cmath>
+#include <stack>
+#include <set>
+#include <iostream>
 #include "../../ThirdParty/fastNoiseLite/FastNoiseLite.h"
 #include "VectorWrapper.h"
-#include <chrono>
+#include "Logger/FileLogger.h"
+
 namespace MapGenerator
 {
-	namespace geomt
+	class geomt
 	{
+	public:
 		// ------------------------ MYGAL
 		template <typename T>
 		static std::vector<mygal::Vector2<T>> generatePoints(int nbPoints)
 		{
 			auto seed = std::chrono::system_clock::now().time_since_epoch().count();
-			std::cout << "seed: " << seed << '\n';
+			// std::cout << "seed: " << seed << '\n';
 			auto generator = std::default_random_engine(seed);
 			auto distribution = std::uniform_real_distribution<T>(0.0, 1.0);
 
@@ -30,7 +36,7 @@ namespace MapGenerator
 		template <typename T>
 		static std::vector<mygal::Vector2<T>> generatePoints(int nbPoints, int seedValue)
 		{
-			std::cout << "seed: " << seedValue << '\n';
+			// std::cout << "seed: " << seedValue << '\n';
 			auto generator = std::default_random_engine(seedValue);
 			auto distribution = std::uniform_real_distribution<T>(0.0, 1.0);
 
@@ -45,7 +51,7 @@ namespace MapGenerator
 		static std::vector<mygal::Vector2<T>> generatePointsConstrained(int nbPoints, int seedValue, bool state, const Mask &mask)
 		{
 			// Timer
-			std::cout << "seed: " << seedValue << '\n';
+			// std::cout << "seed: " << seedValue << '\n';
 			std::default_random_engine generator(seedValue);
 			std::uniform_real_distribution<T> distribution(0.0, 1.0);
 
@@ -94,14 +100,198 @@ namespace MapGenerator
 
 			return diagram;
 		}
+		// Helper: Check if point is inside face (using winding number or ray casting)
+		template <typename T>	
+		static bool isPointInFace(const mygal::Vector2<T>& point, const typename mygal::Diagram<T>::Face& face)
+		{
+			// Ray casting algorithm
+			int crossings = 0;
+			auto halfEdge = face.outerComponent;
+    
+			do {
+				mygal::Vector2<T> p1 = halfEdge->origin->point;
+				mygal::Vector2<T> p2 = halfEdge->destination->point;
+        
+				if (((p1.y <= point.y) && (point.y < p2.y)) || 
+					((p2.y <= point.y) && (point.y < p1.y))) {
+            
+					T intersectX = p1.x + (point.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y);
+					if (point.x < intersectX) {
+						crossings++;
+					}
+					}
+				halfEdge = halfEdge->next;
+			} while (halfEdge != face.outerComponent);
+    
+			return (crossings % 2) == 1;
+		}
+
+		template <typename T>	
+		static mygal::Vector2<T> FindNearestValidPoint(const mygal::Vector2<T>& point, const Mask& mask)
+		{
+			auto wid = static_cast<int>(mask.Width());
+			auto hgt = static_cast<int>(mask.Height());
+			const int x = point.x * wid;
+			const int y = point.y * hgt;
+			if(mask.isInMask(x, y))
+			{
+				return point;
+			}
+
+			if (x >= wid || x < 0 || y >= hgt || y < 0)
+			{
+				return point;
+			}
+
+			// Stack for iterative approach
+			std::stack<std::pair<int, int>> stack;
+			std::set<std::pair<int, int>> visitedPoints;
+			stack.push({x, y});
+
+			while (!stack.empty())
+			{
+				auto [cx, cy] = stack.top();
+				stack.pop();
+				visitedPoints.insert({cx, cy});
+				// Check boundary conditions again and ensure tile hasn't been visited
+				if (cx < 0 || cx >= wid || cy < 0 || cy >= hgt)
+					continue;
+				
+				if(visitedPoints.contains({cx, cy}))
+				{
+					continue;;
+				}
+
+				if(mask.isInMask(cx, cy))
+				{
+					return mygal::Vector2<T>(cx/wid, cy/hgt);
+				}
+
+				// Push neighboring tiles onto the stack
+				stack.push({cx + 1, cy});
+				stack.push({cx - 1, cy});
+				stack.push({cx, cy + 1});
+				stack.push({cx, cy - 1});
+			}
+
+			return point;
+		}
+		
+		// Helper: Extract vertices from face
+		template <typename T>	
+		static std::vector<mygal::Vector2<T>> getFaceVertices(const typename mygal::Diagram<T>::Face& face)
+		{
+		    std::vector<mygal::Vector2<T>> vertices;
+		    auto halfEdge = face.outerComponent;
+		    
+		    do {
+		        vertices.push_back(halfEdge->origin->point);
+		        halfEdge = halfEdge->next;
+		    } while (halfEdge != face.outerComponent);
+		    
+		    return vertices;
+		}
+
+		// Method 2: Grid sampling approach (simpler, less accurate)
+		template <typename T>	
+		static mygal::Vector2<T> computeGridSampledCentroid(const typename mygal::Diagram<T>::Face& face, const Mask& mask)
+		{
+			// Get bounding box of face
+			auto [minX, minY, maxX, maxY] = getFaceBounds<T>(face);
+
+			T totalWeight = 0.0;
+			bool pointInside = false;
+			mygal::Vector2<T> weightedCentroid(0, 0);
+
+			// Sample resolution - higher = more accurate but slower
+			const T sampleStep = 0.05; // Adjust based on your coordinate system
+
+			for (T y = minY; y <= maxY; y += sampleStep) {
+				for (T x = minX; x <= maxX; x += sampleStep) {
+					mygal::Vector2<T> samplePoint(x, y);
+	        
+					// Check if point is inside face AND inside mask
+					int xScaled = x * mask.Width();
+					int yScaled = y * mask.Height();
+					if (isPointInFace(samplePoint, face) && mask.isInMask(xScaled, yScaled))
+					{
+						// Weight by sample area (sampleStep^2)
+						T weight = sampleStep * sampleStep;
+						weightedCentroid += samplePoint * weight;
+						totalWeight += weight;
+						pointInside = true;
+					}
+				}
+			}
+
+			if (totalWeight > 0 && pointInside)
+			{
+				// std::cout << "Point in face and mask, weight: "<< totalWeight << std::endl;
+				return weightedCentroid / totalWeight;
+			}
+
+			// Fallback: return closest valid point to original centroid
+			auto originalCentroid = mygal::Diagram<T>::computeCentroidOfFace(face);
+			// std::cout << "Point using fallback" << std::endl;
+			return FindNearestValidPoint(originalCentroid, mask);
+		}
+		
+		// Helper: Get face bounding box
+		template <typename T>	
+		static std::tuple<T, T, T, T> getFaceBounds(const typename mygal::Diagram<T>::Face& face)
+		{
+			T minX = std::numeric_limits<T>::max();
+			T minY = std::numeric_limits<T>::max();
+			T maxX = std::numeric_limits<T>::lowest();
+			T maxY = std::numeric_limits<T>::lowest();
+    
+			auto halfEdge = face.outerComponent;
+			do {
+				const auto& point = halfEdge->origin->point;
+				minX = std::min(minX, point.x);
+				minY = std::min(minY, point.y);
+				maxX = std::max(maxX, point.x);
+				maxY = std::max(maxY, point.y);
+				halfEdge = halfEdge->next;
+			} while (halfEdge != face.outerComponent);
+    
+			return {minX, minY, maxX, maxY};
+		}
+		
+		template <typename T>	
+		static std::vector<mygal::Vector2<T>> computeMaskedLloydRelaxation(const Mask& mask, mygal::Diagram<T> &diagram)
+		{
+			auto sites = std::vector<mygal::Vector2<T>>();
+			auto faces = diagram.getFaces();
+			sites.reserve(faces.size());
+		    int index = 0;
+			for (const typename mygal::Diagram<T>::Face& face : faces)
+			{
+				mygal::Vector2<T> maskedCentroid = computeGridSampledCentroid<T>(face, mask);
+				const std::string message = "Face: " + std::to_string(index++) + " - Centroid: " + mygal::ToString(maskedCentroid);
+				LOG_DEBUG(*m_logger, message);
+				sites.push_back(maskedCentroid);
+			}
+			
+			return sites;
+		}
 
 		template <typename T>
 		static void lloydRelaxation(mygal::Diagram<T> &diagram, int iterations, const Mask &mask)
 		{
+			std::vector<mygal::Vector2<T>> centroids;
 			for (int i = 0; i < iterations; i++)
 			{
-				std::vector<mygal::Vector2<double>> centroids = diagram.computeLloydRelaxation();
+				LOG_DEBUG(*m_logger, "Masked Lloyd Relaxation: " + std::to_string(i));
+				centroids = computeMaskedLloydRelaxation<T>(mask, diagram);
 				diagram = std::move(geomt::generateDiagram(centroids));
+			}
+
+			LOG_INFO(*m_logger, "Diagram final centroids: ");
+			for(auto point : centroids)
+			{
+				const std::string message = "Centroid: " + mygal::ToString(point);
+				LOG_INFO(*m_logger, message);
 			}
 		}
 
@@ -206,5 +396,7 @@ namespace MapGenerator
 			// Step 3: Map circle noise to a fault line
 			applyNoiseToLine(circleNoise, line, cutPointIndex, noiseScale, thickness);
 		}
-	}
+
+		inline static ALogger::Logger* m_logger = nullptr;
+	};
 }
